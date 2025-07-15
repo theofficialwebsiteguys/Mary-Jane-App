@@ -17,16 +17,18 @@ export class ProductComponent implements OnInit {
 
   @Input() product: Product = {
     id: '',
-    posProductId: '',
-    id_batch: '',
-    category: 'FLOWER',
+    category: 'Flower',
     title: '',
     brand: '',
     desc: '',
     strainType: 'HYBRID',
     thc: '',
+    cbd: '',
     weight: '',
+    unit: '',
+    quantity: 0,
     price: '',
+    priceAfterTax: '',
     image: '',
   };
 
@@ -62,7 +64,7 @@ export class ProductComponent implements OnInit {
     }
     const cartItem: CartItem = { ...this.product, quantity: this.quantity };
     this.cartService.addToCart(cartItem);
-    alert('Item added to cart!');
+    // alert('Item added to cart!');
     this.accessibilityService.announce(`${this.product.title} added to your cart.`, 'polite');
   }
 

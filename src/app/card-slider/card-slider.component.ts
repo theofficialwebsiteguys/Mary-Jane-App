@@ -23,6 +23,7 @@ export class CardSliderComponent implements OnInit {
 
     this.productService.getProducts().subscribe((products) => {
       this.products = products;
+      console.log(this.products)
       this.loading = false; // Set loading to false when data is retrieved
     });
   }

@@ -18,11 +18,12 @@ export class ProductCategoryComponent implements OnInit {
     private router: Router
   ) {}
 
-  @Input() category: CategoryWithImage = { category: 'FLOWER', imageUrl: '' };
+  @Input() category: CategoryWithImage = { category: 'Flower', imageUrl: '' };
 
   ngOnInit() {}
 
   handleCategorySelect(category: ProductCategory) {
+    console.log(category)
     this.productService.updateCategory(category); // Update the selected category in the service
     this.accessibilityService.announce(
       `${category} category selected.`,

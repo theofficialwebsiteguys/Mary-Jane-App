@@ -21,7 +21,7 @@ export class ProductsService {
   private products = new BehaviorSubject<Product[]>([]);
   products$ = this.products.asObservable();
 
-  private currentCategory = new BehaviorSubject<ProductCategory>('FLOWER');
+  private currentCategory = new BehaviorSubject<ProductCategory>('Flower');
   currentCategory$ = this.currentCategory.asObservable();
 
   private currentProduct = new BehaviorSubject<Product | null>(null); // Start with null or a default Product
@@ -32,8 +32,11 @@ export class ProductsService {
   );
   currentProductFilters$ = this.currentProductFilters.asObservable();
 
+  private lastFetchedLocationId: string | null = null;
+
+
   constructor(private http: HttpClient, private route: Router) {
-    this.loadProductsFromSessionStorage();
+    // this.loadProductsFromSessionStorage();
   }
 
   private loadProductsFromSessionStorage(): void {
@@ -49,38 +52,49 @@ export class ProductsService {
     sessionStorage.setItem('products', JSON.stringify(products));
   }
 
-  fetchProducts(): Observable<Product[]> {
-    if (this.products.value.length > 0) {
-      console.log('Products already loaded from session storage.');
-      return of(this.products.value); // Return existing products as an Observable
-    }
-  
-    const options = {
-      url: `${environment.apiUrl}/products/all-products`,
-      params: { venueId: environment.venueId },
-      headers: { 'Content-Type': 'application/json' },
-    };
-  
-    return new Observable<Product[]>((observer) => {
-      CapacitorHttp.get(options)
-        .then((response) => {
-          if (response.status === 200) {
-            const sortedProducts = this.sortProducts(response.data);
-            this.products.next(sortedProducts);
-            this.saveProductsToSessionStorage(sortedProducts);
-            observer.next(sortedProducts);
-            observer.complete();
-          } else {
-            console.error('API request failed:', response);
-            observer.error(response);
-          }
-        })
-        .catch((error) => {
-          console.error('Error fetching products:', error);
-          observer.error(error);
-        });
-    });
-  }
+ fetchProducts(): Observable<Product[]> {
+  // Clear products if location has changed
+  // if (this.lastFetchedLocationId && this.lastFetchedLocationId !== location_id) {
+  //   console.log('Location changed. Clearing previous products.');
+  //   this.products.next([]);
+  //   this.saveProductsToSessionStorage([]); // optional, if you’re syncing to session storage
+  // }
+
+  // Return cached products if already loaded for the same location
+  // if (this.products.value.length > 0 && this.lastFetchedLocationId === location_id) {
+  //   console.log('Products already loaded for this location.');
+  //   return of(this.products.value);
+  // }
+
+  const options = {
+    url: `${environment.apiUrl}/dutchie/inventory`,
+    headers: {
+      'Content-Type': 'application/json',
+      'x-auth-api-key': environment.db_api_key,
+    },
+  };
+
+  return new Observable<Product[]>((observer) => {
+    CapacitorHttp.get(options)
+      .then((response) => {
+        if (response.status === 200) {
+          const sortedProducts = this.sortProducts(response.data.products);
+          this.products.next(sortedProducts);
+          this.saveProductsToSessionStorage(sortedProducts);
+          observer.next(sortedProducts);
+          observer.complete();
+        } else {
+          console.error('API request failed:', response);
+          observer.error(response);
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching products:', error);
+        observer.error(error);
+      });
+  });
+}
+
   
   getProducts(): Observable<Product[]> {
     return this.products$.pipe(
@@ -89,99 +103,13 @@ export class ProductsService {
   }
 
   private sortProducts(products: Product[]): Product[] {
-    return products.sort((a, b) => a.title.localeCompare(b.title));
-  }  
-
-  // getFilteredProducts(): Observable<Product[]> {
-  //   return this.products$.pipe(
-  //     filter((productArray) => productArray.length > 0),
-  //     map((productArray) => {
-  //       const {
-  //         sortMethod: { criterion, direction },
-  //       } = this.currentProductFilters.getValue();
-
-  
-  //       return productArray
-  //         .filter(({ category, brand, strainType, weight, thc }) => {
-  //           const {
-  //             brands,
-  //             strains,
-  //             weights,
-  //             potency: { thc: thcRange },
-  //           } = this.currentProductFilters.getValue();
-  
-  //           const isEmpty = (arr: any) => {
-  //             return arr.length < 1;
-  //           };
-  
-  //           const isInRange = (value: number, range: PotencyRange): boolean => {
-  //             const { lower, upper } = range;
-  //             return value >= lower && value <= upper;
-  //           };
-  
-  //           // Default THC to 100 if null or undefined
-  //           const defaultThc = thc ?? '100% THC';
-  
-  //           return (
-  //             category === this.currentCategory.value &&
-  //             (isEmpty(brands) || brands.includes(brand)) &&
-  //             (!strainType ||
-  //               isEmpty(strains) ||
-  //               strains.some((s) =>
-  //                 strainType.toUpperCase().split(' ').includes(s)
-  //               )) &&
-  //             (!weight || isEmpty(weights) || weights.includes(weight)) &&
-  //             (!defaultThc || isInRange(Number(defaultThc.split('%')[0]), thcRange))
-  //           );
-  //         })
-  //         .sort(
-  //           (
-  //             { price: priceA, thc: thcA, title: titleA },
-  //             { price: priceB, thc: thcB, title: titleB }
-  //           ) => {
-  //             let result = 0;
-  
-  //             // Default THC to 100 if null or undefined for sorting
-  //             const defaultThcA = thcA ?? '100';
-  //             const defaultThcB = thcB ?? '100';
-  
-  //             switch (criterion) {
-  //               case 'POPULAR': {
-  //                 break;
-  //               }
-  //               case 'PRICE': {
-  //                 if (direction === 'ASC')
-  //                   result = Number(priceA) - Number(priceB);
-  //                 else if (direction === 'DESC')
-  //                   result = Number(priceB) - Number(priceA);
-  //                 break;
-  //               }
-  //               case 'THC': {
-  //                 if (direction === 'ASC')
-  //                   result = Number(defaultThcA) - Number(defaultThcB);
-  //                 else if (direction === 'DESC')
-  //                   result = Number(defaultThcB) - Number(defaultThcA);
-  //                 break;
-  //               }
-  //               case 'ALPHABETICAL': {
-  //                 if (direction === 'ASC')
-  //                   result = titleA.localeCompare(titleB);
-  //                 else if (direction === 'DESC')
-  //                   result = titleB.localeCompare(titleA);
-  //                 break;
-  //               }
-  //               default: {
-  //                 break;
-  //               }
-  //             }
-  
-  //             return result;
-  //           }
-  //         );
-  //     }),
-  //     filter((filteredProducts) => filteredProducts.length > 0) // ✅ Ensure it only emits if there are filtered products
-  //   );
-  // }
+    const sorted = products
+      .filter(p => p && typeof p.title === 'string') // filter out invalid products
+      .sort((a, b) => a.title.localeCompare(b.title));
+    
+      console.log(sorted)
+      return sorted;
+  }
 
   getFilteredProducts(searchQuery: string = ''): Observable<Product[]> {
     return this.products$.pipe(
@@ -227,8 +155,8 @@ export class ProductsService {
                 strains.some((s) =>
                   strainType.toUpperCase().split(' ').includes(s)
                 )) &&
-              (!weight || isEmpty(weights) || weights.includes(weight)) &&
-              (!defaultThc || isInRange(Number(defaultThc.split('%')[0]), thcRange))
+              (!weight || isEmpty(weights) || weights.includes(weight)) 
+              // (!defaultThc || isInRange(Number(defaultThc.split('%')[0]), thcRange))
             );
           })
           .sort(
@@ -286,6 +214,7 @@ export class ProductsService {
             }
           );
       }),
+      tap((filteredProducts) => console.log('🟢 Filtered Products:', filteredProducts)),
       filter((filteredProducts) => filteredProducts.length > 0) // ✅ Ensure it only emits if there are filtered products
     );
   }
@@ -338,14 +267,16 @@ export class ProductsService {
 
   getCategories(): CategoryWithImage[] {
     return [
-      { category: 'FLOWER', imageUrl: 'assets/icons/flower.png' },
-      { category: 'PREROLL', imageUrl: 'assets/icons/prerolls.png' },
-      { category: 'EDIBLE', imageUrl: 'assets/icons/edibles.png' },
-      { category: 'CONCENTRATES', imageUrl: 'assets/icons/concentrates.png' },
-      { category: 'BEVERAGE', imageUrl: 'assets/icons/beverages.png' },
-      { category: 'TINCTURES', imageUrl: 'assets/icons/tinctures.png' },
-      { category: 'TOPICAL', imageUrl: 'assets/icons/topicals.png' },
-      { category: 'ACCESSORIES', imageUrl: 'assets/icons/accessories.png' },
+      { category: 'Flower', imageUrl: 'assets/icons/flower.png' },
+      { category: 'Pre-Roll', imageUrl: 'assets/icons/prerolls.png' },
+      { category: 'Edibles', imageUrl: 'assets/icons/edibles.png' },
+      { category: 'Concentrate', imageUrl: 'assets/icons/concentrates.png' },
+      { category: 'Beverages', imageUrl: 'assets/icons/beverages.png' },
+      { category: 'Tincture', imageUrl: 'assets/icons/tinctures.png' },
+      { category: 'Orals', imageUrl: 'assets/icons/orals.png' },
+      { category: 'Topical', imageUrl: 'assets/icons/topicals.png' },
+      { category: 'Accessories', imageUrl: 'assets/icons/accessories.png' },
+      // { category: 'Apparel', imageUrl: 'assets/icons/apparel.png' },
     ];
   }
 

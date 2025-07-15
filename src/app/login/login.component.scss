@@ -15,7 +15,6 @@ $spacing: 16px;
   align-items: center;
   padding: $padding;
   padding-top: calc(env(safe-area-inset-top, 20px) + 20px);
-  height: 100vh; /* Ensures full viewport height */
   overflow-y: auto; /* Allows scrolling if content overflows */
 
   /* Handle safe area insets and keyboard appearance */
@@ -27,9 +26,9 @@ $spacing: 16px;
 /* Login Container */
 .login-container {
   width: 100%;
-  max-width: 400px;
+  max-width: 500px;
   padding: $padding;
-  background-color: var(--ion-color-primary-contrast);
+  background-color: var(--ion-color-secondary);
   border-radius: $border-radius;
   box-shadow: $box-shadow;
   animation: fadeInUp 0.4s ease-in-out;
@@ -38,7 +37,7 @@ $spacing: 16px;
   flex-direction: column;
   align-items: stretch;
 
-  max-height: calc(100vh - 50px); /* Prevents overflow */
+
   overflow-y: auto; /* Allows scrolling when necessary */
   padding-bottom: 20px; /* Extra space for scrolling */
 }
@@ -56,6 +55,7 @@ $spacing: 16px;
     color: var(--ion-color-primary);
   }
 }
+
 
 /* Logo */
 .login-header-logo {
@@ -108,7 +108,7 @@ $spacing: 16px;
   margin-bottom: $spacing;
 
   a {
-    color: var(--ion-color-primary-tint);
+    color: var(--ion-color-primary);
     text-decoration: none;
     font-size: $font-size-footer-link;
     font-weight: 500;

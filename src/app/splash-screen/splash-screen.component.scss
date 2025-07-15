@@ -3,7 +3,7 @@
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  height: 80vh;
+  height: 85vh;
   width: 100%;
   padding: 20px;
   box-sizing: border-box;
@@ -14,6 +14,7 @@
     justify-content: center;
     align-items: center;
     width: 100%;
+    margin-bottom: 75px;
   }
 
   .logo {
@@ -33,7 +34,7 @@
 
     .verification-text {
       font-size: 1.2rem;
-      color: black;
+      color: rgb(0, 0, 0);
       margin-bottom: 20px;
       text-align: center;
       white-space: normal; // Allow text wrapping
@@ -50,15 +51,9 @@
         font-size: 1rem;
         font-weight: bold;
         text-transform: uppercase;
+        color: white;
       }
 
-      .yes-btn {
-        --background: #25463d;
-      }
-
-      .no-btn {
-        --background: #000000;
-      }
     }
   }
 }
@@ -107,5 +102,63 @@
         font-size: 0.9rem;
       }
     }
+  }
+}
+.location-selection {
+  text-align: center;
+  margin-top: 1.5rem;
+
+  .location-heading {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 1rem; // reduced from 1.5rem
+  }
+}
+
+.location-cards {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem; // reduced gap between cards
+}
+
+.location-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1rem 1.25rem; // slightly reduced padding
+  width: 85%;
+  max-width: 340px;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06); // slightly softer shadow
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover,
+  &:focus {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+  }
+
+  img {
+    width: 90px;
+    height: 90px;
+    object-fit: contain;
+    margin-bottom: 0.75rem; // less space under image
+    border-radius: 10px;
+    background-color: #f9f9f9;
+  }
+
+  .location-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111;
+    margin-bottom: 0.3rem; // less gap under title
+  }
+
+  .location-address {
+    font-size: 0.9rem;
+    color: #555;
+    line-height: 1.3;
   }
 }

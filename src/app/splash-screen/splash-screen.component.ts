@@ -1,6 +1,9 @@
 import { trigger, transition, style, animate, state } from '@angular/animations';
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { AccessibilityService } from '../accessibility.service';
+import { SettingsService } from '../settings.service';
+import { environment } from 'src/environments/environment';
+import { ProductsService } from '../products.service';
 
 @Component({
   selector: 'app-splash-screen',
@@ -33,7 +36,11 @@ export class SplashScreenComponent implements OnInit {
   splashVisibility = 'visible';
   logoSrc = 'assets/logo.png';
 
-  constructor(private accessibilityService: AccessibilityService) {}
+  selectedAgeConfirmed: boolean = false;
+  locations: any[] = []; // Populate this with your fetched venue data
+
+
+  constructor(private accessibilityService: AccessibilityService, private settingsService: SettingsService, private productsService: ProductsService) {}
   
   ngOnInit() {
     const isDarkMode = document.body.classList.contains('dark-mode');
@@ -51,16 +58,61 @@ export class SplashScreenComponent implements OnInit {
   }
 
   onYesClick() {
-    this.splashVisibility = 'hidden';
+    this.selectedAgeConfirmed = true;
     this.showAgeVerification = false;
-    this.accessibilityService.announce('Thank you for confirming your age. Entering the app.', 'polite');
     setTimeout(() => {
       this.closeSplash.emit();
     }, 100);
+    // this.accessibilityService.announce('Thank you for confirming your age. Entering the app.', 'polite');
+    // setTimeout(() => {
+    //   this.closeSplash.emit();
+    // }, 100);
   }
 
   onNoClick() {
     this.accessibilityService.announce('Access denied. You must be over 21 to enter.', 'assertive');
     alert('Sorry, you must be over 21 to enter.');
   }
+
+  // loadLocations() {
+  //   this.settingsService.getAlpineVenues().then((data) => {
+  //     console.log(data)
+  //     this.locations = data;
+  //   }).catch((err) => {
+  //     console.error('Failed to load locations', err);
+  //   });
+  // }
+
+  // selectLocation(venue: any) {
+  //   this.settingsService.setSelectedVenueId(venue.id);
+  //   const location_key = this.settingsService.getSelectedVenueKey();
+  //   // Map venue key to flowhub location ID
+  //   let locationId = '';
+  //   switch (location_key) {
+  //     case 'ROCHESTER':
+  //       locationId = environment.flowhub_location_rochester;
+  //       console.log(locationId)
+  //       break;
+  //     case 'CANANDAIGUA':
+  //       locationId = environment.flowhub_location_canandaigua;
+  //       break;
+  //     default:
+  //       console.warn('Unknown venue selected, using default location ID.');
+  //   }
+  //    this.productsService.fetchProducts(locationId).subscribe({
+  //     next: () => {
+  //       console.log("Products fetched successfully.");
+  
+
+  //     },
+  //     error: (error) => {
+  //       console.error("Error fetching products:", error);
+  //     }
+  //   });
+  //   this.accessibilityService.announce('Thank you for confirming your age. Entering the app.', 'polite');
+  //   setTimeout(() => {
+  //     this.closeSplash.emit();
+  //   }, 100);
+  // }
+
 }

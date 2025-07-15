@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { Observable } from 'rxjs';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-tabs',
@@ -6,7 +8,9 @@ import { Component } from '@angular/core';
   styleUrls: ['tabs.page.scss']
 })
 export class TabsPage {
+  isLoggedIn$: Observable<boolean>;
 
-  constructor() {}
-
+  constructor(private authService: AuthService) {
+    this.isLoggedIn$ = this.authService.isLoggedIn();
+  }
 }

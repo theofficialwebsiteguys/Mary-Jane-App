@@ -1,7 +1,7 @@
 <div class="points-container" aria-labelledby="points-heading">
   <div class="points-header">
     <h2 id="points-heading" class="sr-only">Your Points and Membership Status</h2>
-    <span class="points-value" aria-live="polite">{{ points }} pts</span>
+    <span class="points-value" aria-live="polite">{{ points || 0 }} pts</span>
     <p class="membership-status" aria-live="polite">
       {{ isExclusiveMember ? "Exclusive Member: $1 = 1 Point" : "Free Member: $1 = 1 Point" }}
     </p>
@@ -16,19 +16,4 @@
   <div class="progress-steps" aria-label="Reward milestones">
     <span *ngFor="let step of progressSteps">{{ step }}</span>
   </div>
-
-  <!-- <div class="rewards-details" *ngIf="!isExclusiveMember">
-   <div class="reward-item">
-      <ion-icon name="medal-outline"></ion-icon>
-      <div class="reward-header">$99 Annual fee (sign up in-store)</div>
-      <h3>Platinum Tier</h3>
-      <ul class="reward-list">
-        <li>200 bonus points upon joining</li>
-        <li>10% off all in-store purchases of $100+ (pre-tax)</li>
-        <li>Choose any item on the menu for 50% off once every quarter</li>
-        <li>Access to exclusive Flower Power promotions and events</li>
-        <li>Be the first to know about new product drops and restocks on your favorites</li>
-      </ul>
-    </div>
-  </div> -->
 </div>

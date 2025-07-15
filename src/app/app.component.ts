@@ -17,6 +17,7 @@ import { Router } from '@angular/router';
 import { GeolocationService } from './geolocation.service';
 import { ModalController } from '@ionic/angular';
 import { RestrictedComponent } from './restricted/restricted.component';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -49,7 +50,8 @@ export class AppComponent {
     private fcmService: FcmService,
     private router: Router,
     private geoLocationService: GeolocationService,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private productsService: ProductsService
   ) {
     // Listen for app URL open events
     App.addListener('appUrlOpen', (data: any) => {
@@ -70,20 +72,25 @@ export class AppComponent {
   }
 
   ngOnInit() {
-    this.checkGeoLocation();
+    //this.checkGeoLocation();
+    this.initializeApp();
   }
   
   initializeApp() {
     this.authService.validateSession();
     this.settingsService.updateTheme();
+    // this.settingsService.getAlpineVenues();
+
   
     // Only check login after products are fetched
     this.authService.isLoggedIn().subscribe((status) => {
       this.isLoggedIn = status;
       if (this.isLoggedIn) this.onCloseSplash();
     });
+
+
             
-    this.productService.fetchProducts().subscribe({
+    this.productsService.fetchProducts().subscribe({
       next: () => {
         console.log("Products fetched successfully.");
   

@@ -1,13 +1,16 @@
 export type ProductCategory =
-  | 'FLOWER'
-  | 'PREROLL'
-  | 'VAPORIZERS'
-  | 'CONCENTRATES'
-  | 'BEVERAGE'
-  | 'TINCTURES'
-  | 'EDIBLE'
-  | 'TOPICAL'
-  | 'ACCESSORIES';
+  | 'Flower'
+  | 'Pre-Roll'
+  | 'Vape'
+  | 'Concentrate'
+  | 'Beverages'
+  | 'Tincture'
+  | 'Orals'
+  | 'Edibles'
+  | 'Topical'
+  | 'Accessories';
+  // | 'Apparel';
+
 
   export interface CategoryWithImage {
     category: ProductCategory;

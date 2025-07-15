@@ -104,38 +104,3 @@
   clip: rect(0, 0, 0, 0);
   border: 0;
 }
-
-.cannabis-disclaimer {
-  margin: auto;
-  background: #ffeb3b; /* Yellow background for attention */
-  padding: 15px;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  text-align: center;
-  margin-top: 20px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-  max-width: 90%;
-}
-
-.cannabis-disclaimer p {
-  background-color: transparent;
-  color: black;
-  margin: 5px 0;
-  line-height: 1.5;
-}
-
-.cannabis-disclaimer strong {
-  color: #d32f2f; /* Red for important warnings */
-  background-color: transparent;
-}
-
-.cannabis-disclaimer a {
-  color: #007aff; /* Blue for links */
-  background-color: transparent;
-  text-decoration: none;
-  font-weight: bold;
-}
-
-.cannabis-disclaimer a:hover {
-  text-decoration: underline;
-}

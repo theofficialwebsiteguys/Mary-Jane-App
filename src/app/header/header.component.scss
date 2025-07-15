@@ -1,5 +1,5 @@
 img {
-  height: 55px;
+  height: 75px;
 }
 
 /* Cart Button */
@@ -21,8 +21,8 @@ img {
   position: absolute;
   top: -4px;
   right: -6px;
-  background: var(--ion-color-secondary);
-  color: #fff;
+  background-color: var(--ion-color-secondary-contrast);
+  color: #ffffff;
   font-size: 10px;
   font-weight: bold;
   padding: 2px 6px;
@@ -38,6 +38,8 @@ img {
 .action-button {
   position: relative; /* Ensure the badge positions correctly */
   padding: 10px; /* Extra space around the button */
+  font-size: 16px;
+  font-weight: bold;
 }
 
 .action-button {
@@ -61,12 +63,14 @@ img {
   position: sticky;
   top: 0;
   z-index: 1; /* Increase above carousel */
-  background: #fff;
-  padding: calc(5px + env(safe-area-inset-top)) 5px 5px 5px;
+  background: #dddddd;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  color: var(--ion-color-primary);
 }
 
-
+ion-toolbar.heading-container {
+  --background: var(--ion-color-primary-contrast); // or any custom variable you define
+}
 
 /* Cart Icon */
 ion-icon[name="cart-outline"] {
@@ -126,7 +130,7 @@ ion-icon[name="cart-outline"] {
 /* Styling for the Clear All Button */
 .clear-all-button {
   margin: 0;
-  color: #fff;
+  // color: #fff;
   font-weight: bold;
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);

@@ -19,13 +19,14 @@ export class ProductListComponent implements OnInit {
 
   constructor(private productService: ProductsService, private accessibilityService: AccessibilityService) {}
 
-  currentCategory: ProductCategory = 'PREROLL';
+  currentCategory: ProductCategory = 'Pre-Roll';
   products$: Observable<Product[]> = of([]);
 
   ngOnInit() {
     this.updateProducts();
 
     this.productService.currentCategory$.subscribe((category) => {
+      console.log(category)
       this.currentCategory = category; 
       this.updateProducts();
       this.accessibilityService.announce(`Category updated to ${category}.`, 'polite');
@@ -54,6 +55,9 @@ export class ProductListComponent implements OnInit {
       this.products$ = this.productService.getSimilarItems().pipe(startWith([]));
     } else {
       this.products$ = this.productService.getFilteredProducts(this.searchQuery).pipe(startWith([]));
+      this.products$.subscribe((products) => {
+        console.log('Filtered Products:', products); // <-- This will print the products array
+      });
     }
   }
 

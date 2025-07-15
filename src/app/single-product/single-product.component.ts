@@ -18,18 +18,18 @@ import { AccessibilityService } from '../accessibility.service';
 export class SingleProductComponent implements OnInit {
   currentProduct: Product = {
     id: '',
-    posProductId: '',
-    id_batch: '',
-    category: 'FLOWER',
+    category: 'Flower',
     title: '',
     brand: '',
     desc: '',
     strainType: 'HYBRID',
     thc: '',
+    cbd: '',
     weight: '',
     price: '',
     quantity: 0,
     image: '',
+    unit: ''
   };
 
   showFullDescription = false;
@@ -107,9 +107,9 @@ export class SingleProductComponent implements OnInit {
       quantity: this.quantity,
     };
   
-    this.cartService.addToCart(cartItem); 
+   this.cartService.addToCart(cartItem); 
     this.accessibilityService.announce(`${this.currentProduct.title} added to cart. Quantity: ${this.quantity}.`, 'assertive');
-    alert('Item added to cart!');
+    // alert('Item added to cart!');
   }
   
   getProductImage(product: any): string {

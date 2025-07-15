@@ -1,30 +1,39 @@
 .product-detail {
   width: 100%;
   margin: 0 auto;
-  font-family: Arial, sans-serif;
-  color: #333;
-  padding: 16px;
-  border-radius: 12px;
+  font-family: 'Inter', sans-serif;
+  color: #2f2f2f;
+  padding: 20px;
+  border-radius: 2px;
   background-color: #ffffff;
+  box-shadow: none;
 }
 
 .back-button {
-  cursor: pointer;
-  font-size: 1.2em;
-  color: var(--ion-color-primary-tint);
   display: flex;
-}
+  align-items: center;
+  font-size: 1.2rem;
+  color: #777;
+  cursor: pointer;
+  padding: 8px 0;
 
-.back-button ion-icon {
-  margin-right: 8px;
+  ion-icon {
+    margin-right: 8px;
+    font-size: 1.4rem;
+  }
+
+  &:hover {
+    color: #4a4a4a;
+  }
 }
 
 .image-container {
   width: 100%;
-  padding-top: 100%; /* 1:1 Aspect Ratio for square images */
+  padding-top: 100%;
   position: relative;
-  background-color: #f5f5f5;
-  border-radius: 10px;
+  background-color: #f7f7f7;
+  border: 1px solid #e5e5e5;
+  border-radius: 2px;
   overflow: hidden;
 }
 
@@ -38,133 +47,115 @@
 }
 
 .product-info {
-  padding: 15px 0;
+  padding: 16px 0;
   text-align: left;
-}
 
-.brand {
-  font-size: 0.9em;
-  color: #888;
-  margin-bottom: 4px;
-}
+  .brand {
+    font-size: 0.8rem;
+    color: #999;
+    margin-bottom: 4px;
+    letter-spacing: 0.3px;
+  }
 
-.title {
-  font-size: 1.3em;
-  font-weight: bold;
-  margin: 5px 0;
-  color: #333;
-}
+  .title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 6px;
+  }
 
-.price {
-  font-size: 1.2em;
-  font-weight: bold;
-  color: var(--ion-color-primary);
-  margin: 8px 0;
-}
+  .price {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #4a7047;
+    margin-bottom: 6px;
+  }
 
-.strain {
-  font-size: 0.9em;
-  color: #555;
-  margin-top: 10px;
-  text-transform: capitalize;
-}
+  .strain {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 6px;
+    text-transform: capitalize;
+  }
 
-.description {
-  font-size: 1em;
-  color: #666;
-  line-height: 1.5;
-  margin: 10px 0;
-}
+  .description {
+    font-size: 0.9rem;
+    color: #555;
+    line-height: 1.5;
+    margin: 12px 0;
+  }
 
-.see-more {
-  color: var(--ion-color-primary-tint);
-  cursor: pointer;
-  font-weight: bold;
-  text-decoration: none;
-}
+  .see-more {
+    display: inline-block;
+    margin-top: 6px;
+    font-weight: 500;
+    font-size: 0.85rem;
+    color: #6c8a67;
+    cursor: pointer;
 
-.see-more:hover {
-  text-decoration: underline;
-}
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 
-.weight {
-  font-size: 0.9em;
-  color: #666;
-  display: block;
-  margin-top: 8px;
-}
-
-/* App-specific styles for touch friendliness */
-button,
-.back-button {
-  padding: 10px;
-  border: none;
-  background: transparent;
-  color: #000000;
-  font-size: 1em;
-  display: flex;
-  cursor: pointer;
-  transition: color 0.3s;
-  font-size: 1.6em;
-}
-
-button:hover,
-.back-button:hover {
-  color: var(--ion-color-primary-shade);
+  .weight {
+    display: inline-block;
+    font-size: 0.85rem;
+    margin-top: 6px;
+    color: #777;
+  }
 }
 
 .quantity-counter {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 16px 0;
-
-  button,
-  span {
-    font-size: 20px;
-  }
+  margin: 18px 0;
 
   button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 32px;
-    height: 32px;
-    color: var(--ion-color-dark);
-    background-color: #ddd;
-    border: none;
-    padding: 8px 12px;
+    width: 28px;
+    height: 28px;
+    background: #efefef;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    font-size: 18px;
+    color: #333;
     cursor: pointer;
-    border-radius: 4px;
 
     &:hover {
-      background-color: #ccc;
+      background-color: #e3e3e3;
     }
   }
 
   span {
-    min-width: 24px;
+    font-size: 16px;
+    font-weight: 500;
     margin: 0 12px;
-    font-weight: bold;
-    text-align: center;
+    color: #222;
   }
 }
 
 ion-button {
-  margin-top: 16px;
+  --border-radius: 2px;
+  --background: #4a7047;
+  --color: #fff;
+  height: 42px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-top: 12px;
+
+  &:hover {
+    --background: #3c5d38;
+  }
 }
 
 .custom-toast {
-  --background: #333333; /* Dark grey background */
-  --color: #ffffff; /* Ensure text color is white */
-  font-family: 'Arial', sans-serif;
-  font-size: 1.2rem; /* Slightly larger font size */
-  padding: 16px 24px; /* More padding for a bigger appearance */
-  border-radius: 12px; /* Rounded corners */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Subtle shadow for depth */
-  margin: 0 16px; /* Add horizontal margin for spacing */
-  max-width: calc(100% - 32px); /* Ensure it fits on small screens */
-  position: relative;
-  margin-bottom: 50px;
-  color: var(--color); /* Explicitly apply the white color */
+  --background: #333;
+  --color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  padding: 14px 20px;
+  border-radius: 2px;
+  box-shadow: none;
+  margin: 0 16px 50px;
 }

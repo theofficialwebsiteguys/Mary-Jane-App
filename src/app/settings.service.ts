@@ -15,6 +15,12 @@ export class SettingsService {
 
   isLoggedIn: boolean = false;
 
+  private venuesSubject = new BehaviorSubject<any[]>([]);
+  venues$ = this.venuesSubject.asObservable();
+
+  private selectedVenueIdSubject = new BehaviorSubject<string | null>(null);
+  selectedVenueId$ = this.selectedVenueIdSubject.asObservable();
+
   constructor(
     @Inject(DOCUMENT) private document: Document,
     private authService: AuthService,
@@ -27,6 +33,67 @@ export class SettingsService {
     });
   }
 
+
+  async getAlpineVenues(): Promise<any[]> {
+    const options = {
+      url: `${environment.apiUrl}/alpine/venues?venue_id=54b6dd7c6a45d7ce`,
+      method: 'GET',
+      headers: { 
+        'x-auth-api-key': environment.db_api_key,
+        'Content-Type': 'application/json'
+      },
+    };
+
+    try {
+      const response = await CapacitorHttp.request(options);
+      const venues = response.data
+       .filter((venue: any) => !venue.name.includes('Astoria')) 
+       .map((venue: any) => {
+        let key = 'UNKNOWN';
+
+        if (venue.name.includes('Rochester')) key = 'ROCHESTER';
+        else if (venue.name.includes('CANANDAIGUA')) key = 'CANANDAIGUA';
+
+        return {
+          ...venue,
+          key,
+        };
+      });
+
+      this.venuesSubject.next(venues);
+      return venues;
+    } catch (error) {
+      console.error('Error fetching venues from backend:', error);
+      throw error;
+    }
+  }
+
+  setSelectedVenueId(id: string): void {
+    this.selectedVenueIdSubject.next(id);
+    localStorage.setItem('selectedVenueId', id);
+  }
+
+  getSelectedVenueKey(): string | null {
+    const venueId = this.getSelectedVenueId();
+    const venues = this.venuesSubject.value;
+
+    const selectedVenue = venues.find(v => v.id === venueId);
+    return selectedVenue?.key ?? null;
+  }
+
+
+  getSelectedVenueId(): string | null {
+    const id = this.selectedVenueIdSubject.value;
+    if (id) return id;
+
+    const saved = localStorage.getItem('selectedVenueId');
+    if (saved) {
+      this.selectedVenueIdSubject.next(saved);
+      return saved;
+    }
+
+    return null;
+  }
   
   private getHeaders(): { [key: string]: string } {
     const sessionData = localStorage.getItem('sessionData');

@@ -3,12 +3,12 @@
   class="container-category"
   [class.selected]="isSelectedCategory(category.category)"
   (click)="handleCategorySelect(category.category)"
-  [attr.aria-label]="'Select ' + (category.category === 'PREROLL' ? 'Pre Rolls' : category.category.toLowerCase()) + ' category'"
+  [attr.aria-label]="'Select ' + (category.category === 'Pre-Roll' ? 'Pre Rolls' : category.category.toLowerCase()) + ' category'"
 >
   <div class="icon-wrapper">
     <img [src]="category.imageUrl" [alt]="category.category + ' icon'" />
     <p class="category-title">
-      {{ category.category === 'PREROLL' ? 'Pre Rolls' : category.category.toLowerCase() }}
+      {{ category.category === 'Pre-Roll' ? 'Pre Rolls' : category.category.toLowerCase() }}
     </p>
   </div>
 </button>

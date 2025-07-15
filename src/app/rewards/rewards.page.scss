@@ -30,3 +30,38 @@
     display: block;
     margin-bottom: 50px;
   }
+  
+.cannabis-disclaimer {
+  margin: 24px auto;
+  background: #f7f6f2; /* Soft cream or light sage */
+  padding: 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  text-align: left;
+  max-width: 720px;
+  color: #333;
+  box-shadow: none;
+}
+
+.cannabis-disclaimer p {
+  margin: 6px 0;
+  line-height: 1.6;
+  color: #444;
+}
+
+.cannabis-disclaimer strong {
+  color: #6a4e4e; /* Muted burgundy tone for emphasis */
+  font-weight: 600;
+}
+
+.cannabis-disclaimer a {
+  color: #4c6a92; /* Muted navy/indigo */
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.cannabis-disclaimer a:hover {
+  text-decoration: underline;
+  color: #2f4a6d;
+}

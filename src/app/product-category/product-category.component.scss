@@ -16,7 +16,7 @@
 
 /* Selected State */
 .container-category.selected {
-  background-color: rgba(var(--ion-color-primary-rgb), 0.2); /* Subtle highlight on hover */
+  background-color: rgba(var(--ion-color-primary-contrast-rgb), 0.2); /* Subtle highlight on hover */
   border-radius: 12px; /* Match button's rounded corners */
 }
 
@@ -51,8 +51,8 @@
   border-radius: 50%;
   background: radial-gradient(
     circle,
-    rgba(var(--ion-color-primary-rgb), 0.6) 0%,  /* Softer start */
-    rgba(var(--ion-color-primary-rgb), 0) 70%    /* Fades out smoothly */
+    rgba(var(--ion-color-secondary-rgb), 0.6) 0%,  /* Softer start */
+    rgba(var(--ion-color-secondary-rgb), 0) 70%    /* Fades out smoothly */
   );
   transition: transform 0.3s ease, opacity 0.3s ease;
 }

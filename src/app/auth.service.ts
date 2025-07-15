@@ -61,13 +61,19 @@ export class AuthService {
   }
 
   register(userData: any): Observable<any> {
-    const defaultValues = { points: 0, business_id: 1 };
-    const payload = { ...userData, ...defaultValues };
+    // const defaultValues = { points: 0, business_id: 100 };
+
+    const payload = {
+      ...userData
+    };
 
     return new Observable((observer) => {
       CapacitorHttp.post({
         url: `${this.apiUrl}/register`,
-        headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'x-auth-api-key': environment.db_api_key,
+        'Content-Type': 'application/json'  // ✅ Ensure correct content type
+        },
         data: payload,
       })
         .then((response) => {
@@ -77,6 +83,7 @@ export class AuthService {
           }).subscribe();
           observer.next(response.data);
           observer.complete();
+          console.log(response)
         })
         .catch((error) => observer.error(error));
     });
@@ -84,15 +91,16 @@ export class AuthService {
 
   login(credentials: { email: string; password: string }): Observable<any> {
     const payload = {
-      ...credentials,
-      businessId: '1',
-      businessName: 'Flower Power Dispensers',
+      ...credentials
     };
 
     return new Observable((observer) => {
       CapacitorHttp.post({
         url: `${this.apiUrl}/login`,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'x-auth-api-key': environment.db_api_key,
+          'Content-Type': 'application/json'  // ✅ Ensure correct content type
+        },
         data: payload,
       })
         .then((response) => {
@@ -114,7 +122,6 @@ export class AuthService {
         .catch((error) => observer.error(error));
     });
   }
-
 
   logout(): void {
     const headers = this.getHeaders();
@@ -309,10 +316,10 @@ export class AuthService {
       const enrichedOrders = orders.map((order) => ({
         ...order,
         items: Object.entries(order.items)
-          .map(([posProductId, quantity]) => {
-            const product = products.find((p) => p.posProductId == posProductId);
-            return product ? { ...product, quantity } : null;
-          })
+          // .map(([posProductId, quantity]) => {
+          //   const product = products.find((p) => p.posProductId == posProductId);
+          //   return product ? { ...product, quantity } : null;
+          // })
           .filter((item) => item !== null),
       }));
       this.enrichedOrders.next(enrichedOrders);

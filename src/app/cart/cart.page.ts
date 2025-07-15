@@ -70,7 +70,6 @@ export class CartPage {
     );
     console.log("redirecting")
     this.redirectToCart();
-    //await this.presentToast('Your order has been placed successfully!');
   }
 
   ionViewDidEnter(): void {

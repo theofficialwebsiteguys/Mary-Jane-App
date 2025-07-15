@@ -24,15 +24,14 @@
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 80px;
-  padding: 10px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.5));
+  height: 84px;
+  padding: 10px 8px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.3));
   color: var(--ion-color-light);
-  text-align: center;
 }
 
 .card-details .product-title {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   margin: 0;
 }
@@ -46,16 +45,24 @@
 
 .category-section {
   padding: 20px 24px 16px;
+  margin: 10px;
+  border-radius: 10px;
 
   &:first-child {
     padding-top: 0; /* Removes top padding only for the first section */
   }
 
   &:nth-child(even) {
-    background-color: rgba(var(--ion-color-secondary-rgb), 0.7) !important;
+    background-color: rgba(var(--ion-color-primary-rgb)) !important;
+      .section-header h2, ion-icon{
+      color: white !important;
+    }
   }
   &:nth-child(4n-2) {
-    background-color: rgba(var(--ion-color-primary-rgb), 0.6) !important;
+    background-color: rgba(var(--ion-color-primary-contrast-rgb)) !important;
+    .section-header h2, ion-icon{
+      color: white !important;
+    }
   }
 }
 
@@ -92,7 +99,7 @@
   width: 100%;
   height: 100%;
   background-color: #fff;
-  border-radius: 15px; /* Slightly more rounded corners */
+  border-radius: 8px; /* Slightly more rounded corners */
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.1); /* Enhanced shadow for depth */
   overflow: hidden;
   position: relative;
@@ -110,11 +117,30 @@
   color: black;
 }
 
+
+
+.product-brand,
 .product-title {
-  text-align: left;
+  font-size: 13px;
+  font-weight: 500;
+  margin: 0;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: white;
+}
+
+.product-title {
+  font-weight: 600;
+  margin-top: 2px;
 }
 
 .product-price {
+  margin-top: auto;
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--ion-color-secondary);
   text-align: right;
 }
 

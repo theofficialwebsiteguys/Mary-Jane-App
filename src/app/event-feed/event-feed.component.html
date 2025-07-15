@@ -1,0 +1,33 @@
+<ion-card
+  class="feed-card"
+  [ngClass]="{ 'rsvp-card': item.type === 'rsvp' }"
+  *ngFor="let item of feed"
+>
+  <!-- Shared Header -->
+  <ion-item lines="none">
+    <ion-avatar slot="start">
+      <img [src]="item.user.avatar" />
+    </ion-avatar>
+    <ion-label>
+      <h3>{{ item.user.name }}</h3>
+      <p class="timestamp">{{ item.date | date: 'short' }}</p>
+    </ion-label>
+  </ion-item>
+
+  <!-- RSVP Card Content -->
+  <ion-card-content *ngIf="item.type === 'rsvp'">
+    <p>
+      <strong>{{ item.user.name }}</strong>
+      is attending <strong>{{ item.event }}</strong> 🎉
+    </p>
+  </ion-card-content>
+
+  <!-- Comment Card Content -->
+  <ion-card-content *ngIf="item.type === 'comment'">
+    <p>{{ item.content }}</p>
+    <ion-item lines="none" class="reply-box">
+      <ion-input placeholder="Reply..." class="reply-input"></ion-input>
+      <ion-button fill="clear" size="small">Send</ion-button>
+    </ion-item>
+  </ion-card-content>
+</ion-card>

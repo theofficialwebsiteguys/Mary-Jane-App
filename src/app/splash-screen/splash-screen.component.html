@@ -1,8 +1,9 @@
 <div class="splash-container" [@fadeOut] *ngIf="splashVisibility === 'visible'" role="dialog" aria-labelledby="splash-logo" aria-modal="true">
-  <div class="logo-container">
+  <div  *ngIf="showAgeVerification" class="logo-container">
     <img [src]="logoSrc" [@logoAnimation]="logoState" class="logo" alt="App Logo" id="splash-logo" />
   </div>
 
+  <!-- Age Verification -->
   <div *ngIf="showAgeVerification" @fadeIn class="age-verification" role="alertdialog" aria-labelledby="age-verification-heading" aria-describedby="age-verification-description">
     <p class="verification-text">Are you 21 years old or older?</p>
     <div class="button-group">
@@ -24,4 +25,24 @@
       </ion-button>
     </div>
   </div>
+
+
+  <!-- <div *ngIf="selectedAgeConfirmed && locations.length > 0" class="location-selection" @fadeIn role="region" aria-label="Select your location">
+    <h2 class="location-heading">Choose Your Store</h2>
+    <div class="location-cards">
+      <div
+        class="location-card"
+        *ngFor="let location of locations"
+        (click)="selectLocation(location)"
+        tabindex="0"
+        role="button"
+        [attr.aria-label]="'Select ' + location.name"
+      >
+        <img [src]="location.logo" alt="">
+        <h3 class="location-name">{{ location.name }}</h3>
+        <p class="location-address">{{ location.addressFormatted }}</p>
+      </div>
+    </div>
+  </div> -->
+
 </div>

@@ -3,7 +3,7 @@
     <div class="section-header">
       <a (click)="updateCategory(category.category)" class="view-all" role="button"
         [attr.aria-label]="'View all products in ' + category.category">
-        <h2>{{ category.category === "PREROLL" ? "Pre Rolls" : category.category.toLowerCase() }}</h2>
+        <h2>{{ category.category === "Pre-Roll" ? "Pre Rolls" : category.category.toLowerCase() }}</h2>
         <ion-icon name="arrow-forward-outline" class="arrow-icon" aria-hidden="true"></ion-icon>
       </a>
     </div>
@@ -21,10 +21,15 @@
               <div class="image-container">
                 <img [src]="getProductImage(product)" [alt]="product.title + ' image'" />
                 <div class="card-details">
-                  <p class="product-title">
-                    {{ product.title | slice:0:35 }}{{ product.title.length > 35 ? '...' : '' }}
+                  <p class="product-brand" title="{{ product.brand }}">
+                    {{ product.brand | slice:0:25 }}{{ product.brand.length > 25 ? '…' : '' }}
                   </p>
-                  <p class="product-price">{{ product.price | currency }}</p>
+                  <p class="product-title" title="{{ product.title }}">
+                    {{ product.title | slice:0:30 }}{{ product.title.length > 30 ? '…' : '' }}
+                  </p>
+                  <p class="product-price">
+                    {{ product.price | currency }}
+                  </p>
                 </div>
               </div>
             </div>

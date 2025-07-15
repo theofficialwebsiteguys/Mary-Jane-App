@@ -2,10 +2,15 @@ ion-fab {
     margin-bottom: 20%;
   }
   
+  .custom-chat-button {
+    --background: var(--ion-color-secondary-contrast);  // your custom mint green
+    --color: #ffffff;       // icon color
+  }
+
   ion-card {
     background-color: white;
   }
-  
+
   .chat-form {
     position: fixed;
     bottom: 120px; // Default position

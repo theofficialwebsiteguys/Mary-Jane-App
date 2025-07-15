@@ -1,49 +1,43 @@
 .checkout-container {
-  padding: 25px;
-  margin-bottom: 50px;
+  padding: 24px;
+  margin-bottom: 80px;
+  font-family: 'Inter', sans-serif;
+  background: #ffffff;
+  color: #333;
 
   .header {
     display: flex;
     align-items: center;
-    justify-content: space-between; 
-    padding: 12px 16px;
-    margin-bottom: 16px; 
+    justify-content: space-between;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e3e3e3;
 
     .back-button {
-      display: flex;
-      align-items: center;
+      font-size: 1rem;
+      color: #666;
       cursor: pointer;
-      font-size: 1.2rem;
-      color: #333; 
-      transition: color 0.2s ease-in-out;
-
       ion-icon {
-        font-size: 1.5rem;
-      }
-
-      &:hover {
-        color: #4caf50;
+        font-size: 1.2rem;
       }
     }
 
     h1 {
-      flex: 1;
-      text-align: center;
-      font-size: 2rem;
-      font-weight: bold;
-      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 500;
+      margin: 0 auto;
+      color: #444;
     }
   }
 
   .section {
-    margin-bottom: 24px;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 16px;
+    margin-top: 32px;
+    z-index: 0;
 
     h2 {
-      font-size: 1.4rem;
-      font-weight: bold;
+      font-size: 1.1rem;
+      font-weight: 500;
       margin-bottom: 16px;
+      color: #555;
     }
 
     .input-row {
@@ -52,256 +46,158 @@
     }
 
     .rounded-input {
-      border-radius: 8px;
-      --padding-start: 12px;
+      border-radius: 2px;
+      border: 1px solid #ddd;
+      background-color: #fafafa;
+      --padding-start: 10px;
       margin-bottom: 16px;
       z-index: 0;
     }
 
-    .radio-item {
-      display: flex;
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      margin: 12px 0;
-      margin-bottom: 8px;
-      align-items: flex-start;
+    .readonly-input {
+      background: #f5f5f5;
+      color: #777;
       z-index: 0;
-    
-      ion-label {
-        margin-left: 8px;
-        font-weight: bold;
-      }
-    
-      ion-radio {
-        --size: 24px;
-      }
     }
-  }
 
-  .aeropay-label {
-    display: flex;
-    flex-direction: column; 
-    align-items: flex-start;
-  }
-  
-  #aeropay-button-container {
-    margin-top: 10px; 
-  }
-  
-  .summary {
-    p {
-      display: flex;
-      justify-content: space-between;
-      font-size: 1rem;
-      margin-bottom: 8px;
-
-      span {
-        font-weight: bold;
-      }
-    }
-  }
-}
-
-.selected-bank {
-  background: rgba(0, 128, 0, 0.1);
-  border-left: 4px solid green;
-  transition: background 0.3s ease, border-left 0.3s ease;
-}
-
-.sticky-footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 60px;
-  color: #ffffff;
-  font-size: 1.2rem;
-  font-weight: bold;
-  display: flex;
-  justify-content: space-between; 
-  align-items: center;
-  margin: 0;
-  border: none;
-  --border-radius: 0px; 
-  z-index: 1000;
-}
-
-.footer-content {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.footer-content span {
-  flex: 1;
-  text-align: center; 
-}
-
-
-
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.date-time-container {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-
-  .date-picker-container {
-    position: relative;
-    flex: 1;
-    z-index: 0; 
-    .tooltip-calendar {
-      position: absolute;
-      top: 50px;
-      left: 0;
-      z-index: 1050; 
-      background: #ffffff;
-      border: 1px solid #d1d1d1;
-      border-radius: 8px;
-      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-      padding: 8px;
-      width: 300px; 
-    }
-    
-  }  
-
-  .enhanced-box {
-    border-radius: 8px;
-    padding: 12px;
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-
-    &:hover {
-      transform: translateY(-2px);
-    }
-  }
-
-  ion-item {
-    border-radius: 8px;
-    --padding-start: 12px;
-    font-size: 1rem;
-  }
-}
-
-.premium-banner {
-  background-color: #e0ffe6;
-  color: #007f3d;
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  text-align: center;
-}
-
-
-.aeropay-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-top: 16px;
-}
-
-.aeropay-banks{
-  width: 100%;
-}
-
-.aeropay-image{
-  max-width: 60%;
-  margin-top: 5px;
-}
-
-.loading-container{
-  display: flex;
-  margin-top: 20px;
-}
-
-#widget {
-  margin-top: 20px;
-}
-
-
-ion-radio::part(container) {
-  -webkit-appearance: none;
-  appearance: none;
-  display: inline-flex;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: 2px solid #ccc;
-  background-color: #fff;
-}
-
-.cart-items {
-  margin-top: 20px;
-
-  ul {
-    list-style: none;
-    padding: 0;
-
-    .order-item {
+    .radio-item {
+      padding: 10px 14px;
+      border: 1px solid #ddd;
+      border-radius: 2px;
+      margin-bottom: 10px;
       display: flex;
       align-items: center;
-      margin-bottom: 15px;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.3); 
-      padding-bottom: 10px;
+      background: #fcfcfc;
+      z-index: 0;
 
-      img.item-image {
-        width: 60px; 
-        height: 60px;
-        object-fit: cover;
-        border-radius: 8px;
-        margin-right: 15px;
+      ion-label {
+        font-size: 0.95rem;
+        color: #444;
+        margin-left: 10px;
       }
 
-      .item-details {
-        display: flex;
-        flex-direction: column;
-      }
-
-      .item-title {
-        font-size: 14px;
-        font-weight: 500;
-      }
-
-      .item-quantity {
-        font-size: 13px;
+      ion-radio {
+        --size: 18px;
+        --color-checked: #444;
       }
     }
   }
-}
 
-.delivery-address {
-  margin-top: 16px;
-  padding: 16px;
-  border-radius: 8px;
-  background-color: #f9f9f9;
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  .delivery-address {
+    background: #fcfcfc;
+    padding: 18px;
+    border: 1px solid #eaeaea;
+    border-radius: 2px;
 
-  h3 {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-bottom: 12px;
+    h3 {
+      font-size: 1rem;
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+
+    .input-row {
+      gap: 12px;
+    }
   }
 
-  .input-row {
+  .date-time-container {
     display: flex;
     gap: 12px;
+    margin-top: 12px;
+
+    ion-item {
+      border-radius: 2px;
+      --padding-start: 10px;
+      background: #fafafa;
+    }
   }
 
-  .rounded-input {
-    border-radius: 8px;
-    --padding-start: 12px;
+  .summary {
+    p {
+      font-size: 0.95rem;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+
+      span {
+        font-weight: 500;
+        color: #222;
+      }
+    }
+  }
+
+  .premium-banner {
+    background-color: #fff4f8;
+    color: #a85775;
+    padding: 10px 12px;
+    font-size: 0.95rem;
+    border: 1px solid #f2dbe2;
+    font-style: italic;
     margin-bottom: 12px;
   }
+
+  .cart-items {
+    margin-top: 20px;
+
+    ul {
+      list-style: none;
+      padding: 0;
+
+      .order-item {
+        display: flex;
+        align-items: center;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #e5e5e5;
+        margin-bottom: 12px;
+
+        img.item-image {
+          width: 56px;
+          height: 56px;
+          object-fit: cover;
+          border: 1px solid #ddd;
+          border-radius: 2px;
+          margin-right: 14px;
+        }
+
+        .item-title {
+          font-size: 0.95rem;
+          font-weight: 500;
+        }
+
+        .item-quantity {
+          font-size: 0.85rem;
+          color: #777;
+        }
+      }
+    }
+  }
+
+
 }
+
+  .sticky-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    color: #ffffff;
+    font-size: 1.2rem;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    margin: 0;
+    border: none;
+    --border-radius: 0px; 
+    z-index: 1000;
+  }
+
+  ion-item.rounded-input,
+  ion-item.radio-item,
+  ion-item.points-slider {
+    --background: transparent !important;
+    background: transparent !important;
+    --border-color: transparent;
+    --box-shadow: none;
+  }

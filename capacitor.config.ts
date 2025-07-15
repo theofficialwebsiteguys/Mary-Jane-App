@@ -1,11 +1,11 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.flowerpowerdispensers.application',
-  appName: 'Flower Power Dispensers',
+  appId: 'com.cottonmouth.app',
+  appName: 'CottonMouth Dispensary',
   webDir: 'www',
   server: {
-    hostname: "com.flowerpowerdispensers.app",
+    hostname: "com.cottonmouth.app",
     androidScheme: "https",
     allowNavigation: ["pay.aero.inc"]
   },
@@ -23,7 +23,7 @@ const config: CapacitorConfig = {
       presentationOptions: ["badge", "sound", "alert"]
     },
     DeepLinks: {
-      schemes: ["flowerPower"],
+      schemes: ["cottonmouth"],
       hosts: ["dispensary-api-ac9613fa4c11.herokuapp.com"]
     }
   },

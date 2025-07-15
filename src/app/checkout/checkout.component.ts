@@ -3,7 +3,6 @@ import { CartService } from '../cart.service';
 import { LoadingController, ToastController } from '@ionic/angular';
 import { AccessibilityService } from '../accessibility.service';
 import { AuthService } from '../auth.service';
-import { AeropayService } from '../aeropay.service';
 import { openWidget } from 'aerosync-web-sdk';
 import { SettingsService } from '../settings.service';
 import { FcmService } from '../fcm.service';
@@ -55,29 +54,13 @@ export class CheckoutComponent implements OnInit {
 
   enableDelivery: boolean = false;
 
-  aeropayAuthToken: string | null = null;
-
   verificationRequired: boolean = false;
   verificationCode: string = '';
   existingUserId: string = '';
 
-  aerosyncURL: string | null = null;
-  aerosyncToken: string | null = null;
-  aerosyncUsername: string | null = null;
-  showAerosyncWidget: boolean = false;
-
-  userBankAccounts: any[] = []; // Store user bank accounts
-  showBankSelection: boolean = false; // Control UI visibility
-  selectedBankId: string | null = null; // Track selected bank
-
-  isFetchingAeroPay: boolean = false; 
-
   @Output() back: EventEmitter<void> = new EventEmitter<void>();
   @Output() orderPlaced = new EventEmitter<void>();
-  bankLinked: boolean = false;
-  aeropayUserId: any;
 
-  loadingAerosync = false;
   selectedDeliveryDate: string | null = null;
   selectedDeliveryTime: string = '';
 
@@ -103,6 +86,7 @@ export class CheckoutComponent implements OnInit {
   validDeliveryDates: string[] = [];
 
   deliveryAddressValid: boolean = false;
+  originalPricing: any;
 
   
   constructor(
@@ -111,7 +95,6 @@ export class CheckoutComponent implements OnInit {
     private accessibilityService: AccessibilityService,
     private toastController: ToastController,
     private authService: AuthService,
-    private aeropayService: AeropayService,
     private settingsService: SettingsService,
     private fcmService: FcmService
   ) {}
@@ -207,200 +190,6 @@ export class CheckoutComponent implements OnInit {
     });
   }
 
-  async startAeroPayProcess() {
-    this.isFetchingAeroPay = true;
-  
-      this.aeropayService.fetchMerchantToken().subscribe({
-        next: (response: any) => {
-          // **Check for API errors inside the response**
-          if (response.data.success === false || !response.data.token) {
-            console.error('AeroPay Authentication Failed:', response.error);
-            this.presentToast(`Authentication Error: ${response.error.message}`, 'danger');
-            this.isFetchingAeroPay = false;
-            return; // **Exit function to prevent further execution**
-          }
-  
-          this.createAeroPayUser();
-        },
-        error: (error: any) => {
-          console.error('AeroPay Authentication Request Failed:', error);
-          this.presentToast('Authentication request failed. Please try again.', 'danger');
-          this.isFetchingAeroPay = false;
-        }
-      });
-  }
-  
-
-  async createAeroPayUser() {  
-    const userData = {
-      first_name: this.checkoutInfo.user_info.fname,
-      last_name: this.checkoutInfo.user_info.lname,
-      phone_number: this.checkoutInfo.user_info.phone,
-      email: this.checkoutInfo.user_info.email
-    };
-  
-    this.aeropayService.createUser(userData).subscribe({
-      next: (response: any) => {
-        this.isFetchingAeroPay = false;
-
-        if (response.data.displayMessage) {
-          this.verificationRequired = true;
-          this.existingUserId = response.data.existingUser.userId; // Store userId for verification
-          this.presentToast(response.data.displayMessage, 'warning');
-        } else  {
-          if (response.data.success && response.data.user) {
-            this.userBankAccounts = response.data.user.bankAccounts || []; // Store bank accounts
-            this.aeropayUserId = response.data.user.userId;
-    
-            if (this.userBankAccounts.length > 0) {
-              console.log('User has linked bank accounts:', this.userBankAccounts);
-              this.showBankSelection = true; // Show bank selection UI
-              this.selectedBankId = this.userBankAccounts[0].bankAccountId;
-            } else {
-              console.log('No linked bank accounts. Opening AeroSync widget...');
-              this.retrieveAerosyncCredentials();
-            }
-          }
-
-        }
-      },
-      error: (error: any) => {
-        console.error('Error Creating AeroPay User:', error);
-        this.presentToast('Error creating user. Please try again.', 'danger');
-        this.isFetchingAeroPay = false;
-      }
-    });
-  }
-
-  async verifyAeroPayUser() {
-    if (!this.verificationCode.trim()) {
-      this.presentToast('Please enter the verification code.', 'danger');
-      return;
-    }
-  
-    this.aeropayService.verifyUser(this.existingUserId, this.verificationCode).subscribe({
-      next: (response: any) => {
-        this.verificationRequired = false; // Hide verification input
-        this.presentToast('Verification successful!', 'success');
-        this.createAeroPayUser();
-      },
-      error: (error: any) => {
-        console.error('Verification Failed:', error);
-        this.presentToast('Invalid verification code. Please try again.', 'danger');
-      }
-    });
-  }
-
-  async retrieveAerosyncCredentials() {
-    this.loadingAerosync = true;
-    this.aeropayService.fetchUsedForMerchantToken(this.aeropayUserId).subscribe({
-      next: (response: any) => {
-
-        // **Check for API errors inside the response**
-        if (response.data.success === false || !response.data.token) {
-          console.error('AeroPay Authentication Failed:', response.data.error);
-          this.presentToast(`Authentication Error: ${response.data.error.message}`, 'danger');
-          this.loadingAerosync = false;
-          return; // **Exit function to prevent further execution**
-        }
-
-        this.aeropayService.getAerosyncCredentials().subscribe({
-          next: (response: any) => {
-            if (response.data.success) {
-              this.aerosyncURL = response.data.fastlinkURL;
-              this.aerosyncToken = response.data.token;
-              this.aerosyncUsername = response.data.username;
-    
-              // Open the Aerosync Widget in an in-app browser
-              this.openAerosyncWidget();
-            } else {
-              console.error('Failed to retrieve Aerosync widget.');
-            }
-            this.loadingAerosync = false;
-          },
-          error: (error: any) => {
-            console.error('Error Retrieving Aerosync Widget:', error);
-            this.loadingAerosync = false;
-          }
-        });
-      },
-      error: (error: any) => {
-        console.error('AeroPay Authentication Request Failed:', error);
-        this.presentToast('Authentication request failed. Please try again.', 'danger');
-        this.loadingAerosync = false;
-      }
-    });
-   
-  }
-
-  openAerosyncWidget() {
-    if (!this.aerosyncToken) {
-      console.error('Missing AeroSync Token');
-      return;
-    }
-
-    let widgetRef = openWidget({
-      id: "widget",
-      iframeTitle: 'Connect',
-      environment: 'production', // 'production' for live
-      token: this.aerosyncToken,
-      style: {
-        width: '375px',
-        height: '688px',
-        bgColor: '#000000',
-        opacity: 0.7
-      },
-      deeplink: "", // Leave empty if not needed
-      consumerId: "", // Optional: Merchant customization
-
-      onLoad: function () {
-        console.log("AeroSync Widget Loaded");
-      },
-      onSuccess: (event: any) => {
-        if (event.user_id && event.user_password) {
-          this.linkBankToAeropay(event.user_id, event.user_password);
-        } else {
-          console.error("Missing user credentials in event:", event);
-        }
-      },
-      onError: function (event) {
-        console.error("AeroSync Error:", event);
-      },
-      onClose: function () {
-        console.log("AeroSync Widget Closed");
-      },
-      onEvent: function (event: object, type: string): void {
-        console.log(event, type)
-      }
-    });
-
-    widgetRef.launch();
-  }
-
-  linkBankToAeropay(userId: string, userPassword: string) {  
-    this.aeropayService.linkBankAccount(userId, userPassword).subscribe({
-      next: (response: any) => {
-        if (response.data.success) {
-          this.presentToast('Bank account linked successfully!', 'success');
-  
-          this.createAeroPayUser();
-        } else {
-          console.error('Failed to link bank:', response.data);
-          this.presentToast('Failed to link your bank. Please try again.', 'danger');
-        }
-      },
-      error: (error: any) => {
-        console.error('Error linking bank account:', error);
-        this.presentToast('An error occurred while linking your bank.', 'danger');
-      }
-    });
-  }
-  
-  
-  selectBank(bankId: string) {
-    this.selectedBankId = bankId;
-  }
-
   generateTimeOptionsForDay(dayOfWeek: number) {
     this.timeOptions = [];
   
@@ -427,12 +216,22 @@ export class CheckoutComponent implements OnInit {
   }
   
   
-  calculateDefaultTotals() {
-    this.finalSubtotal = this.checkoutInfo.cart.reduce(
-      (total: number, item: any) => total + (item.price * item.quantity),
-      0
-    );
-    this.finalTax = this.finalSubtotal * 0.13;
+  async calculateDefaultTotals() {
+    const cartItems = this.checkoutInfo.cart.map((item: any) => ({
+      productId: item.id,
+      quantity: item.quantity
+    }));
+
+    const isDelivery = this.selectedOrderType === 'delivery';
+    const customerTypeId = 2;
+
+    const pricing = await this.cartService.checkCartPrice(cartItems, isDelivery, customerTypeId);
+
+    this.originalPricing = pricing.pricing;
+
+    this.finalSubtotal = pricing.pricing.subTotal;
+
+    this.finalTax = pricing.pricing.subTotal;
     this.finalTotal = this.finalSubtotal + this.finalTax;
     this.updateTotals();
   }
@@ -450,7 +249,7 @@ export class CheckoutComponent implements OnInit {
     this.employeeDiscountApplied = false;
     this.employeeDiscountAmount = 0;
   
-    let subtotalAfterPoints = this.originalSubtotal - pointsValue;
+    let subtotalAfterPoints = this.originalPricing.subTotal - pointsValue;
     if (subtotalAfterPoints < 0) subtotalAfterPoints = 0;
   
     // ✅ Apply 10% premium discount if eligible
@@ -466,7 +265,7 @@ export class CheckoutComponent implements OnInit {
       subtotalAfterPoints -= this.employeeDiscountAmount;
     }
   
-    this.finalTax = subtotalAfterPoints * 0.13;
+    this.finalTax = this.originalPricing.taxes;
     this.finalTotal = subtotalAfterPoints + this.finalTax;
   
     this.accessibilityService.announce(
@@ -518,8 +317,6 @@ export class CheckoutComponent implements OnInit {
   }
   
   
-  
-  
   async placeOrder() {
     this.isLoading = true;
     const loading = await this.loadingController.create({
@@ -548,55 +345,39 @@ export class CheckoutComponent implements OnInit {
             }
           : null;
 
-          if (this.selectedPaymentMethod === 'aeropay' && this.selectedBankId) {
-            this.aeropayService.fetchUsedForMerchantToken(this.aeropayUserId).subscribe({
-              next: async (response: any) => {
-                const transactionResponse = await this.aeropayService.createTransaction(
-                  this.finalTotal.toFixed(2), // Convert total to string
-                  this.selectedBankId
-                ).toPromise();
-          
-                if (!transactionResponse.data || !transactionResponse.data.success) {
-                  console.error('AeroPay Transaction Failed:', transactionResponse.data);
-                  this.presentToast('Payment failed. Please try again.', 'danger');
-                  this.isLoading = false;
-                  await loading.dismiss();
-                  return;
-                }
-          
-                this.presentToast('Payment successful!', 'success');
-              },
-              error: (error: any) => {
-                console.log('Error:', error);
-                this.presentToast('Error', 'danger');
-              }
-            });
-           
-          }
-  
-      const response = await this.cartService.checkout(points_redeem, this.selectedOrderType, deliveryAddress);
-  
-      pos_order_id = response.id_order;
-      points_add = response.subtotal;
+      console.log(user_id)
+      console.log(this.finalSubtotal)
+      console.log(this.checkoutInfo.cart)
 
-      await this.cartService.placeOrder(user_id, pos_order_id, points_redeem ? 0 : points_add, points_redeem, this.finalSubtotal, this.checkoutInfo.cart);
-  
-      this.orderPlaced.emit();
+      const cartItems = this.checkoutInfo.cart.map((item: any) => ({
+        productId: item.id,
+        quantity: item.quantity
+      }));
 
-      const userOrders = await this.authService.getUserOrders(); // ✅ Ensure this is awaited
+      this.cartService.checkout(points_redeem, this.selectedOrderType, deliveryAddress);
+      // const response = await this.cartService.checkout(points_redeem, this.selectedOrderType, deliveryAddress);
+  
+      // pos_order_id = response.id_order;
+      // points_add = response.subtotal;
+
+      // await this.cartService.placeOrder(user_id, pos_order_id, points_redeem ? 0 : points_add, points_redeem, this.finalSubtotal, this.checkoutInfo.cart);
+  
+      // this.orderPlaced.emit();
+
+      // const userOrders = await this.authService.getUserOrders(); // ✅ Ensure this is awaited
       
-      this.accessibilityService.announce('Your order has been placed successfully.', 'polite');
+      // this.accessibilityService.announce('Your order has been placed successfully.', 'polite');
 
-      const orderTypeMessage =
-      this.selectedOrderType === 'delivery'
-        ? 'Your delivery order has been placed!'
-        : 'Your pickup order has been placed!';
+      // const orderTypeMessage =
+      // this.selectedOrderType === 'delivery'
+      //   ? 'Your delivery order has been placed!'
+      //   : 'Your pickup order has been placed!';
 
-      await this.fcmService.sendPushNotification(
-        this.checkoutInfo.user_info.id,
-        'Order Confirmed',
-        orderTypeMessage
-      );
+      // await this.fcmService.sendPushNotification(
+      //   this.checkoutInfo.user_info.id,
+      //   'Order Confirmed',
+      //   orderTypeMessage
+      // );
 
     } catch (error:any) {
       console.error('Error placing order:', error);
@@ -623,16 +404,10 @@ export class CheckoutComponent implements OnInit {
     this.selectedOrderType = event.detail.value;
     if(this.selectedOrderType === 'delivery'){
       this.selectedPaymentMethod = 'aeropay'
-      this.startAeroPayProcess();
     }
   }
 
   onPaymentMethodChange(selectedMethod: string) {
-    if (selectedMethod === 'aeropay') {
-      this.startAeroPayProcess();
-    }else{
-      this.showBankSelection = false;
-    }
   }
   
 

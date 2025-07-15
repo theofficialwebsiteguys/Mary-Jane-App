@@ -75,12 +75,9 @@ body{
   --ion-background-color: var(--ion-background-primary);
 
   p, h2{
-    font-family: "Noto Sans Display", serif;
+    font-family: 'Inter', sans-serif;
     font-optical-sizing: auto;
-    font-weight: 400;
-    font-style: normal;
-    font-variation-settings:
-      "wdth" 100;
+    color: #333;
   }
 
   .icon-wrapper{
@@ -96,7 +93,7 @@ body{
     &.tab-selected {
       i,
       ion-label {
-        color: var(--ion-color-primary);
+        color: var(--ion-color-primary-contrast);
       }
     }
   }

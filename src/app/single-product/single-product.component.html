@@ -25,7 +25,7 @@
     <p id="product-strain" class="strain">
       {{ currentProduct.strainType }}
       {{ currentProduct.strainType && currentProduct.thc ? "-" : "" }}
-      {{ currentProduct.thc }}
+      {{ currentProduct.thc }} THC
     </p>
     <p id="product-description" class="description">
       {{ getDescription() }}
@@ -43,7 +43,7 @@
         {{ showFullDescription ? "See Less" : "See More" }}
       </span>
     </p>
-    <span id="product-weight" class="weight">{{ currentProduct.weight }}</span>
+    <span id="product-weight" class="weight">{{ currentProduct.weight }}g</span>
   </div>
 
   <ng-container *ngIf="isLoggedIn">

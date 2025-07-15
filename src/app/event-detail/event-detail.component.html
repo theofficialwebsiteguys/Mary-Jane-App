@@ -1,0 +1,22 @@
+<ion-content class="event-detail-page">
+  <!-- Banner Image -->
+  <div class="event-banner" *ngIf="event?.image">
+    <img [src]="event.image" alt="Event Image" />
+  </div>
+
+  <!-- Event Info -->
+  <div class="event-card">
+    <h1 class="event-title">{{ event.title }}</h1>
+    <div class="event-meta">
+      <p><i class="fa-regular fa-calendar"></i> {{ event.date | date: 'fullDate' }}</p>
+      <p><i class="fa-regular fa-clock"></i> {{ event.date | date: 'shortTime' }}</p>
+      <p><i class="fa-solid fa-location-dot"></i> {{ event.location }}</p>
+    </div>
+
+    <p class="event-description">{{ event.description }}</p>
+
+    <ion-button expand="block" class="rsvp-button" color="tertiary" (click)="toggleRSVP()">
+      {{ rsvpStatus ? 'Cancel RSVP' : 'RSVP Now' }}
+    </ion-button>
+  </div>
+</ion-content>
