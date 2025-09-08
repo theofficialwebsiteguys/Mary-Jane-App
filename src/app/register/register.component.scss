@@ -77,6 +77,7 @@ $spacing: 16px;
     display: block;
     margin-bottom: 6px;
     font-weight: 600;
+    color: white;
 
     &.required::after {
       content: "*";

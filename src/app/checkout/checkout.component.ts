@@ -88,6 +88,13 @@ export class CheckoutComponent implements OnInit {
   deliveryAddressValid: boolean = false;
   originalPricing: any;
 
+  stateTaxAmount: number = 0;
+  cannabisTaxAmount: number = 0;
+
+  private readonly STATE_TAX_RATE = 6.625;
+  private readonly CANNABIS_TAX_RATE = 2.0;
+
+  private readonly TOTAL_TAX_RATE = this.STATE_TAX_RATE + this.CANNABIS_TAX_RATE;
   
   constructor(
     private cartService: CartService,
@@ -226,54 +233,71 @@ export class CheckoutComponent implements OnInit {
     const customerTypeId = 2;
 
     const pricing = await this.cartService.checkCartPrice(cartItems, isDelivery, customerTypeId);
-
     this.originalPricing = pricing.pricing;
 
-    this.finalSubtotal = pricing.pricing.subTotal;
+    // ✅ Manually calculate subtotal using sale price (if available)
+    const calculatedSubtotal = this.checkoutInfo.cart.reduce((total: number, item: any) => {
+      const price = item.sale?.discountedPrice ?? item.price;
+      return total + price * item.quantity;
+    }, 0);
 
-    this.finalTax = pricing.pricing.subTotal;
+    this.finalSubtotal = calculatedSubtotal;
+
+    // ✅ Manually calculate tax based on discounted subtotal
+    this.finalTax = this.finalSubtotal * (this.TOTAL_TAX_RATE / 100); // convert % to decimal
+
+    // ✅ Total = subtotal + tax
     this.finalTotal = this.finalSubtotal + this.finalTax;
-    this.updateTotals();
+
+    this.updateTotals(); // ⬅️ will reapply discounts and recalculate tax breakdown
   }
+
 
   updateTotals() {
-    const pointsValue = this.pointsToRedeem * this.pointValue;
-    this.originalSubtotal = this.checkoutInfo.cart.reduce(
-      (total: number, item: any) => total + (item.price * item.quantity),
-      0
-    );
-  
-    // Reset premium discount
-    this.premiumDiscountApplied = false;
-    this.premiumDiscountAmount = 0;
-    this.employeeDiscountApplied = false;
-    this.employeeDiscountAmount = 0;
-  
-    let subtotalAfterPoints = this.originalPricing.subTotal - pointsValue;
-    if (subtotalAfterPoints < 0) subtotalAfterPoints = 0;
-  
-    // ✅ Apply 10% premium discount if eligible
-    if (this.checkoutInfo.user_info.premium && this.originalSubtotal > 100) {
-      this.premiumDiscountAmount = subtotalAfterPoints * this.premiumDiscountRate;
-      this.premiumDiscountApplied = true;
-      subtotalAfterPoints -= this.premiumDiscountAmount;
-    }
+  const pointsValue = this.pointsToRedeem * this.pointValue;
 
-    if (this.checkoutInfo.user_info.role === 'employee' || this.checkoutInfo.user_info.role === 'admin') {
-      this.employeeDiscountAmount = subtotalAfterPoints * this.employeeDiscountRate;
-      this.employeeDiscountApplied = true;
-      subtotalAfterPoints -= this.employeeDiscountAmount;
-    }
-  
-    this.finalTax = this.originalPricing.taxes;
-    this.finalTotal = subtotalAfterPoints + this.finalTax;
-  
-    this.accessibilityService.announce(
-      `Subtotal updated to ${subtotalAfterPoints.toFixed(2)} dollars.`,
-      'polite'
-    );
+  this.originalSubtotal = this.checkoutInfo.cart.reduce(
+    (total: number, item: any) => {
+      const price = item.sale?.discountedPrice ?? item.price;
+      return total + price * item.quantity;
+    },
+    0
+  );
+
+  this.premiumDiscountApplied = false;
+  this.premiumDiscountAmount = 0;
+  this.employeeDiscountApplied = false;
+  this.employeeDiscountAmount = 0;
+
+  let subtotalAfterPoints = this.originalSubtotal - pointsValue;
+  if (subtotalAfterPoints < 0) subtotalAfterPoints = 0;
+
+  if (this.checkoutInfo.user_info.premium && this.originalSubtotal > 100) {
+    this.premiumDiscountAmount = subtotalAfterPoints * this.premiumDiscountRate;
+    this.premiumDiscountApplied = true;
+    subtotalAfterPoints -= this.premiumDiscountAmount;
   }
-  
+
+  if (['employee', 'admin'].includes(this.checkoutInfo.user_info.role)) {
+    this.employeeDiscountAmount = subtotalAfterPoints * this.employeeDiscountRate;
+    this.employeeDiscountApplied = true;
+    subtotalAfterPoints -= this.employeeDiscountAmount;
+  }
+
+  // ✅ Recalculate tax from adjusted subtotal
+  this.finalTax = subtotalAfterPoints * (this.TOTAL_TAX_RATE / 100);
+  this.finalTotal = subtotalAfterPoints + this.finalTax;
+
+  // ✅ Tax breakdown
+  this.stateTaxAmount = (this.STATE_TAX_RATE / this.TOTAL_TAX_RATE) * this.finalTax;
+  this.cannabisTaxAmount = (this.CANNABIS_TAX_RATE / this.TOTAL_TAX_RATE) * this.finalTax;
+
+  this.accessibilityService.announce(
+    `Subtotal updated to ${subtotalAfterPoints.toFixed(2)} dollars.`,
+    'polite'
+  );
+  }
+
 
   goBack() {
     this.back.emit();

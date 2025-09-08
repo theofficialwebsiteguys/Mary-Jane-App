@@ -63,7 +63,7 @@ $spacing: 16px;
   margin: $spacing auto;
 
   .logo {
-    width: 150px; // Slightly larger for emphasis
+    width: 200px; // Slightly larger for emphasis
     height: auto;
   }
 }
@@ -76,7 +76,7 @@ $spacing: 16px;
     display: block;
     margin-bottom: 6px;
     font-weight: 600;
-    color: var(--ion-color-primary);
+    color: white;
 
     &.required::after {
       content: "*";

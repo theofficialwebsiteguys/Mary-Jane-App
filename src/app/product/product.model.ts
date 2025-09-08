@@ -6,6 +6,7 @@ export type Product = {
   [key: string]: any;
   id: string;
   category: ProductCategory; // .cannabisComplianceType OR .cannabisType
+  masterCategory?: string; // .masterCategory
   title: string; // .name
   desc: string; // .description
   brand: string;  //.brand.name
@@ -17,4 +18,11 @@ export type Product = {
   image: string;  // either .image OR .images[0]
   quantity: number;
   unit: string;
+    sale?: {
+    discountId: number;
+    discountName: string;
+    discountValue: number; // percentage (e.g. 0.3)
+    discountedPrice: number;
+    menuDisplay?: any;
+  };
 };

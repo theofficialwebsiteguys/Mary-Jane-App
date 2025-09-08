@@ -121,7 +121,7 @@ export class ProductsService {
 
   
         return productArray
-          .filter(({ category, title, brand, strainType, weight, thc }) => {
+          .filter(({ category, masterCategory, title, brand, strainType, weight, thc }) => {
             const {
               brands,
               strains,
@@ -144,7 +144,9 @@ export class ProductsService {
             const isMatchingSearch = searchQuery.trim() === '' || title.toLowerCase().includes(searchQuery.toLowerCase());
 
             const isMatchingCategory =
-                searchQuery.trim() !== '' || category === this.currentCategory.value;
+              searchQuery.trim() !== '' ||
+              this.getEffectiveCategory(category ?? '', masterCategory ?? '') === this.currentCategory.value;
+
   
             return (
               isMatchingSearch && 
@@ -233,7 +235,7 @@ export class ProductsService {
         }, options);
 
         productArray.forEach((product) => {
-          if (product.category === this.currentCategory.value) { // Filter by currentCategory
+          if (this.getEffectiveCategory(product.category ?? '', product.masterCategory ?? '') === this.currentCategory.value) { // Filter by currentCategory
             fields.forEach((field) => {
               if (!!product[field]) {
                 options[`${field}s`].add(product[field]);
@@ -269,14 +271,15 @@ export class ProductsService {
     return [
       { category: 'Flower', imageUrl: 'assets/icons/flower.png' },
       { category: 'Pre-Roll', imageUrl: 'assets/icons/prerolls.png' },
+      { category: 'Vapes', imageUrl: 'assets/icons/vaporizer.png' },
+      { category: 'Concentrates', imageUrl: 'assets/icons/concentrates.png' },
       { category: 'Edibles', imageUrl: 'assets/icons/edibles.png' },
-      { category: 'Concentrate', imageUrl: 'assets/icons/concentrates.png' },
-      { category: 'Beverages', imageUrl: 'assets/icons/beverages.png' },
-      { category: 'Tincture', imageUrl: 'assets/icons/tinctures.png' },
-      { category: 'Orals', imageUrl: 'assets/icons/orals.png' },
-      { category: 'Topical', imageUrl: 'assets/icons/topicals.png' },
+      // { category: 'Beverages', imageUrl: 'assets/icons/beverages.png' },
+      { category: 'Tinctures', imageUrl: 'assets/icons/tinctures.png' },
+      { category: 'Topicals', imageUrl: 'assets/icons/topicals.png' },
+      { category: 'CBD', imageUrl: 'assets/icons/cbd.png' },
       { category: 'Accessories', imageUrl: 'assets/icons/accessories.png' },
-      // { category: 'Apparel', imageUrl: 'assets/icons/apparel.png' },
+      { category: 'Apparel', imageUrl: 'assets/icons/apparel.png' },
     ];
   }
 
@@ -302,7 +305,9 @@ export class ProductsService {
 
   updateCurrentProduct(product: Product) {
     this.currentProduct.next(product);
-    this.updateCategory(product.category)
+    this.updateCategory(
+      this.getEffectiveCategory(product.category ?? '', product.masterCategory ?? '') as ProductCategory
+    );
     console.log(product);
     this.route.navigateByUrl('/product-display');
   }
@@ -323,5 +328,53 @@ export class ProductsService {
       )
     );
   }
+
+  private normalizeCategory(category: string): string {
+    const aliasMap: { [key: string]: ProductCategory } = {
+      'RSO': 'Concentrates',
+      'Live Resin': 'Concentrates',
+      'Cartridges': 'Vapes',
+      'Disposables': 'Vapes',
+      'Shake': 'Flower',
+      'Bud': 'Flower',
+      'Capsules': 'Edibles',
+      // Add more aliases here
+    };
+
+    return aliasMap[category?.trim()] || category?.trim();
+  }
   
+
+  public getEffectiveCategory(category: string, masterCategory: string): ProductCategory {
+    const normalized = this.normalizeCategory(category);
+    const fallback = this.normalizeCategory(masterCategory);
+
+    if (this.validProductCategories.includes(normalized as ProductCategory)) {
+      return normalized as ProductCategory;
+    }
+
+    if (this.validProductCategories.includes(fallback as ProductCategory)) {
+      return fallback as ProductCategory;
+    }
+
+    // Final fallback if neither match — could return 'Flower', 'Uncategorized', etc.
+    return 'Flower';
+  }
+
+  private validProductCategories: ProductCategory[] = [
+    'Flower',
+    'Pre-Roll',
+    'Vape',
+    'Vapes',
+    'Concentrates',
+    'Edibles',
+    'Tinctures',
+    'Topicals',
+    'CBD',
+    'Accessories',
+    'Apparel',
+    'Beverages',
+  ];
+
+
 }

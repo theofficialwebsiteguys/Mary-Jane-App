@@ -14,6 +14,7 @@ import { AccessibilityService } from '../accessibility.service';
 })
 export class ProductComponent implements OnInit {
   constructor(private productService: ProductsService, private cartService: CartService, private authService: AuthService, private accessibilityService: AccessibilityService) {}
+  @Input() index: number = 0;
 
   @Input() product: Product = {
     id: '',
@@ -22,6 +23,13 @@ export class ProductComponent implements OnInit {
     brand: '',
     desc: '',
     strainType: 'HYBRID',
+    sale: {
+      discountId: 0,
+      discountName: '',
+      discountValue: 0,
+      discountedPrice: 0,
+      menuDisplay: undefined
+    },
     thc: '',
     cbd: '',
     weight: '',

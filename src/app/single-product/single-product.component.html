@@ -11,17 +11,36 @@
     <ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon>
   </div>
 
+  <p class="discount-name" *ngIf="currentProduct.sale?.discountName || currentProduct.sale?.menuDisplay?.menuDisplayName">
+    {{ currentProduct.sale?.menuDisplay?.menuDisplayName || currentProduct.sale?.discountName }}
+  </p>
+
   <div class="image-container">
     <img
       [src]="getProductImage(currentProduct)"
       [alt]="currentProduct.title ? currentProduct.title + ' image' : 'Product Image'"
     />
+    
+    <!-- SALE BADGE -->
+    <div class="sale-tag" *ngIf="currentProduct.sale">
+      {{ (currentProduct.sale.discountValue * 100) | number: '1.0-0' }}% OFF
+    </div>
   </div>
+
 
   <div class="product-info" aria-labelledby="product-title" aria-describedby="product-description product-price product-strain product-weight">
     <p class="brand">{{ currentProduct.brand }}</p>
     <h2 id="product-title" class="title">{{ currentProduct.title }}</h2>
-    <span id="product-price" class="price">{{ currentProduct.price | currency }}</span>
+    <ng-container *ngIf="currentProduct.sale; else regularPrice">
+      <span id="product-price" class="price sale-price">
+        <span class="original-price">{{ currentProduct.price | currency }}</span>
+        {{ currentProduct.sale.discountedPrice | currency }}
+      </span>
+    </ng-container>
+    <ng-template #regularPrice>
+      <span id="product-price" class="price">{{ currentProduct.price | currency }}</span>
+    </ng-template>
+
     <p id="product-strain" class="strain">
       {{ currentProduct.strainType }}
       {{ currentProduct.strainType && currentProduct.thc ? "-" : "" }}

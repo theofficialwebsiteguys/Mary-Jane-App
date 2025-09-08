@@ -29,9 +29,9 @@ export class AccountComponent implements OnInit {
         { icon: 'call-outline', label: 'Phone', value: this.user.phone }
       ];
       this.darkModeEnabled = this.settingsService.getDarkModeEnabled();
-      this.settings = [
-        { id: 'darkMode', label: 'Dark Mode', value: this.darkModeEnabled, action: (val: boolean) => this.toggleDarkMode(val) }
-      ];
+      // this.settings = [
+      //   { id: 'darkMode', label: 'Dark Mode', value: this.darkModeEnabled, action: (val: boolean) => this.toggleDarkMode(val) }
+      // ];
     }
   }
 

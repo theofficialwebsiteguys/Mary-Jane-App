@@ -60,7 +60,7 @@
         <ion-row class="checkbox-container">
           <label
             class="checkbox-wrapper"
-            *ngFor="let brand of dynamicFilterOptions.brands"
+            *ngFor="let brand of (showAllBrands ? dynamicFilterOptions.brands : (dynamicFilterOptions.brands | slice:0:previewCount))"
             [attr.aria-label]="'Filter by brand ' + brand.label"
           >
             <input
@@ -72,6 +72,17 @@
             <ion-label>{{ brand.label }}</ion-label>
           </label>
         </ion-row>
+
+        <ion-button
+          *ngIf="dynamicFilterOptions.brands.length > previewCount"
+          fill="clear"
+          size="small"
+          (click)="toggleShowAllBrands()"
+          aria-label="Toggle showing all brands"
+          class="show-more-button"
+        >
+          {{ showAllBrands ? 'Show less' : ('Show all (' + (dynamicFilterOptions.brands.length - previewCount) + ' more)') }}
+        </ion-button>
       </div>
 
       <div class="section">

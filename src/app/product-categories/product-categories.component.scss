@@ -1,12 +1,42 @@
-.categories {
-  display: flex;
-  gap: 16px; /* Larger gap for more open layout */
-  flex-wrap: nowrap;
-  padding: 15px 16px;
-  overflow-x: auto;
-  scrollbar-width: none; /* Hide scrollbar in Firefox */
+.categories-wrapper {
+  position: relative;
 }
 
+.categories {
+  display: flex;
+  gap: 16px;
+  flex-wrap: nowrap;
+  padding: 30px 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
 .categories::-webkit-scrollbar {
-  display: none; /* Hide scrollbar in Chrome/Safari */
+  display: none;
+}
+
+.arrow {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50px;
+  display: flex;
+  align-items: center;
+  font-size: 28px;
+  font-weight: bold;
+  color: #666;
+  pointer-events: none;
+}
+
+.arrow.right {
+  right: 0;
+  justify-content: flex-end;
+  background: linear-gradient(to right, transparent, #fff 70%);
+  padding-right: 8px;
+}
+
+.arrow.left {
+  left: 0;
+  justify-content: flex-start;
+  background: linear-gradient(to left, transparent, #fff 70%);
+  padding-left: 8px;
 }

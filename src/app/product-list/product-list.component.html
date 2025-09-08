@@ -2,10 +2,11 @@
 
   <ng-container *ngIf="(products$ | async) as products; else loading">
     <ng-container *ngIf="products.length > 0; else loading">
-      <ng-container *ngFor="let product of products">
+      <ng-container *ngFor="let product of products; let i = index">
         <app-product
-          *ngIf="isCategoryVisible(product.category)"
+          *ngIf="isCategoryVisible(product.category ?? '', product.masterCategory ?? '')"
           [product]="product"
+          [index]="i"
           role="listitem"
           [attr.aria-label]="'View details for ' + product.title"
         ></app-product>

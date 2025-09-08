@@ -82,3 +82,33 @@
     padding: 16px 0;
   }
 }
+
+.item-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  font-weight: bold;
+  margin: 4px 0;
+
+  .original-price {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 0.9rem;
+  }
+
+  .discounted-price {
+    color: #d32f2f;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .sale-tag {
+    background-color: #e53935;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-top: 4px;
+  }
+}

@@ -1,8 +1,16 @@
-<ion-row class="categories" role="list" aria-label="Product Categories">
-  <app-product-category
-    *ngFor="let category of categories"
-    [category]="category"
-    role="listitem"
-    [attr.aria-label]="'Browse ' + category.category + ' products'"
-  ></app-product-category>
-</ion-row>
+<div class="categories-wrapper">
+  <ion-row #categoriesRow class="categories" role="list" aria-label="Product Categories" (scroll)="onScroll($event)">
+    <app-product-category
+      *ngFor="let category of categories"
+      [category]="category"
+      role="listitem"
+      [attr.aria-label]="'Browse ' + category.category + ' products'">
+    </app-product-category>
+  </ion-row>
+
+  <!-- Left arrow -->
+  <div class="arrow left" *ngIf="showLeftArrow">‹</div>
+
+  <!-- Right arrow -->
+  <div class="arrow right" *ngIf="showRightArrow">›</div>
+</div>

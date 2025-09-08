@@ -14,18 +14,18 @@
     justify-content: center;
     align-items: center;
     width: 100%;
-    margin-bottom: 75px;
+    margin-bottom: 25px;
   }
 
   .logo {
-    width: 60%;
-    max-width: 400px; // Prevent logo from being too large on desktops
+    width: 80%;
+    max-width: 500px; // Prevent logo from being too large on desktops
     height: auto;
   }
 
   .age-verification {
     position: absolute;
-    top: calc(60%); // Adjusted for better alignment
+    top: calc(55%); // Adjusted for better alignment
     display: flex;
     flex-direction: column;
     align-items: center;

@@ -5,7 +5,17 @@
     </div>
     <div class="item-details">
       <h4>{{ item.title }}</h4>
-      <div class="item-price">{{ item.price | currency }}</div>
+      <div class="item-price">
+        <ng-container *ngIf="item.sale; else regularPrice">
+          <span class="original-price">{{ item.price | currency }}</span>
+          <span class="discounted-price">{{ item.sale.discountedPrice | currency }}</span>
+          <span class="sale-tag">{{ (item.sale.discountValue * 100) | number: '1.0-0' }}% OFF</span>
+        </ng-container>
+        <ng-template #regularPrice>
+          <span>{{ item.price | currency }}</span>
+        </ng-template>
+      </div>
+
       <div class="quantity-controls">
         <button (click)="updateQuantity(item, -1)" [attr.aria-label]="'Decrease quantity of ' + item.title">-</button>
         <span aria-live="polite" aria-atomic="true">{{ item.quantity }}</span>

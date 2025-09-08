@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { addIcons } from 'ionicons';
 import { close } from 'ionicons/icons';
-import { Observable, of } from 'rxjs';
+import { map, Observable, of } from 'rxjs';
 
 import { ProductsService } from '../products.service';
 
@@ -44,11 +44,20 @@ export class ProductFiltersComponent implements OnInit {
     weights: [],
   });
 
+  previewCount = 8;
+  showAllBrands = false;
+
   ngOnInit() {
     this.productService.products$.subscribe(() => {
-      this.dynamicFilterOptions$ =
-        this.productService.getProductFilterOptions();
-    });
+          this.dynamicFilterOptions$ = this.productService.getProductFilterOptions().pipe(
+            map(options => ({
+              ...options,
+              brands: [...options.brands].sort((a, b) =>
+                a.label.localeCompare(b.label)
+              )
+            }))
+          );
+        });
   }
 
   setOpen(isOpen: boolean) {
@@ -104,5 +113,13 @@ export class ProductFiltersComponent implements OnInit {
     }
 
     this.handleFilterUpdate();
+  }
+
+  toggleShowAllBrands() {
+    this.showAllBrands = !this.showAllBrands;
+    this.accessibilityService.announce(
+      this.showAllBrands ? 'Showing all brands.' : 'Showing fewer brands.',
+      'polite'
+    );
   }
 }

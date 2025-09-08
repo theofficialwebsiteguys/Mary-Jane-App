@@ -1,14 +1,29 @@
-<ion-item (click)="updateProductDisplay()" role="button" [attr.aria-label]="'View details for ' + product.title">
+<ion-item (click)="updateProductDisplay()" role="button" [attr.aria-label]="'View details for ' + product.title" [ngClass]="{ 'odd-item': index % 2 !== 0, 'even-item': index % 2 === 0 }">
   <ion-row class="container">
-    <img [src]="getProductImage(product)" [alt]="product.title + ' image'" />
+    <div class="image-wrapper">
+      <img [src]="getProductImage(product)" [alt]="product.title + ' image'" />
+      <div class="sale-tag" *ngIf="product.sale">
+        {{ (product.sale.discountValue * 100) | number: '1.0-0' }}% OFF
+      </div>
+    </div>
+
     <ion-label class="info">
       <p>{{ product.brand }}</p>
       <h1 class="product-title">{{ product.title }}</h1>
       <p class="capitalize">{{ product.strainType | lowercase }}</p>
       <p>{{ product.thc }}</p>
+
       <ion-row class="weightAndPrice">
         <h3>{{ product.weight }}g</h3>
-        <h2>{{ product.price | currency }}</h2>
+        <ng-container *ngIf="product.sale; else regularPrice">
+          <h2 class="sale-price">
+            <span class="original-price">{{ product.price | currency }}</span>
+            {{ product.sale.discountedPrice | currency }}
+          </h2>
+        </ng-container>
+        <ng-template #regularPrice>
+          <h2>{{ product.price | currency }}</h2>
+        </ng-template>
       </ion-row>
 
       <ng-container *ngIf="isLoggedIn">
@@ -24,4 +39,3 @@
     </ion-label>
   </ion-row>
 </ion-item>
-

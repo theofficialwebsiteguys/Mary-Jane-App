@@ -40,7 +40,7 @@
   font-size: 18px;
   font-weight: bold;
   margin: 5px 0 0 0;
-  color: var(--ion-color-secondary);
+  color: white;
 }
 
 .category-section {
@@ -48,23 +48,25 @@
   margin: 10px;
   border-radius: 10px;
 
-  &:first-child {
-    padding-top: 0; /* Removes top padding only for the first section */
-  }
-
-  &:nth-child(even) {
+  &:nth-child(odd) {
     background-color: rgba(var(--ion-color-primary-rgb)) !important;
-      .section-header h2, ion-icon{
+
+    .section-header h2,
+    ion-icon {
       color: white !important;
     }
   }
-  &:nth-child(4n-2) {
+
+  &:nth-child(even) {
     background-color: rgba(var(--ion-color-primary-contrast-rgb)) !important;
-    .section-header h2, ion-icon{
+
+    .section-header h2,
+    ion-icon {
       color: white !important;
     }
   }
 }
+
 
 .section-header {
   display: flex;
@@ -151,11 +153,24 @@
   height: 200px; /* Adjust height as needed */
 }
 
-ion-spinner {
-  width: 50px;
-  height: 50px;
-  color: var(--ion-color-primary);
+.custom-spinner {
+  width: 80px;
+  height: 80px;
+  animation: spin 1.2s linear infinite;
+  display: block;
+  margin: auto;
 }
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 
 /* View More Slide (Placed at the End of Products) */
 .view-more-slide {
@@ -185,4 +200,36 @@ ion-spinner {
 
 .view-more-button ion-icon {
   font-size: 16px;
+}
+
+.sale-tag {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  background-color: #e53935;
+  color: white;
+  font-size: 1.0rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 3px;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+}
+
+.sale-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  color: #d32f2f;
+
+  .original-price {
+    text-decoration: line-through;
+    color: #bbb;
+    font-size: 13px;
+    margin-bottom: 2px;
+  }
+
+  // Discounted price style
+  font-weight: bold;
+  font-size: 24px;
 }

@@ -3,36 +3,62 @@
     <div class="section-header">
       <a (click)="updateCategory(category.category)" class="view-all" role="button"
         [attr.aria-label]="'View all products in ' + category.category">
-        <h2>{{ category.category === "Pre-Roll" ? "Pre Rolls" : category.category.toLowerCase() }}</h2>
+       <h2>
+          {{
+            category.category === "Pre-Roll"
+              ? "Pre Rolls"
+              : category.category === "CBD"
+                ? "CBD"
+                : category.category.toLowerCase()
+          }}
+        </h2>
         <ion-icon name="arrow-forward-outline" class="arrow-icon" aria-hidden="true"></ion-icon>
       </a>
     </div>
-    <div *ngIf="loading" class="loading-container">
+    <!-- <div *ngIf="loading" class="loading-container">
       <ion-spinner name="crescent"></ion-spinner>
+    </div> -->
+    <div *ngIf="loading" class="loading-container">
+      <img src="assets/snake-spinner.png" class="custom-spinner" alt="Loading..." />
     </div>
+
 
     <!-- Scrollable Product Slider -->
     <div class="slider-container" tabindex="0" [attr.aria-label]="'Product slider for ' + category.category">
       <div class="slider">
         <ng-container *ngFor="let product of getLimitedProducts(category.category)">
           <div class="slide">
-            <div class="card" (click)="updateProductDisplay(product)" role="button"
-              [attr.aria-label]="'View details for ' + product.title">
-              <div class="image-container">
-                <img [src]="getProductImage(product)" [alt]="product.title + ' image'" />
-                <div class="card-details">
-                  <p class="product-brand" title="{{ product.brand }}">
-                    {{ product.brand | slice:0:25 }}{{ product.brand.length > 25 ? '…' : '' }}
+          <div class="card" (click)="updateProductDisplay(product)" role="button"
+            [attr.aria-label]="'View details for ' + product.title">
+            <div class="image-container">
+              <img [src]="getProductImage(product)" [alt]="product.title + ' image'" />
+              
+              <!-- 🔴 SALE TAG -->
+              <div class="sale-tag" *ngIf="product.sale">
+                {{ (product.sale.discountValue * 100) | number: '1.0-0' }}% OFF
+              </div>
+
+              <div class="card-details">
+                <!-- <p class="product-brand" title="{{ product.brand }}">
+                  {{ product.brand | slice:0:25 }}{{ product.brand.length > 25 ? '…' : '' }}
+                </p> -->
+                <p class="product-title" title="{{ product.title }}">
+                  {{ product.title | slice:0:30 }}{{ product.title.length > 30 ? '…' : '' }}
+                </p>
+
+                <!-- 🏷 Discounted vs Regular Price -->
+                <ng-container *ngIf="product.sale; else regularPrice">
+                  <p class="product-price sale-price">
+                    <span class="original-price">{{ product.price | currency }}</span>
+                    {{ product.sale.discountedPrice | currency }}
                   </p>
-                  <p class="product-title" title="{{ product.title }}">
-                    {{ product.title | slice:0:30 }}{{ product.title.length > 30 ? '…' : '' }}
-                  </p>
-                  <p class="product-price">
-                    {{ product.price | currency }}
-                  </p>
-                </div>
+                </ng-container>
+                <ng-template #regularPrice>
+                  <p class="product-price">{{ product.price | currency }}</p>
+                </ng-template>
               </div>
             </div>
+          </div>
           </div>
         </ng-container>
 

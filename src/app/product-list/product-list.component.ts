@@ -67,7 +67,11 @@ export class ProductListComponent implements OnInit {
     this.updateProducts();
   }
 
-  isCategoryVisible(category: string): boolean {
-    return this.searchQuery.trim() !== '' || category === this.currentCategory;
+  isCategoryVisible(category: string, masterCategory: string): boolean {
+    return (
+      this.searchQuery.trim() !== '' ||
+      this.productService.getEffectiveCategory(category, masterCategory) === this.currentCategory
+    );
   }
+
 }

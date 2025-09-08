@@ -43,6 +43,7 @@ export class AuthService {
   
     return {
       Authorization: token, // Ensure correct Bearer token format
+      'x-auth-api-key': environment.db_api_key,
       'Content-Type': 'application/json', // Optional, ensures JSON data format
     };
   }
@@ -69,7 +70,7 @@ export class AuthService {
 
     return new Observable((observer) => {
       CapacitorHttp.post({
-        url: `${this.apiUrl}/register`,
+        url: `${this.apiUrl}/register?venue_id=${environment.aiq_venue_id}`,
       headers: { 
         'x-auth-api-key': environment.db_api_key,
         'Content-Type': 'application/json'  // ✅ Ensure correct content type

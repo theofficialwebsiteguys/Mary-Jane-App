@@ -15,12 +15,8 @@ export class BannerCarouselComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // this.loadCarouselImages();
-    this.banners = [{ image: 'assets/banner2.jpg' , title: 'goood life banner', description: 'goood life banner'},
-      { image: 'assets/banner1.png' , title: 'banner 1', description: 'goood life banner'},
-      { image: 'assets/banner4.avif' , title: 'banner 2', description: 'goood life banner'},
-      { image: 'assets/banner3.jpg' , title: 'banner 3', description: 'goood life banner'},
-      { image: 'assets/banner6.webp' , title: 'banner 4', description: 'goood life banner'},
-      { image: 'assets/banner5.avif' , title: 'banner 5', description: 'goood life banner'}
+    this.banners = [{ image: 'assets/banner1.jpg' , title: 'banner 1', description: 'cottonmouth banner'},
+      { image: 'assets/banner2.jpg' , title: 'banner 2', description: 'cottonmouth banner'}
     ]
     this.startCarousel();
   }

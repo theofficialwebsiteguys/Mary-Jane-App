@@ -29,7 +29,14 @@ export class SingleProductComponent implements OnInit {
     price: '',
     quantity: 0,
     image: '',
-    unit: ''
+    unit: '',
+    sale: {
+      discountId: 0,
+      discountName: '',
+      discountValue: 0,
+      discountedPrice: 0,
+      menuDisplay: undefined
+    },
   };
 
   showFullDescription = false;

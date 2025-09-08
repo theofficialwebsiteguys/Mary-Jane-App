@@ -1,46 +1,54 @@
+:root {
+  --page-bg: #f8f8f8;      /* match your page background */
+}
+
 .carousel-container {
   position: relative;
-  height: 250px; /* Adjust height as needed */
+  height: 250px;
   overflow: hidden;
+  background: var(--page-bg); /* where the image will fade into */
 }
+
+/* remove the old overlay gradient */
+.carousel-container::after { display: none; }
 
 .carousel-slide {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-  transition: opacity 0.5s ease;
-  opacity: 0;
-  position: absolute;
-  top: 0;
-  left: 0;
+  position: absolute; inset: 0;
+  display: flex; justify-content: center; align-items: center;
+  opacity: 0; transition: opacity .5s ease;
 }
-
-.carousel-slide.active {
-  opacity: 1;
-}
+.carousel-slide.active { opacity: 1; }
 
 .banner-content {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  width: 100%; height: 100%;
+  display: flex; justify-content: center; align-items: center;
   overflow: hidden;
-  background-color: #000; /* Optional: to fill any empty space */
+  background: var(--page-bg); /* important: NOT black */
 }
 
 .banner-content img {
-  width: 100%;
-  height: 100%;
-  object-fit: fill; /* Fills the container without leaving gaps */
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center;
+
+  /* smooth fade-out of the bottom 25–30% of the image */
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%);
+          mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%);
 }
 
+@media (min-width: 600px) {
+  .carousel-container { height: 350px; }
+}
 
-@media screen and (min-width: 600px) {
-  .carousel-container {
-    height: 350px;
-  }
+/* panel that holds categories and overlaps the fade slightly */
+.stacked-panel {
+  position: relative;
+  z-index: 2;
+  margin-top: -14px;                     /* overlap the faded area */
+  background: var(--page-bg);
+  border-top-left-radius: 18px;
+  border-top-right-radius: 18px;
+  box-shadow:
+    0 -6px 18px rgba(0,0,0,.06) inset,
+    0 6px 18px rgba(0,0,0,.06);
+  padding-top: 10px;
 }

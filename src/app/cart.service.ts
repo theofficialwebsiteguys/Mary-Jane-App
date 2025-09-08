@@ -20,6 +20,12 @@ export interface CartItem {
   id_item?: string;
   price_after_points?: number;
   price_after_premium?: number;
+  sale?: {
+    discountId: number;
+    discountValue: number; // e.g. 0.2 for 20% off
+    discountedPrice: number;
+    discountName?: string;
+  };
 }
 
 @Injectable({

@@ -34,11 +34,15 @@ export class CartItemsComponent implements OnInit {
 
   calculateSubtotal(): number {
     const subtotal = this.items.reduce(
-      (total, item) => total + Number(item.price) * item.quantity,
+      (total: any, item: any) => {
+        const price = item.sale?.discountedPrice ?? item.price;
+        return total + price * item.quantity;
+      },
       0
     );
     this.accessibilityService.announce(`Subtotal updated to ${subtotal.toFixed(2)} dollars.`, 'polite');
     return subtotal;
   }
+
 
 }
