@@ -123,9 +123,9 @@ export class AppComponent {
 
   async checkGeoLocation() {
     try {
-      const isInNY = await this.geoLocationService.isUserInNewYork();
+      const isInNJ = await this.geoLocationService.isUserInNewJersey();
   
-      if (!isInNY) {
+      if (!isInNJ) {
         this.showRestrictedAccessModal(); // Show the modal if the user is outside NY
       } else {
         this.initializeApp(); // Proceed with app initialization if in NY

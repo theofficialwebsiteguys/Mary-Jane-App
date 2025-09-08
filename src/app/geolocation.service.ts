@@ -5,16 +5,17 @@ import { Geolocation } from '@capacitor/geolocation';
   providedIn: 'root'
 })
 export class GeolocationService {
-  private NYBounds = {
-    north: 45.0153,  // Northernmost point
-    south: 40.4774,  // Southernmost point
-    west: -79.7624,  // Westernmost point
-    east: -71.8562,  // Easternmost point
+  // New Jersey bounding box
+  private NJBounds = {
+    north: 41.3572,   // Northernmost point
+    south: 38.9285,   // Southernmost point
+    west: -75.5598,   // Westernmost point
+    east: -73.8939,   // Easternmost point
   };
 
   constructor() {}
 
-  async isUserInNewYork(): Promise<boolean> {
+  async isUserInNewJersey(): Promise<boolean> {
     try {
       // Request location permissions
       const permission = await Geolocation.requestPermissions();
@@ -28,18 +29,17 @@ export class GeolocationService {
       const coordinates = await Geolocation.getCurrentPosition();
       const { latitude, longitude } = coordinates.coords;
   
-      // Check if the user is within NY bounds
-      const isInNY =
-        latitude >= this.NYBounds.south &&
-        latitude <= this.NYBounds.north &&
-        longitude >= this.NYBounds.west &&
-        longitude <= this.NYBounds.east;
+      // Check if the user is within NJ bounds
+      const isInNJ =
+        latitude >= this.NJBounds.south &&
+        latitude <= this.NJBounds.north &&
+        longitude >= this.NJBounds.west &&
+        longitude <= this.NJBounds.east;
   
-      return isInNY;
+      return isInNJ;
     } catch (error) {
       console.error('Error getting user location:', error);
       return false;
     }
   }
-  
 }
