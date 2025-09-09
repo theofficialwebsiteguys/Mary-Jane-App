@@ -1,3 +1,9 @@
+@supports(padding-top: env(safe-area-inset-top)) {
+    .heading-container {
+        padding-top: env(safe-area-inset-top);
+    }
+}
+
 img {
   height: 50px;
 }
