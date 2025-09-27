@@ -202,19 +202,19 @@ export class RegisterComponent {
       error: (err) => {
         this.loading = false;
     
-        const errorMessage = err.error.error; // Assuming `err.error` is the string you provided
-    
-        if (err.status === 500) {
-          if (errorMessage.includes('SequelizeUniqueConstraintError')) {
-            this.error = 'This user already exists in the system.';
-          } else if (errorMessage.includes('SequelizeValidationError')) {
-            this.error = 'The provided phone or email is invalid.';
-          } else {
-            this.error = 'An unexpected error occurred. Please try again later.';
-          }
-        } else {
-          this.error = 'Unable to register a new user at this time. Please try again later.';
-        }
+        const errorMessage = err.data.error; // Assuming `err.error` is the string you provided
+        this.error
+        // if (err.status === 500) {
+        //   if (errorMessage.includes('SequelizeUniqueConstraintError')) {
+        //     this.error = 'This user already exists in the system.';
+        //   } else if (errorMessage.includes('SequelizeValidationError')) {
+        //     this.error = 'The provided phone or email is invalid.';
+        //   } else {
+        //     this.error = 'An unexpected error occurred. Please try again later.';
+        //   }
+        // } else {
+        //   this.error = 'Unable to register a new user at this time. Please try again later.';
+        // }
       },
     });
     

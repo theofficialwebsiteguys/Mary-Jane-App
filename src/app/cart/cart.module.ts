@@ -10,7 +10,6 @@ import { CartPage } from './cart.page';
 import { CartItemsComponent } from '../cart-items/cart-items.component';
 import { SharedModule } from '../shared/shared.module';
 import { CheckoutComponent } from '../checkout/checkout.component';
-import { RecentOrdersComponent } from '../recent-orders/recent-orders.component';
 
 @NgModule({
   imports: [
@@ -20,6 +19,6 @@ import { RecentOrdersComponent } from '../recent-orders/recent-orders.component'
     CartPageRoutingModule,
     SharedModule
   ],
-  declarations: [CartPage, CartItemsComponent, CheckoutComponent, RecentOrdersComponent]
+  declarations: [CartPage, CartItemsComponent, CheckoutComponent]
 })
 export class CartPageModule {}

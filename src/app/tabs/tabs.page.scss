@@ -1,17 +1,28 @@
 ion-tab-bar {
   bottom: 0;
   left: 0;
-  // width: 100%;
-  z-index: 10; /* Lower z-index for a softer overlay effect */
-  box-shadow: -2px 5px rgba(0, 0, 0, 0.1); /* Softer, more subtle shadow */
-  border-top: 1px solid rgba(0, 0, 0, 0.05); /* Thin and light border for separation */
+  z-index: 10;
+  box-shadow: -2px 5px rgba(0, 0, 0, 0.1);
   background-color: #000000;
+  border-top: none; /* Add this to remove the default border on the bar */
 }
 
-ion-tab-button{
+ion-tab-button {
   background-color: #000000;
+  border-top: none; /* Add this to remove the default border on the buttons */
+  color: #a9a9a9; /* Set a default color for unselected tabs */
 }
 
 .icon {
   font-size: 1.8em;
+}
+
+/* Updated styles for the selected tab */
+ion-tab-button.tab-selected {
+  border-top: 4px solid white; /* Your custom vibrant top border */
+}
+
+ion-tab-button.tab-selected .icon,
+ion-tab-button.tab-selected ion-label {
+  color: white; /* Your custom color for the icon and label */
 }

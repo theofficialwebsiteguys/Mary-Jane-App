@@ -1,4 +1,4 @@
-<ion-content>
+<ion-content [fullscreen]="true" [scrollY]="false">
   <div class="auth-container" role="main">
     <ng-container [ngSwitch]="showMode">
       <app-login *ngSwitchCase="'login'" aria-label="Login Form"></app-login>

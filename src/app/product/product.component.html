@@ -32,7 +32,7 @@
           <span aria-live="polite">{{ quantity }}</span>
           <button (click)="adjustQuantity(1, $event)" [attr.aria-label]="'Increase quantity of ' + product.title">+</button>
         </ion-row>
-        <ion-button class="add-to-cart-btn" expand="block" color="primary" (click)="addToCart($event)" [attr.aria-label]="'Add ' + product.title + ' to cart'">
+        <ion-button class="add-to-cart-btn" expand="block" (click)="addToCart($event)" [attr.aria-label]="'Add ' + product.title + ' to cart'">
           Add to Cart
         </ion-button>
       </ng-container>

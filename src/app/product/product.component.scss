@@ -16,10 +16,14 @@ ion-item {
 
 .odd-item {
   --background: rgba(var(--ion-color-primary-rgb), 0.95);
+  ion-button.add-to-cart-btn {
+    --background: #323232;
+  }
 }
 
 .even-item {
   --background: rgba(var(--ion-color-primary-contrast-rgb), 1);
+
 }
 
 
@@ -129,7 +133,7 @@ ion-button.add-to-cart-btn {
   font-size: 0.9rem;
   font-weight: 500;
   --border-radius: 2px;
-  --background: #323232;
+  // --background: #323232;
   --color: #fff;
   --box-shadow: none;
 

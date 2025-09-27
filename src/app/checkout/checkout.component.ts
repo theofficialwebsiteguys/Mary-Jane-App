@@ -378,30 +378,29 @@ export class CheckoutComponent implements OnInit {
         quantity: item.quantity
       }));
 
-      this.cartService.checkout(points_redeem, this.selectedOrderType, deliveryAddress);
-      // const response = await this.cartService.checkout(points_redeem, this.selectedOrderType, deliveryAddress);
+      const response = await this.cartService.checkout(points_redeem, this.selectedOrderType, deliveryAddress);
   
-      // pos_order_id = response.id_order;
-      // points_add = response.subtotal;
+      pos_order_id = response.orderResult.orderId;
+      points_add = this.finalSubtotal;
 
-      // await this.cartService.placeOrder(user_id, pos_order_id, points_redeem ? 0 : points_add, points_redeem, this.finalSubtotal, this.checkoutInfo.cart);
+      await this.cartService.placeOrder(user_id, pos_order_id, points_redeem ? 0 : points_add, points_redeem, this.finalSubtotal, this.checkoutInfo.cart);
   
-      // this.orderPlaced.emit();
+      this.orderPlaced.emit();
 
-      // const userOrders = await this.authService.getUserOrders(); // ✅ Ensure this is awaited
+       await this.authService.getUserOrders();
       
-      // this.accessibilityService.announce('Your order has been placed successfully.', 'polite');
+      this.accessibilityService.announce('Your order has been placed successfully.', 'polite');
 
-      // const orderTypeMessage =
-      // this.selectedOrderType === 'delivery'
-      //   ? 'Your delivery order has been placed!'
-      //   : 'Your pickup order has been placed!';
+      const orderTypeMessage =
+      this.selectedOrderType === 'delivery'
+        ? 'Your delivery order has been placed!'
+        : 'Your pickup order has been placed!';
 
-      // await this.fcmService.sendPushNotification(
-      //   this.checkoutInfo.user_info.id,
-      //   'Order Confirmed',
-      //   orderTypeMessage
-      // );
+      await this.fcmService.sendPushNotification(
+        this.checkoutInfo.user_info.id,
+        'Order Confirmed',
+        orderTypeMessage
+      );
 
     } catch (error:any) {
       console.error('Error placing order:', error);
@@ -513,6 +512,23 @@ export class CheckoutComponent implements OnInit {
     this.timeOptions = options;
   }
   
-
+  placeholderFor(category?: string | null): string {
+    const key = (category || 'default').toLowerCase();
+    // map to your assets; provide a default fallback
+    const map: Record<string, string> = {
+      flower: 'assets/flower-general.png',
+      'pre-roll': 'assets/pre-roll-general.png',
+      prerolls: 'assets/pre-roll-general.png',
+      edibles: 'assets/edibles-general.png',
+      vapes: 'assets/vapes-general.png',
+      concentrates: 'assets/concentrates-general.png',
+      beverage: 'assets/beverage-general.png',
+      tinctures: 'assets/tincture-general.png',
+      topicals: 'assets/topicals-general.png',
+      accessories: 'assets/accessories-general.png',
+      default: 'assets/default.png'
+    };
+    return map[key] || map['default'];
+  }
   
 }

@@ -22,7 +22,7 @@ export class AuthService {
 
   private enrichedOrders = new BehaviorSubject<any[]>([]);
 
-  private apiUrl = `${environment.apiUrl}/users`;
+  private apiUrl = `${environment.apiUrl}/alpine`;
 
   constructor(private http: HttpClient, private router: Router, @Inject(FcmService) private fcmService: FcmService, private productsService: ProductsService) {
     const user = localStorage.getItem('user_info');
@@ -97,7 +97,7 @@ export class AuthService {
 
     return new Observable((observer) => {
       CapacitorHttp.post({
-        url: `${this.apiUrl}/login`,
+        url: `${this.apiUrl}/login?venue_id=${environment.aiq_venue_id}`,
         headers: { 
           'x-auth-api-key': environment.db_api_key,
           'Content-Type': 'application/json'  // ✅ Ensure correct content type
@@ -125,21 +125,28 @@ export class AuthService {
   }
 
   logout(): void {
-    const headers = this.getHeaders();
-
-    CapacitorHttp.post({
-      url: `${this.apiUrl}/logout`,
-      headers,
-      data: {},
-    })
-      .then(() => {
-        this.removeToken();
+            this.removeToken();
         this.authStatus.next(false);
         this.userSubject.next(null);
         this.router.navigate(['/rewards']);
         this.removeUser();
-      })
-      .catch((error) => console.error('Logout failed:', error));
+    // const headers = this.getHeaders();
+
+    // console.log("here")
+
+    // CapacitorHttp.post({
+    //   url: `${this.apiUrl}/logout`,
+    //   headers,
+    //   data: {},
+    // })
+    //   .then(() => {
+    //     this.removeToken();
+    //     this.authStatus.next(false);
+    //     this.userSubject.next(null);
+    //     this.router.navigate(['/rewards']);
+    //     this.removeUser();
+    //   })
+    //   .catch((error) => console.error('Logout failed:', error));
   }
 
   private storeSessionData(sessionId: string, expiresAt: Date): void {
@@ -221,7 +228,7 @@ export class AuthService {
     const headers = this.getHeaders();
 
     CapacitorHttp.get({
-      url: `${this.apiUrl}/validate-session`,
+      url: `${environment.apiUrl}/users/validate-session`,
       headers,
     })
       .then((response) => {
@@ -252,7 +259,7 @@ export class AuthService {
     const headers = this.getHeaders();
 
     CapacitorHttp.get({
-      url: `${this.apiUrl}/id/${this.getCurrentUser().id}`,
+      url: `${environment.apiUrl}/users/id/${this.getCurrentUser().id}`,
       headers,
     })
       .then((response) => {
@@ -337,13 +344,10 @@ export class AuthService {
   async getUserOrders(): Promise<any> {
     try {
       const response = await CapacitorHttp.get({
-        url: `${environment.apiUrl}/orders/user`,
-        headers: this.getHeaders(),
+        url: `${environment.apiUrl}/dutchie/userOrders`,
+        headers: {'x-auth-api-key': environment.db_api_key},
         params: { user_id: String(this.getCurrentUser().id) }, // Ensure it's a string
       });
-  
-      console.log("API Response:", response);
-      console.log("Response Data Type:", typeof response.data);
   
       // Handle cases where the response is not an object
       if (typeof response.data === "number") {
@@ -359,7 +363,7 @@ export class AuthService {
         console.warn("Failed to parse response:", e);
       }
   
-      this.handleRecentOrders(response.data);
+      this.enrichedOrders.next(response.data);
       this.updateUserData();
   
       return response.data;

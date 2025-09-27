@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, forkJoin, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, firstValueFrom, forkJoin, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { AuthService } from './auth.service';
 import { CapacitorHttp } from '@capacitor/core';
@@ -172,60 +172,61 @@ export class CartService {
     this.saveCart([]);
   }
 
-  checkout(points_redeem: number, orderType: string, deliveryAddress: any) {
+   async checkout(
+    points_redeem: number,
+    orderType: string,
+    deliveryAddress: any
+  ): Promise<{ orderResult: any }> {
     const cartItems = this.getCart();
 
-    this.authService.getUserInfo().subscribe((user_info: any) => {
-      const preorder: any = {
-        items: cartItems.map(item => ({
-          productId: item.id,
-          quantity: item.quantity,
-        })),
-        isDelivery: orderType === 'delivery',
-        notes: '',
-        ...(orderType === 'delivery' && {
-          deliveryInfo: {
-            street: deliveryAddress.street,
-            street2: deliveryAddress.street2 || '',
-            city: deliveryAddress.city,
-            state: deliveryAddress.state,
-            zip: deliveryAddress.zip,
-          }
-        })
-      };
+    // 1) Get user info as a promise
+    const user_info: any = await firstValueFrom(this.authService.getUserInfo());
 
-      const userInfo = {
-        firstName: user_info.fname,
-        lastName: user_info.lname,
-        emailAddress: user_info.email,
-        phone: user_info.phone,
-        dateOfBirth: user_info.dob,
-      };
+    // 2) Build preorder payload
+    const preorder: any = {
+      items: cartItems.map(item => ({
+        productId: item.id,
+        quantity: item.quantity,
+      })),
+      isDelivery: orderType === 'delivery',
+      notes: '',
+      ...(orderType === 'delivery' && deliveryAddress ? {
+        deliveryInfo: {
+          street: deliveryAddress.street,
+          street2: deliveryAddress.street2 || '',
+          city: deliveryAddress.city,
+          state: deliveryAddress.state,
+          zip: deliveryAddress.zip,
+        }
+      } : {})
+    };
 
-      const payload = {
-        preorder,
-        userInfo,
-      };
+    const userInfo = {
+      firstName: user_info.fname,
+      lastName: user_info.lname,
+      emailAddress: user_info.email,
+      phone: user_info.phone,
+      dateOfBirth: user_info.dob,
+    };
 
-      console.log(payload)
+    const payload = { preorder, userInfo, pointsRedeem: points_redeem };
 
-      CapacitorHttp.post({
-        url: `${environment.apiUrl}/dutchie/submitOrder`,
-        headers: {
-          'x-auth-api-key': environment.db_api_key,
-          'Content-Type': 'application/json'
-        },
-        data: payload,
-      })
-        .then((response) => {
-          console.log('Dutchie preorder submitted successfully:', response.data);
-          this.clearCart();
-          // Navigate to confirmation screen if needed
-        })
-        .catch((error) => {
-          console.error('Dutchie preorder failed:', error);
-        });
+    // 3) Call API with await
+    const res = await CapacitorHttp.post({
+      url: `${environment.apiUrl}/dutchie/submitOrder`,
+      headers: {
+        'x-auth-api-key': environment.db_api_key,
+        'Content-Type': 'application/json'
+      },
+      data: payload,
     });
+
+    console.log('Dutchie preorder submitted successfully:', res.data);
+
+    this.clearCart();
+
+    // 4) Return result in expected shape
+    return res.data;
   }
 
   

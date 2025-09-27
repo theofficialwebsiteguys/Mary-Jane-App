@@ -67,7 +67,8 @@ export class LoginComponent {
       },
       error: (err) => {
         this.loading = false;
-        this.error = this.getErrorMessage(err);
+        // this.error = this.getErrorMessage(err);
+        this.error = err.data.error;
         this.accessibilityService.announce(this.error, 'assertive');
       },
     });

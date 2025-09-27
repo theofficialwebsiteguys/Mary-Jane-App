@@ -10,6 +10,13 @@
       <ion-label>Products</ion-label>
     </ion-tab-button>
 
+    <ng-container *ngIf="isLoggedIn$ | async">
+      <ion-tab-button tab="orders" routerLink="/orders" aria-label="Orders">
+        <i class="fa-solid fa-receipt icon"></i>
+        <ion-label>Orders</ion-label>
+      </ion-tab-button>
+    </ng-container>
+
     <ion-tab-button tab="rewards" routerLink="/rewards" aria-label="Rewards">
       <i class="fa-solid fa-award icon" aria-hidden="true"></i>
       <ion-label>Rewards</ion-label>

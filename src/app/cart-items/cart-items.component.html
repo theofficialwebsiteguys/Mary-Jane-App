@@ -1,7 +1,7 @@
 <div class="cart-container">
   <div class="cart-item" *ngFor="let item of items">
     <div class="item-image">
-      <img [src]="!item.image ? 'assets/default.png' : item.image " [alt]="'Image of ' + item.title"/>
+      <img [src]="!item.image ? placeholderFor(item.category) : item.image " [alt]="'Image of ' + item.title"/>
     </div>
     <div class="item-details">
       <h4>{{ item.title }}</h4>

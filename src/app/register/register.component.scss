@@ -15,36 +15,38 @@ $box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 $padding: 20px;
 $spacing: 16px;
 
+html, body {
+  height: 100%;
+}
+
 // Log In Page
 .log-in-page {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: flex-start;
   align-items: center;
-  padding: $padding;
-  padding-top: calc(env(safe-area-inset-top, 20px) + 100px);
-  
-   /* Avoid cut-off issues on keyboard appearance */
-   @supports (padding-bottom: env(safe-area-inset-bottom)) {
-    padding-bottom: calc(env(safe-area-inset-bottom) + 20px); // Account for keyboard and safe area
-  }
-
+  padding: 16px;
+  padding-top: calc(env(safe-area-inset-top, 20px) + 60px);
+  min-height: 100vh; /* This sets the height to the full viewport */
+  overflow: hidden; /* This is the key: it prevents the page from scrolling */
 }
 
 // Login Container
 .login-container {
   width: 100%;
   max-width: 420px; // Slightly wider to fit two fields per row
-  padding: $padding;
-  border-radius: $border-radius;
-  box-shadow: $box-shadow;
-  animation: fadeInUp 0.4s ease-in-out;
-  overflow-y: auto;
-  padding-bottom: 20px; // Provide extra space for better scrolling
+  padding: 16px;
+  padding-bottom: 250px; /* You can remove this if it's not needed, it adds extra space at the bottom */
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  align-items: stretch; // Makes the form stretch to fill space
+  flex-grow: 1; /* Allows the container to grow to fill space */
+  overflow-y: auto; /* This enables vertical scrolling for this container only */
+  max-height: calc(100vh - 120px); /* This sets a maximum height */
   background-color: var(--ion-color-secondary);
 }
+
 
 // Login Header
 .login-header {
@@ -264,4 +266,20 @@ ion-checkbox {
   --size: 20px;
   --checkmark-color: var(--ion-color-light);
   --border-color: var(--ion-color-medium);
+}
+
+.password-requirements {
+  font-size: 0.75rem;
+  color: $text-color-light;
+  margin: 6px 0 0 0;
+  padding-left: 1.2rem;
+  list-style-type: disc;
+
+  li {
+    margin-bottom: 2px;
+  }
+}
+
+* {
+  -webkit-overflow-scrolling: touch;
 }
