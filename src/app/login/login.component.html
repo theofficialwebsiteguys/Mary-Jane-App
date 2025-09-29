@@ -42,17 +42,24 @@
         </div>
       </div>
 
-      <div class="form-group">
+ <div class="form-group">
         <label for="password" class="required">Password</label>
-        <input
-          type="password"
-          id="password"
-          formControlName="password"
-          placeholder="Enter your password"
-          required
-          aria-required="true"
-          aria-label="Enter your password"
-        />
+        <div class="password-input-wrapper">
+          <input
+            [type]="passwordFieldType" id="password"
+            formControlName="password"
+            placeholder="Enter your password"
+            required
+            aria-required="true"
+            aria-label="Enter your password"
+          />
+          <ion-icon
+            [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"
+            (click)="togglePasswordVisibility()"
+            class="password-toggle-icon"
+            aria-hidden="true"
+          ></ion-icon>
+        </div>
         <div
           *ngIf="submitted && loginForm.get('password')?.invalid"
           class="form-error"
@@ -61,7 +68,7 @@
           Password is required.
         </div>
       </div>
-
+      
       <div class="forgot-password">
         <a
           routerLink="/auth"

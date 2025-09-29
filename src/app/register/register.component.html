@@ -175,16 +175,25 @@
 
      <div class="form-group">
       <label for="password" class="required">Password</label>
-      <input
-        type="password"
-        id="password"
-        formControlName="password"
-        [class.invalid]="submitted && registerForm.get('password')?.invalid"
-        placeholder="Enter your password"
-        required
-        aria-required="true"
-        [attr.aria-invalid]="submitted && registerForm.get('password')?.invalid"
-      />
+      
+        <div class="password-input-wrapper">
+          <input
+            [type]="passwordFieldType"
+            id="password"
+            formControlName="password"
+            [class.invalid]="submitted && registerForm.get('password')?.invalid"
+            placeholder="Enter your password"
+            required
+            aria-required="true"
+            [attr.aria-invalid]="submitted && registerForm.get('password')?.invalid"
+          />
+          <ion-icon
+            [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"
+            (click)="togglePasswordVisibility()"
+            class="password-toggle-icon"
+            aria-hidden="true"
+          ></ion-icon>
+        </div>
 
       <!-- Password requirements helper -->
       <ul class="password-requirements" id="password-requirements">
@@ -207,18 +216,24 @@
 
       <div class="form-group">
         <label for="confirmPassword" class="required">Confirm Password</label>
-        <input
-          type="password"
-          id="confirmPassword"
-          formControlName="confirmPassword"
-          [class.invalid]="
-            submitted && registerForm.get('notMatching')?.invalid
-          "
-          placeholder="Confirm your password"
-          required
-          aria-required="true"
-          [attr.aria-invalid]="submitted && registerForm.get('notMatching')?.invalid"
-        />
+         <div class="password-input-wrapper">
+          <input
+            [type]="confirmPasswordFieldType"
+            id="confirmPassword"
+            formControlName="confirmPassword"
+            [class.invalid]="submitted && registerForm.hasError('notMatching')"
+            placeholder="Confirm your password"
+            required
+            aria-required="true"
+            [attr.aria-invalid]="submitted && registerForm.hasError('notMatching')"
+          />
+          <ion-icon
+            [name]="showConfirmPassword ? 'eye-off-outline' : 'eye-outline'"
+            (click)="toggleConfirmPasswordVisibility()"
+            class="password-toggle-icon"
+            aria-hidden="true"
+          ></ion-icon>
+        </div>
         <div
           *ngIf="submitted && registerForm.hasError('notMatching')"
           class="form-error" aria-live="assertive"

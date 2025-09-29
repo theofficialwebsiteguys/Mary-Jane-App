@@ -18,6 +18,10 @@ export class LoginComponent {
   error = '';
   darkModeEnabled: boolean = false;
 
+  showPassword = false;
+  passwordFieldType: 'password' | 'text' = 'password';
+
+
   constructor(
     private readonly fb: FormBuilder,
     private readonly router: Router,
@@ -37,6 +41,14 @@ export class LoginComponent {
 
   ngOnDestroy() {
     this.resetForm();
+  }
+
+  
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
+    this.passwordFieldType = this.showPassword ? 'text' : 'password';
+    const announcement = this.showPassword ? 'Password characters now visible.' : 'Password characters now hidden.';
+    this.accessibilityService.announce(announcement, 'polite');
   }
 
   resetForm() {

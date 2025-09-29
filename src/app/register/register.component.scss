@@ -283,3 +283,40 @@ ion-checkbox {
 * {
   -webkit-overflow-scrolling: touch;
 }
+
+.password-input-wrapper {
+  position: relative; /* Context for the absolute icon */
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrapper input {
+  width: 100%;
+  padding-right: 40px; /* Space for the icon */
+}
+
+.password-toggle-icon {
+  position: absolute; /* Takes the icon out of flow */
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  z-index: 10;
+}
+
+/* IMPORTANT: Ensure this general selector still applies to the wrapped input */
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group input[type="text"],
+.form-group input[type="tel"],
+.form-group input[type="date"],
+/* Add the specific wrapper selector to guarantee style consistency */
+.password-input-wrapper input { 
+    width: 100%;
+    padding: 12px;
+    border: 1px solid $input-border-color;
+    border-radius: $border-radius;
+    font-size: $font-size-input;
+    background-color: #f9f9f9; /* The white background you want */
+    color: $text-color-dark; /* The dark text color you want */
+}

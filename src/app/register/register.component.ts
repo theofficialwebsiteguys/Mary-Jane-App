@@ -47,6 +47,12 @@ export class RegisterComponent {
   currentYear = new Date().getFullYear();
   darkModeEnabled: boolean = false;
 
+  showPassword = false;
+  passwordFieldType: 'password' | 'text' = 'password';
+
+  showConfirmPassword = false;
+  confirmPasswordFieldType: 'password' | 'text' = 'password';
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -116,6 +122,26 @@ export class RegisterComponent {
     if (activeElement && activeElement.tagName === 'INPUT') {
       activeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
+  }
+
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
+    this.passwordFieldType = this.showPassword ? 'text' : 'password';
+    const announcement = this.showPassword
+      ? 'Password characters now visible.'
+      : 'Password characters now hidden.';
+    this.accessibilityService.announce(announcement, 'polite');
+  }
+
+  toggleConfirmPasswordVisibility() {
+    this.showConfirmPassword = !this.showConfirmPassword;
+    this.confirmPasswordFieldType = this.showConfirmPassword
+      ? 'text'
+      : 'password';
+    const announcement = this.showConfirmPassword
+      ? 'Confirm Password characters now visible.'
+      : 'Confirm Password characters now hidden.';
+    this.accessibilityService.announce(announcement, 'polite');
   }
 
   onSubmit() {

@@ -86,14 +86,14 @@ $spacing: 16px;
   }
 
   input[type="email"],
-  input[type="password"] {
+  .password-input-wrapper input { 
     width: 100%;
     padding: 12px;
     border: 1px solid $input-border-color;
     border-radius: $border-radius;
     font-size: $font-size-input;
-    background-color: #f9f9f9;
-    color: var(--ion-color-primary);
+    background-color: #f9f9f9; /* Apply the light background */
+    color: black; /* Apply the dark text color */
 
     &:focus {
       border-color: var(--ion-color-primary);
@@ -128,4 +128,31 @@ $spacing: 16px;
   margin-bottom: 1rem;
   font-size: 0.9rem;
   text-align: center;
+}
+
+
+
+/* 1. Wrapper establishes the positioning context */
+.password-input-wrapper {
+  position: relative; /* Essential for absolute positioning of the icon */
+  display: flex; /* Ensures the input and icon are on the same line (if not absolutely positioned) */
+  align-items: center;
+}
+
+/* 2. Input takes full width and reserves space for the icon */
+.password-input-wrapper input {
+  width: 100%;
+  /* CRITICAL: Reserves space for the icon so the text doesn't flow underneath it */
+  padding-right: 40px; 
+}
+
+/* 3. Icon is placed on top of the input and does not affect flow */
+.password-toggle-icon {
+  position: absolute; /* Takes the icon out of the normal document flow */
+  right: 10px; 
+  top: 50%;
+  transform: translateY(-50%); /* Vertically centers the icon */
+  cursor: pointer;
+  /* Ensure the icon is placed over the input field's boundaries */
+  z-index: 10; 
 }
