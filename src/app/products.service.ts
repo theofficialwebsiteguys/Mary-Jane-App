@@ -52,7 +52,7 @@ export class ProductsService {
     sessionStorage.setItem('products', JSON.stringify(products));
   }
 
- fetchProducts(): Observable<Product[]> {
+ fetchProducts(toggleVape = true): Observable<Product[]> {
   // Clear products if location has changed
   // if (this.lastFetchedLocationId && this.lastFetchedLocationId !== location_id) {
   //   console.log('Location changed. Clearing previous products.');
@@ -68,6 +68,7 @@ export class ProductsService {
 
   const options = {
     url: `${environment.apiUrl}/dutchie/inventory`,
+    params: { toggleVape: String(toggleVape) },
     headers: {
       'Content-Type': 'application/json',
       'x-auth-api-key': environment.db_api_key,
@@ -268,7 +269,21 @@ export class ProductsService {
   }
 
   getCategories(): CategoryWithImage[] {
-    return [
+    // return [
+    //   { category: 'Flower', imageUrl: 'assets/icons/flower.png' },
+    //   { category: 'Pre-Roll', imageUrl: 'assets/icons/prerolls.png' },
+    //   { category: 'Vapes', imageUrl: 'assets/icons/vaporizer.png' },
+    //   { category: 'Concentrates', imageUrl: 'assets/icons/concentrates.png' },
+    //   { category: 'Edibles', imageUrl: 'assets/icons/edibles.png' },
+    //   // { category: 'Beverages', imageUrl: 'assets/icons/beverages.png' },
+    //   { category: 'Tinctures', imageUrl: 'assets/icons/tinctures.png' },
+    //   { category: 'Topicals', imageUrl: 'assets/icons/topicals.png' },
+    //   { category: 'CBD', imageUrl: 'assets/icons/cbd.png' },
+    //   { category: 'Accessories', imageUrl: 'assets/icons/accessories.png' },
+    //   { category: 'Apparel', imageUrl: 'assets/icons/apparel.png' },
+    // ];
+
+    const categories: CategoryWithImage[] = [
       { category: 'Flower', imageUrl: 'assets/icons/flower.png' },
       { category: 'Pre-Roll', imageUrl: 'assets/icons/prerolls.png' },
       { category: 'Vapes', imageUrl: 'assets/icons/vaporizer.png' },
@@ -281,6 +296,16 @@ export class ProductsService {
       { category: 'Accessories', imageUrl: 'assets/icons/accessories.png' },
       { category: 'Apparel', imageUrl: 'assets/icons/apparel.png' },
     ];
+
+    const hasVapeProducts = this.products.value.some(
+      (p) => p.category?.toLowerCase() === 'vapes'
+    );
+
+    console.log(hasVapeProducts)
+
+    return hasVapeProducts
+      ? categories
+      : categories.filter((c) => c.category !== 'Vapes');
   }
 
   getSimilarItems(): Observable<Product[]> {
