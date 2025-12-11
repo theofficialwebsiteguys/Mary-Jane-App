@@ -7,6 +7,15 @@ import { environment } from 'src/environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CapacitorHttp, HttpResponse } from '@capacitor/core';
 
+export interface Announcement {
+  id: string;
+  title?: string;
+  message: string;
+  ctaText?: string;
+  ctaUrl?: string;
+  priority?: 'info' | 'promo' | 'warning';
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -105,6 +114,7 @@ export class SettingsService {
     }
   
     return {
+      'x-auth-api-key': environment.db_api_key,
       Authorization: token,
       'Content-Type': 'application/json',
     };
@@ -298,7 +308,40 @@ export class SettingsService {
     }
   }
   
+  async getBusinessAnnouncements(): Promise<Announcement[]> {
+    const options = {
+      url: `${environment.apiUrl}/businesses/announcements`,
+      method: 'GET',
+      headers: { 'x-auth-api-key': environment.db_api_key },
+    };
+
+    try {
+      const response = await CapacitorHttp.request(options);
+
+      console.log('Fetched announcements:', response.data);
+      return response.data as Announcement[];
+    } catch (error) {
+      console.error('Error fetching announcements:', error);
+      return [];
+    }
+  }
   
 
-  
+  async getDiscounts(): Promise<any[]> {
+    const options = {
+      url: `${environment.apiUrl}/alpine/discounts`,
+      method: 'GET',
+      headers: { 'x-auth-api-key': environment.db_api_key },
+    };
+
+    try {
+      const response = await CapacitorHttp.request(options);
+
+      console.log('Fetched discounts:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching discounts:', error);
+      return [];
+    }
+  }
 }

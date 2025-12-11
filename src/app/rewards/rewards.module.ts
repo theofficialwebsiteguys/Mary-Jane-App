@@ -14,6 +14,7 @@ import { ReferComponent } from '../refer/refer.component';
 import { ReviewComponent } from '../review/review.component';
 import { GuestComponent } from '../guest/guest.component';
 import { RedeemProductsComponent } from '../redeem-products/redeem-products.component';
+import { AiqTiersComponent } from '../aiq-tiers/aiq-tiers.component';
 
 @NgModule({
   imports: [
@@ -23,6 +24,6 @@ import { RedeemProductsComponent } from '../redeem-products/redeem-products.comp
     RewardsPageRoutingModule,
     SharedModule
   ],
-  declarations: [RewardsPage, PointsComponent, AccountComponent, ReferComponent, ReviewComponent, GuestComponent, RedeemProductsComponent]
+  declarations: [RewardsPage, PointsComponent, AccountComponent, ReferComponent, ReviewComponent, GuestComponent, RedeemProductsComponent, AiqTiersComponent]
 })
 export class RewardsPageModule {}

@@ -1,210 +1,74 @@
-@supports(padding-top: env(safe-area-inset-top)) {
-    .heading-container {
-        padding-top: env(safe-area-inset-top);
-    }
-}
-
-img {
-  height: 50px;
-}
-
-/* Cart Button */
-.cart-button {
-  position: relative;
-  --background: transparent;
-  --box-shadow: none;
-  padding: 0;
-}
-
-/* Font Awesome Cart Icon */
-.cart-button i {
-  font-size: 22px; /* Adjust the size of the icon */
-  color: var(--ion-color-primary); /* Match your app's primary color */
-}
-
-/* Cart Badge */
-.cart-badge {
-  position: absolute;
-  top: -4px;
-  right: -6px;
-  background-color: #222222;
-  color: #ffffff;
-  font-size: 10px;
-  font-weight: bold;
-  padding: 2px 6px;
-  border-radius: 50%;
-  min-width: 16px;
-  height: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
-}
-
-.action-button {
-  position: relative; /* Ensure the badge positions correctly */
-  padding: 10px; /* Extra space around the button */
-  font-size: 16px;
-  font-weight: bold;
-}
-
-.action-button {
-  text-transform: capitalize;
-  --border-radius: 0 !important;
-
-  a {
-    text-decoration: none;
-    color: black;
-  }
-}
-
-.points-display {
-  font-size: 14px;
-  font-weight: bold;
-  margin-left: 8px;
-  color: var(--ion-color-primary);
-}
-
-.heading-container {
-  position: sticky;
-  top: 0;
-  z-index: 1; /* Increase above carousel */
-  background: #dddddd;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-  color: var(--ion-color-primary);
-}
-
+/* ===== Toolbar Base ===== */
 ion-toolbar.heading-container {
-  --background: var(--ion-color-primary-contrast); // or any custom variable you define
+  --min-height: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  --padding-top: env(safe-area-inset-top);
+  --padding-start: 8px;
+  --padding-end: 8px;
+  background: #dddddd;
+  box-shadow: 0 2px 4px rgba(0,0,0,.1);
 }
 
-/* Cart Icon */
-ion-icon[name="cart-outline"] {
-  font-size: 24px; /* Size of the cart icon */
-  color: var(--ion-color-primary);
+/* Ensure both sides behave identically */
+.toolbar-side {
+  display: flex;
+  align-items: center;
 }
 
-/* Notification Button */
-.notification-button {
-  position: relative;
+/* ===== Unified Button Reset ===== */
+.toolbar-btn {
   --background: transparent;
   --box-shadow: none;
+  --border-radius: 0;
+  min-width: 40px;
+  height: 40px;
   padding: 0;
-}
-
-/* Font Awesome Bell Icon */
-.notification-button i {
-  font-size: 22px; /* Same size as the cart icon */
-  color: var(--ion-color-primary); /* Match your app's primary color */
-}
-
-/* Notification Badge */
-.notification-badge {
-  position: absolute;
-  top: -4px; /* Align with the cart badge */
-  right: -6px;
-  background: var(--ion-color-secondary);
-  color: #fff;
-  font-size: 10px;
-  font-weight: bold;
-  padding: 2px 6px;
-  border-radius: 50%;
-  min-width: 16px;
-  height: 16px;
+  margin: 0 2px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
 }
 
-.modal-container {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  background-color: #f7f7f7;
-  border-radius: 10px;
-  padding: 10px;
-  overflow: hidden;
+/* ===== Logo ===== */
+.logo-btn {
+  min-width: auto;
+  padding: 0 6px;
 }
 
-.notification-content {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 16px;
-}
-/* Styling for the Clear All Button */
-.clear-all-button {
-  margin: 0;
-  // color: #fff;
-  font-weight: bold;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+.logo {
+  height: 34px;
+  display: block;
 }
 
-.sticky-footer {
-  position: sticky;
-  margin-top: 10px;
-  bottom: 0;
-  background: white; /* Ensure it doesn't overlap with background */
-  border-top: 1px solid #ddd; /* Slight border for separation */
-  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for better visibility */
-  z-index: 10;
+/* ===== Icons ===== */
+.icon-btn i {
+  font-size: 21px;
+  color: var(--ion-color-primary);
+  line-height: 1;
 }
 
+/* ===== Text Button ===== */
+.text-btn {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 0 8px;
+}
 
-/* Optional: Style for the individual notification "Clear" button */
-.notification-item {
+/* ===== Badges ===== */
+.badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  font-size: 10px;
+  border-radius: 999px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 12px;
-  border-radius: 6px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-  font-size: 14px;
-  transition: background 0.3s ease;
-}
-
-.notification-item.unread {
-  font-weight: bold;
-}
-
-.notification-item:hover {
-  background-color: #e0e0e0;
-}
-
-.notification-icon {
-  font-size: 18px;
-  margin-right: 12px;
-  color: var(--ion-color-primary);
-}
-
-ion-button.clear {
-  font-size: 12px;
-  color: var(--ion-color-danger);
-  padding: 0;
-  margin-left: 12px;
-}
-
-
-.empty-notifications {
-  text-align: center;
-  color: #aaa;
-  font-size: 16px;
-}
-
-.scrollable-notifications {
-  overflow-y: auto;
-}
-
-.notification-text {
-  display: flex;
-  flex-direction: column;
-}
-
-.notification-date {
-  font-size: 12px;
-  color: #888;
-  margin-top: 4px;
+  justify-content: center;
+  background: #222;
+  color: #fff;
 }

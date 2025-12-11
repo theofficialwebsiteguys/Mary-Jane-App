@@ -1,164 +1,82 @@
 .splash-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  width: 100%;
+  height: 100%;
+
   display: flex;
   justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  height: 85vh;
-  width: 100%;
-  padding: 20px;
-  box-sizing: border-box;
-  position: relative;
+  align-items: center; /* ⬅️ PERFECT VERTICAL CENTER */
 
-  .logo-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    margin-bottom: 25px;
-  }
+  background-image: url('/assets/background.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 
-  .logo {
-    width: 80%;
-    max-width: 500px; // Prevent logo from being too large on desktops
-    height: auto;
-  }
-
-  .age-verification {
-    position: absolute;
-    top: calc(55%); // Adjusted for better alignment
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: 10px;
-
-    .verification-text {
-      font-size: 1.2rem;
-      color: rgb(0, 0, 0);
-      margin-bottom: 20px;
-      text-align: center;
-      white-space: normal; // Allow text wrapping
-    }
-
-    .button-group {
-      display: flex;
-      flex-direction: row;
-      gap: 15px;
-
-      ion-button {
-        width: 100px;
-        height: 45px;
-        font-size: 1rem;
-        font-weight: bold;
-        text-transform: uppercase;
-        color: white;
-      }
-
-    }
-  }
+  padding-bottom: env(safe-area-inset-bottom); /* ⬅️ Accounts for tab bars & iOS home bar */
 }
 
-/* Tablet */
-@media (max-width: 768px) {
-  .logo {
-    width: 70%;
-  }
-
-  .age-verification {
-    top: 65%;
-    .verification-text {
-      font-size: 1rem;
-    }
-
-    .button-group {
-      ion-button {
-        width: 90px;
-        height: 40px;
-        font-size: 0.9rem;
-      }
-    }
-  }
-}
-
-/* Mobile */
-@media (max-width: 480px) {
-  .logo {
-    width: 80%;
-  }
-
-  .age-verification {
-    top: 70%;
-    .verification-text {
-      font-size: 0.9rem;
-    }
-
-    .button-group {
-      flex-direction: column;
-      gap: 10px;
-
-      ion-button {
-        width: 100px;
-        height: 40px;
-        font-size: 0.9rem;
-      }
-    }
-  }
-}
-.location-selection {
-  text-align: center;
-  margin-top: 1.5rem;
-
-  .location-heading {
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: #ffffff;
-    margin-bottom: 1rem; // reduced from 1.5rem
-  }
-}
-
-.location-cards {
+/* ---------- CENTERED COLUMN ---------- */
+.splash-content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem; // reduced gap between cards
+  justify-content: center;   /* ⬅️ Keeps everything centered */
+  text-align: center;
+
+  gap: 50px;                 /* Adjust spacing between logo & text/buttons */
+  width: 100%;
+  padding: 0 20px;           /* Safe margins */
+  margin-bottom: 100px;
 }
 
-.location-card {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 1rem 1.25rem; // slightly reduced padding
-  width: 85%;
-  max-width: 340px;
-  text-align: center;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06); // slightly softer shadow
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+/* ---------- LOGO ---------- */
+.logo {
+  width: 65%;
+  max-width: 420px;
+  height: auto;
+}
 
-  &:hover,
-  &:focus {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
-  }
+/* ---------- AGE TITLE ---------- */
+.age-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--ion-color-primary);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin: 0;
+}
 
-  img {
-    width: 90px;
-    height: 90px;
-    object-fit: contain;
-    margin-bottom: 0.75rem; // less space under image
-    border-radius: 10px;
-    background-color: #f9f9f9;
-  }
+/* ---------- YES / NO BUTTONS ---------- */
+.age-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+}
 
-  .location-name {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #111;
-    margin-bottom: 0.3rem; // less gap under title
-  }
+.yes-btn {
+  --background: #5b6053;
+  --background-activated: #3d4137;
+  --background-focused: #3d4137;
+  width: 130px;
+  height: 48px;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: white;
+}
 
-  .location-address {
-    font-size: 0.9rem;
-    color: #555;
-    line-height: 1.3;
-  }
+.no-btn {
+  --background: #ffffff;
+  --background-activated: #dddddd;
+  --background-focused: #cccccc;
+  width: 130px;
+  height: 48px;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: black;
 }

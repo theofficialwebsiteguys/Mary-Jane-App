@@ -1,120 +1,197 @@
 <div class="order-history">
-  <h2>Pending Orders</h2>
 
+  <!-- LOADING STATE -->
   <div *ngIf="loading" class="loading-container">
     <ion-spinner name="crescent"></ion-spinner>
   </div>
 
+  <!-- NO ORDERS EVER -->
   <div
-    class="order-list"
-    *ngIf="!loading && pendingOrders.length > 0"
-    role="region"
-    aria-labelledby="pending-orders-heading"
+    class="current-order-tracker"
+    *ngIf="!loading && !hasOrders"
   >
-    <div
-      class="order-card"
-      *ngFor="let order of pendingOrders; let i = index"
-      [class.expanded]="expandedOrderIndex.pending === i"
-    >
-      <div
-        class="order-header"
-        (click)="toggleExpand(i, 'pending')"
-        [attr.aria-expanded]="expandedOrderIndex.pending === i"
-        [attr.aria-controls]="'pending-order-items-' + i"
-        [attr.aria-label]="'View details for order ' + order.orderId"
+    <div class="no-order-message">
+      <p>No orders yet.</p>
+      <p>Start a new order and track it here.</p>
+    </div>
+  </div>
+
+
+  <!-- NO ACTIVE ORDER (but has history) -->
+  <div
+    class="current-order-tracker"
+    *ngIf="!loading && hasOrders && !currentOrder"
+  >
+    <div class="no-order-message">
+      <p>No active order.</p>
+      <p>Your past orders are shown below.</p>
+    </div>
+  </div>
+
+
+  <!-- CURRENT ORDER TRACKER -->
+  <div
+    class="current-order-tracker"
+    *ngIf="!loading && currentOrder"
+  >
+    <p class="status-message">
+      Your order is currently:<br />
+      <span
+        class="status-badge-lg"
+        [ngClass]="getStatusClass(currentOrder)"
       >
-        <div class="order-info">
-          <p>{{ order.orderDate | date:'longDate' }}</p>
-          <h3>Order #{{ order.orderId }}</h3>
-          <p>{{ order.items.length }} items</p>
-          <p *ngIf="order.orderType === 'Delivery'">🚚 Delivery Order</p>
-          <p class="status-badge">{{ getLatestStatus(order) }}</p>
+        {{ getLatestStatus(currentOrder) }}
+      </span>
+    </p>
+
+    <div class="status-tracker">
+      <div
+        *ngFor="let step of statusSteps; let i = index"
+        class="step-container"
+        [class.active]="getCurrentStepIndex(currentOrder) >= i"
+        [class.completed]="getCurrentStepIndex(currentOrder) > i"
+      >
+        <div class="circle">
+          <span *ngIf="getCurrentStepIndex(currentOrder) > i">✓</span>
         </div>
-        <div class="order-amount">
-          <p>${{ order.total | number : "1.2-2" }}</p>
-        </div>
+        <div class="label">{{ step }}</div>
       </div>
-      <div class="order-items" *ngIf="expandedOrderIndex.pending === i">
-        <ul>
-          <li *ngFor="let item of order.items" class="order-item">
-            <!-- <img
-              src="assets/default.png"
-              [alt]="'Image of ' + item.productName"
-              class="item-image"
-            /> -->
-            <span>{{ item.quantity }}x</span>
-            <span>{{ item.productName }}</span>
-          </li>
-        </ul>
-        <!-- <button
-          class="reorder-button"
-          (click)="reorder(order)"
-          [attr.aria-label]="'Reorder items from order' + order.orderId"
-        >
-          Reorder
-        </button> -->
+
+      <div class="progress-bar">
+        <div
+          class="progress"
+          [style.width]="getProgressWidth(currentOrder)"
+        ></div>
       </div>
     </div>
   </div>
-  <div *ngIf="!loading && pendingOrders.length === 0" class="no-orders-message">
-    <p>No pending orders found.</p>
-  </div>
 
-  <hr />
+  <!-- PENDING ORDERS -->
+  <ng-container *ngIf="!loading && pendingList.length">
+    <h2>Pending Orders</h2>
 
-  <h2>Past Orders</h2>
-
-  <div *ngIf="loading" class="loading-container">
-    <ion-spinner name="crescent"></ion-spinner>
-  </div>
-
-  <div
-    class="order-list"
-    *ngIf="!loading && pastOrders.length > 0"
-    role="region"
-    aria-labelledby="past-orders-heading"
-  >
-    <div
-      class="order-card"
-      *ngFor="let order of pastOrders; let i = index"
-      [class.expanded]="expandedOrderIndex.past === i"
-    >
+    <div class="order-list">
       <div
-        class="order-header"
-        (click)="toggleExpand(i, 'past')"
-        [attr.aria-expanded]="expandedOrderIndex.past === i"
-        [attr.aria-controls]="'past-order-items-' + i"
-        [attr.aria-label]="'View details for order ' + order.orderId"
+        class="order-card"
+        *ngFor="let order of pendingList; let i = index"
+        [class.expanded]="expandedOrderIndex.pending === i"
       >
-        <div class="order-info">
-          <h3>Order #{{ order.orderId }}</h3>
-          <p>{{ order.items.length }} items</p>
-          <p *ngIf="order.orderType === 'Delivery'">🚚 Delivery Order</p>
-          <p class="status-badge-complete">{{ getLatestStatus(order) }}</p>
-        </div>
-        <div class="order-amount">
-          <p>${{ order.total | number : "1.2-2" }}</p>
-        </div>
-      </div>
-
-      <div class="order-items" *ngIf="expandedOrderIndex.past === i">
-        <ul>
-          <li *ngFor="let item of order.items" class="order-item">
-            <span>{{ item.quantity }}x</span>
-            <span>{{ item.productName }}</span>
-          </li>
-        </ul>
-        <!-- <ion-button
-          class="reorder-button"
-          (click)="reorder(order)"
-          [attr.aria-label]="'Reorder items from order ' + order.orderId"
+        <div
+          class="order-header"
+          (click)="toggleExpand(i, 'pending')"
+          [attr.aria-expanded]="expandedOrderIndex.pending === i"
         >
-          Reorder
-        </ion-button> -->
+          <div class="order-info">
+            <h3>{{ getOrderDate(order.status_list?.[0]?.created_at) }}</h3>
+            <p>{{ order.items.length }} items</p>
+            <p
+              class="status-badge"
+              [ngClass]="getStatusClass(order)"
+            >
+              {{ getLatestStatus(order) }}
+            </p>
+          </div>
+        </div>
+
+        <div
+          class="order-items"
+          *ngIf="expandedOrderIndex.pending === i"
+        >
+          <ul>
+            <li
+              *ngFor="let item of order.items"
+              class="order-item"
+            >
+              <img
+                [src]="item.image || 'assets/default.png'"
+                [alt]="item.title"
+                class="item-image"
+              />
+              <span>{{ item.quantity }}x</span>
+              <span>{{ item.title }}</span>
+            </li>
+          </ul>
+
+          <div class="order-total-row">
+            <span></span>
+            <span class="order-total-amount">
+              ${{ order.total | number : '1.2-2' }}
+            </span>
+          </div>
+
+          <button
+            class="reorder-button"
+            (click)="reorder(order)"
+          >
+            Reorder
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-  <div *ngIf="!loading && pastOrders.length === 0" class="no-orders-message">
-    <p>No past orders found.</p>
-  </div>
+  </ng-container>
+
+  <!-- PAST ORDERS -->
+  <ng-container *ngIf="!loading && pastOrders.length">
+    <h2>Past Orders</h2>
+
+    <div class="order-list">
+      <div
+        class="order-card"
+        *ngFor="let order of pastOrders; let i = index"
+        [class.expanded]="expandedOrderIndex.past === i"
+      >
+        <div
+          class="order-header"
+          (click)="toggleExpand(i, 'past')"
+          [attr.aria-expanded]="expandedOrderIndex.past === i"
+        >
+          <div class="order-info">
+            <h3>{{ getOrderDate(order.status_list?.[0]?.created_at) }}</h3>
+            <p>{{ order.items.length }} items</p>
+            <p
+              class="status-badge"
+              [ngClass]="getStatusClass(order)"
+            >
+              {{ getLatestStatus(order) }}
+            </p>
+          </div>
+        </div>
+
+        <div
+          class="order-items"
+          *ngIf="expandedOrderIndex.past === i"
+        >
+          <ul>
+            <li
+              *ngFor="let item of order.items"
+              class="order-item"
+            >
+              <img
+                [src]="item.image || 'assets/default.png'"
+                [alt]="item.title"
+                class="item-image"
+              />
+              <span>{{ item.quantity }}x</span>
+              <span>{{ item.title }}</span>
+            </li>
+          </ul>
+
+          <div class="order-total-row">
+            <span>Total:</span>
+            <span class="order-total-amount">
+              ${{ order.total | number : '1.2-2' }}
+            </span>
+          </div>
+
+          <ion-button
+            class="reorder-button"
+            (click)="reorder(order)"
+          >
+            Reorder
+          </ion-button>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
 </div>

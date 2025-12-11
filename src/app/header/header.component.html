@@ -1,6 +1,10 @@
 <ion-toolbar class="heading-container">
-  <ion-buttons slot="start">
-    <ion-button class="action-button" (click)="refreshApp()" aria-label="Go to home page">
+  <ion-buttons slot="start" class="toolbar-side">
+    <ion-button
+      class="toolbar-btn logo-btn"
+      (click)="refreshApp()"
+      aria-label="Go to home page"
+    >
       <img
         [src]="darkModeEnabled ? 'assets/logo-dark-mode.png' : 'assets/logo.png'"
         class="logo"
@@ -9,74 +13,37 @@
     </ion-button>
   </ion-buttons>
 
-  <ion-buttons slot="end">
+  <ion-buttons slot="end" class="toolbar-side">
     <ion-button
-      class="action-button"
       *ngIf="!isLoggedIn"
+      class="toolbar-btn text-btn"
       routerLink="/auth"
       [queryParams]="{ mode: 'login' }"
-      aria-label="Log in to your account"
     >
       Log In
     </ion-button>
 
     <ng-container *ngIf="isLoggedIn">
-      <ion-label class="points-display" aria-live="polite">{{ userPoints || 0 }} Points</ion-label>
-
-      <!-- Cart Button -->
-      <ion-button class="action-button cart-button" routerLink="/cart" aria-label="View your shopping cart">
+      <ion-button
+        class="toolbar-btn icon-btn"
+        routerLink="/cart"
+        aria-label="View cart"
+      >
         <i class="fas fa-cart-shopping"></i>
-        <ion-badge *ngIf="cartItemCount > 0" class="cart-badge" [attr.aria-label]="cartItemCount + ' items in cart'">
+        <ion-badge *ngIf="cartItemCount > 0" class="badge">
           {{ cartItemCount }}
         </ion-badge>
       </ion-button>
 
-      <!-- Notification Button -->
-      <ion-button class="action-button notification-button" (click)="toggleNotifications()" aria-label="View notifications">
+      <ion-button
+        class="toolbar-btn icon-btn"
+        (click)="toggleNotifications()"
+        aria-label="View notifications"
+      >
         <i class="fas fa-bell"></i>
-        <ion-badge *ngIf="unreadCount > 0" class="notification-badge" [attr.aria-label]="unreadCount + ' unread notifications'">
+        <ion-badge *ngIf="unreadCount > 0" class="badge">
         </ion-badge>
       </ion-button>
-
     </ng-container>
   </ion-buttons>
 </ion-toolbar>
-
-<ion-modal [isOpen]="showNotifications" (ionModalDidDismiss)="closeNotifications()" aria-labelledby="sort-filter-title">
-  <ng-template>
-    <ion-header>
-      <ion-toolbar>
-        <ion-title id="sort-filter-title">Notifications</ion-title>
-        <ion-buttons slot="end">
-          <ion-button aria-label="Close notifications" (click)="closeNotifications()">
-            <ion-icon slot="icon-only" name="close" aria-hidden="true"></ion-icon>
-          </ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
-
-    <div class="filters-container scrollable-notifications">
-      <div *ngIf="notifications.length === 0" class="empty-notifications">
-        No new notifications.
-      </div>
-
-      <div *ngFor="let notification of notifications" 
-           class="notification-item" 
-           [class.unread]="!notification.read"
-           (click)="markAsRead(notification)">
-        <ion-icon name="alert-circle" class="notification-icon" aria-hidden="true"></ion-icon>
-        <div class="notification-text">
-          <span>{{ notification.message }}</span>
-          <small class="notification-date">{{ notification.createdAt | date:'MMM d, y, h:mm a' }}</small>
-        </div>
-        <ion-button fill="clear" slot="end" (click)="clearNotification(notification)">Clear</ion-button>
-      </div>
-
-      <div class="sticky-footer">
-        <ion-button fill="solid" expand="full" class="clear-all-button" (click)="clearAllNotifications()">
-          Clear All
-        </ion-button>
-      </div>
-    </div>
-  </ng-template>
-</ion-modal>

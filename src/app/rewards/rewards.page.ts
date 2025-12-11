@@ -1,6 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AuthService } from '../auth.service';
 import { AlertController, IonContent } from '@ionic/angular';
+import { Discount } from '../aiq-tiers/aiq-tiers.component';
+import { SettingsService } from '../settings.service';
 
 @Component({
   selector: 'app-rewards',
@@ -13,15 +15,16 @@ export class RewardsPage implements OnInit {
   user: any;
 
   isLoggedIn: boolean = false;
-
+  discounts: Discount[] = [];
   showAdvanced = false;
-  constructor(private authService: AuthService,   private alertController: AlertController,) {}
+  constructor(private authService: AuthService,   private alertController: AlertController, private settingsService: SettingsService) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     this.authService.isLoggedIn().subscribe((status) => {
       this.isLoggedIn = status;
-      this.authService.getUserInfo().subscribe((userInfo: any) => {
+      this.authService.getUserInfo().subscribe(async (userInfo: any) => {
         this.user = userInfo;
+        this.discounts = await this.settingsService.getDiscounts();
       });
     });
   }

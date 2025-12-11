@@ -1,78 +1,126 @@
+/* FAB BUTTON */
+.chat-fab {
+  --background: #222;
+  --color: #fff;
+  transform: scale(1);
+  transition: transform .2s ease;
+  &:active {
+    transform: scale(.92);
+  }
+}
+
 ion-fab {
-    margin-bottom: 20%;
+  bottom: calc(
+    env(safe-area-inset-bottom) + 72px
+  );
+}
+
+
+/* CHAT PANEL */
+.chat-panel {
+  position: fixed;
+  bottom: 85px;
+  right: 20px;
+  width: 92vw;
+  max-width: 380px;
+
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+
+  border-radius: 22px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+
+  padding: 14px 18px 20px;
+
+  animation-duration: .35s;
+  animation-fill-mode: both;
+  z-index: 9999;
+}
+
+/* SLIDE UP ANIMATION */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(.98);
   }
-  
-  .custom-chat-button {
-    --background: #222222;  // your custom mint green
-    --color: #FFFFFF;       // icon color
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animated {
+  animation-duration: .35s;
+  animation-fill-mode: both;
+}
+
+.fadeInUp {
+  animation-name: fadeInUp;
+}
+
+/* HEADER */
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+
+  h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0;
+    color: #222;
   }
 
-  ion-card {
-    background-color: white;
-  }
+  .close-btn {
+    background: none;
+    border: none;
+    padding: 6px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.3rem;
 
-  .chat-form {
-    position: fixed;
-    bottom: 120px; // Default position
-    right: 10px;
-    width: 90%;
-    max-width: 400px;
-    height: auto;
-    border-radius: 15px;
-    z-index: 1000;
-    transition: bottom 0.3s ease-in-out; // ✅ Smooth transition when repositioning
-  }
-  
-  
-  @keyframes fadeInBubble {
-    from {
-      opacity: 0;
-      transform: scale(0.9);
+    ion-icon {
+      color: #888;
+      transition: color .2s ease;
     }
-    to {
-      opacity: 1;
-      transform: scale(1);
+
+    &:hover ion-icon {
+      color: #222;
     }
   }
-  
-  .bubble-arrow {
-    position: absolute;
-    bottom: -14px;
-    right: 30px;
-    width: 0;
-    height: 0;
-    border-left: 14px solid transparent;
-    border-right: 14px solid transparent;
-    border-top: 14px solid white;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* BODY */
+.chat-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* INPUTS */
+.chat-input,
+.chat-textarea {
+  --background: #f6f6f6;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  border-radius: 12px;
+  border: 1px solid #e3e3e3;
+  color: black;
+}
+
+.chat-textarea {
+  min-height: 120px;
+}
+
+/* SEND BUTTON */
+.send-btn {
+  --background: #222;
+  --border-radius: 12px;
+  height: 48px;
+  font-size: 1rem;
+
+  &:active {
+    transform: translateY(1px);
   }
-  
-  .chat-header {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-  }
-  
-  .input-item {
-    margin-bottom: 25px; // Extra spacing between inputs
-  }
-  
-  .textarea-item {
-    min-height: 160px; // Larger textarea
-    ion-textarea {
-      height: 160px;
-    }
-  }
-  
-  /* Screen Reader Only */
-  .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0,0,0,0);
-    border: 0;
-  }
-  
+}

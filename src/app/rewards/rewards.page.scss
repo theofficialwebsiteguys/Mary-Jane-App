@@ -1,3 +1,5 @@
+
+
 .action-button {
     text-transform: capitalize;
     width: 100%;
@@ -64,4 +66,33 @@
 .cannabis-disclaimer a:hover {
   text-decoration: underline;
   color: #2f4a6d;
+}
+
+
+.rewards-page {
+  padding: 24px 16px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  background: #f6f7f3;
+}
+
+.rewards-section {
+  width: 100%;
+}
+
+.advanced {
+  margin-top: 12px;
+
+  ion-item {
+    --background: transparent;
+    font-size: 0.95rem;
+    color: #555;
+  }
+}
+
+.danger-btn {
+  --background: #e53935;
+  --color: #fff;
+  margin-top: 16px;
 }

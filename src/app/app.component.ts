@@ -83,10 +83,10 @@ export class AppComponent {
 
   
     // Only check login after products are fetched
-    this.authService.isLoggedIn().subscribe((status) => {
-      this.isLoggedIn = status;
-      if (this.isLoggedIn) this.onCloseSplash();
-    });
+    // this.authService.isLoggedIn().subscribe((status) => {
+    //   this.isLoggedIn = status;
+    //   if (this.isLoggedIn) this.onCloseSplash();
+    // });
 
 
             

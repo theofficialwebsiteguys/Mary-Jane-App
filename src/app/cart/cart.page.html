@@ -2,24 +2,86 @@
   <app-header></app-header>
 
   <div *ngIf="!showCheckout && !showConfirmation">
+
     <ng-container *ngIf="cartItems.length > 0; else emptyCart">
+
+      <!-- CART ITEMS LIST -->
       <app-cart-items [items]="cartItems"></app-cart-items>
+
+      <!-- LIVE TOTALS SECTION -->
+      <!-- LIVE TOTALS SECTION -->
+    <!-- LIVE TOTALS SECTION -->
+<div class="totals-container soft" [class.hidden]="cartItems.length === 0">
+
+  <!-- Loading State -->
+  <div class="totals-loading fade" [class.visible]="previewLoading">
+    <ion-spinner name="crescent"></ion-spinner>
+    <span>Calculating taxes & discounts...</span>
+  </div>
+
+  <!-- Totals Display -->
+  <div class="totals-blended fade" [class.visible]="!previewLoading && previewTotals">
+
+    <div class="row">
+      <span>Subtotal</span>
+      <span>{{ previewTotals?.subTotal | currency }}</span>
+    </div>
+
+    <div class="row">
+      <span>Tax</span>
+      <span>{{ previewTotals?.taxTotal | currency }}</span>
+    </div>
+
+    <div class="row" *ngIf="previewTotals?.discountTotal">
+      <span>Discounts</span>
+      <span class="discount">{{ previewTotals?.discountTotal | currency }}</span>
+    </div>
+
+    <div class="row total">
+      <span>Total</span>
+      <span>{{ previewTotals?.total | currency }}</span>
+    </div>
+
+  </div>
+
+  <div class="totals-error fade" [class.visible]="previewError">
+    {{ previewError }}
+  </div>
+
+</div>
+
+
+
+      <!-- CHECKOUT BUTTON -->
       <div class="checkout-container">
-        <ion-button class="checkout-button" (click)="checkout()" aria-label="Proceed to checkout">Continue</ion-button>
+        <ion-button class="checkout-button" (click)="checkout()" aria-label="Proceed to checkout">
+          Continue
+        </ion-button>
       </div>
+
     </ng-container>
 
+    <!-- EMPTY CART -->
     <ng-template #emptyCart>
       <div class="empty-cart-message" role="alert" aria-live="polite">
         <ion-icon name="cart-outline" size="large" aria-hidden="true"></ion-icon>
         <p>Your cart is empty!</p>
-        <ion-button routerLink="/products" aria-label="Browse available products">Browse Products</ion-button>
+        <ion-button routerLink="/products" aria-label="Browse available products">
+          Browse Products
+        </ion-button>
       </div>
     </ng-template>
+
   </div>
 
+  <!-- CHECKOUT SECTION -->
   <div *ngIf="showCheckout">
-    <app-checkout [checkoutInfo]="checkoutInfo" (back)="removeCheckout()" (orderPlaced)="onOrderPlaced()" aria-label="Checkout section"></app-checkout>
+    <app-checkout
+      [checkoutInfo]="checkoutInfo"
+      (back)="removeCheckout()"
+      (orderPlaced)="onOrderPlaced()"
+      aria-label="Checkout section"
+    ></app-checkout>
   </div>
 
 </ion-content>

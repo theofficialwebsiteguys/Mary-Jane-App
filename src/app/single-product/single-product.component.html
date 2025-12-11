@@ -1,89 +1,225 @@
 <div class="product-detail">
-  <div
-    class="back-button"
-    (click)="goBack()"
-    role="button"
-    tabindex="0"
-    aria-label="Go back to the previous page"
-    (keydown.enter)="goBack()"
-    (keydown.space)="goBack()"
-  >
-    <ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon>
-  </div>
-
-  <p class="discount-name" *ngIf="currentProduct.sale?.discountName || currentProduct.sale?.menuDisplay?.menuDisplayName">
-    {{ currentProduct.sale?.menuDisplay?.menuDisplayName || currentProduct.sale?.discountName }}
-  </p>
-
-  <div class="image-container">
-    <img
-      [src]="getProductImage(currentProduct)"
-      [alt]="currentProduct.title ? currentProduct.title + ' image' : 'Product Image'"
-    />
-    
-    <!-- SALE BADGE -->
-    <div class="sale-tag" *ngIf="currentProduct.sale">
-      {{ (currentProduct.sale.discountValue * 100) | number: '1.0-0' }}% OFF
+  <div class="detail-header">
+    <div
+      class="back-button"
+      (click)="goBack()"
+      role="button"
+      tabindex="0"
+      aria-label="Go back to the previous page"
+      (keydown.enter)="goBack()"
+      (keydown.space)="goBack()"
+    >
+      <ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon>
+      <span>Product Details</span>
     </div>
+
+    <p
+      class="discount-name"
+      *ngIf="currentProduct.sale?.discountName || currentProduct.sale?.menuDisplay?.menuDisplayName"
+    >
+      {{ currentProduct.sale?.menuDisplay?.menuDisplayName || currentProduct.sale?.discountName }}
+    </p>
   </div>
 
+  <div class="product-main">
+    <div class="image-column">
+      <div class="image-container">
+        <img
+          [src]="primaryImage"
+          [alt]="currentProduct.title + ' image'"
+        />
 
-  <div class="product-info" aria-labelledby="product-title" aria-describedby="product-description product-price product-strain product-weight">
-    <p class="brand">{{ currentProduct.brand }}</p>
-    <h2 id="product-title" class="title">{{ currentProduct.title }}</h2>
-    <ng-container *ngIf="currentProduct.sale; else regularPrice">
-      <span id="product-price" class="price sale-price">
-        <span class="original-price">{{ currentProduct.price | currency }}</span>
-        {{ currentProduct.sale.discountedPrice | currency }}
-      </span>
-    </ng-container>
-    <ng-template #regularPrice>
-      <span id="product-price" class="price">{{ currentProduct.price | currency }}</span>
-    </ng-template>
+        <div class="sale-tag" *ngIf="currentProduct.sale">
+          {{ (currentProduct.sale.discountValue * 100) | number:'1.0-0' }}% OFF
+        </div>
+      </div>
 
-    <p id="product-strain" class="strain">
-      {{ currentProduct.strainType }}
-      {{ currentProduct.strainType && currentProduct.thc ? "-" : "" }}
-      {{ currentProduct.thc }} THC
-    </p>
-    <p id="product-description" class="description">
-      {{ getDescription() }}
-      <span
-        class="see-more"
-        (click)="toggleDescription()"
-        (keydown.enter)="toggleDescription()"
-        (keydown.space)="toggleDescription()"
-        role="button"
-        tabindex="0"
-        [attr.aria-expanded]="showFullDescription"
-        [attr.aria-label]="showFullDescription ? 'See less of the product description' : 'See more of the product description'"
-        *ngIf="currentProduct.desc"
+      <!-- GALLERY -->
+      <div class="thumbnail-row" *ngIf="currentProduct.gallery?.length">
+        <button
+          *ngFor="let img of currentProduct.gallery; let i = index"
+          (click)="selectImage(i)"
+          [class.active]="i === currentImageIndex"
+          class="thumb"
+          type="button"
+        >
+          <img [src]="img" alt="">
+        </button>
+      </div>
+    </div>
+
+
+    <!-- INFO COLUMN -->
+    <div
+      class="info-column product-info"
+      aria-labelledby="product-title"
+      aria-describedby="product-description product-price product-strain product-weight"
+    >
+      <p class="brand-line">
+        <span class="brand">{{ currentProduct.brand }}</span>
+        <span class="dot" *ngIf="currentProduct.category">•</span>
+        <span class="category" *ngIf="currentProduct.category">
+          {{ currentProduct.category }}
+        </span>
+      </p>
+
+      <h2 id="product-title" class="title">
+        {{ currentProduct.title }}
+      </h2>
+
+      <div class="meta-row">
+        <span class="pill strain-pill" *ngIf="currentProduct.strainType">
+          {{ currentProduct.strainType }}
+        </span>
+
+        <span class="pill subtype-pill" *ngIf="currentProduct.subtype">
+          {{ currentProduct.subtype }}
+        </span>
+
+          <p class="thc"
+            *ngIf="(+currentProduct.thc > 0) || (+currentProduct.thcMG > 0)">
+
+            <ng-container *ngIf="+currentProduct.thc > 0; else showMg">
+              {{ currentProduct.thc }}% THC
+            </ng-container>
+
+            <ng-template #showMg>
+              {{ currentProduct.thcMG }}mg THC
+            </ng-template>
+
+          </p>
+
+      </div>
+
+      <div
+        class="tags-row"
+        *ngIf="
+          currentProduct.attributes?.flavors?.length ||
+          currentProduct.attributes?.effects?.length ||
+          currentProduct.flavors?.length ||
+          currentProduct.effects?.length
+        "
       >
-        {{ showFullDescription ? "See Less" : "See More" }}
+        <div class="tag-group" *ngIf="currentProduct.attributes?.flavors?.length || currentProduct.flavors?.length">
+          <span class="tag-label">Flavors</span>
+          <span class="tag-pill" *ngFor="let f of (currentProduct.attributes?.flavors || currentProduct.flavors)">
+            {{ f }}
+          </span>
+        </div>
+
+        <div class="tag-group" *ngIf="currentProduct.attributes?.effects?.length || currentProduct.effects?.length">
+          <span class="tag-label">Effects</span>
+          <span class="tag-pill effect-pill" *ngFor="let f of (currentProduct.attributes?.effects || currentProduct.effects)">
+            {{ f }}
+          </span>
+        </div>
+      </div>
+
+      
+  
+
+
+      <ng-container *ngIf="currentProduct.sale; else regularPrice">
+        <div id="product-price" class="price sale-price">
+          <span class="original-price">
+            {{ currentProduct.price | currency }}
+          </span>
+          <span class="sale-number">
+            {{ currentProduct.sale.discountedPrice | currency }}
+          </span>
+        </div>
+      </ng-container>
+
+      <ng-template #regularPrice>
+        <div id="product-price" class="price">
+          {{ currentProduct.price | currency }}
+        </div>
+      </ng-template>
+
+       <div class="actions-row" *ngIf="isLoggedIn">
+        <div class="quantity-counter" aria-label="Select product quantity">
+          <button (click)="decrementQuantity()" aria-label="Decrease quantity">
+            −
+          </button>
+          <span aria-live="polite">{{ quantity }}</span>
+          <button (click)="incrementQuantity()" aria-label="Increase quantity">
+            +
+          </button>
+        </div>
+
+        <ion-button
+          expand="block"
+          (click)="addToCart()"
+          [attr.aria-label]="'Add ' + currentProduct.title + ' to cart'"
+        >
+          Add to Cart
+        </ion-button>
+      </div>
+
+      <ion-button
+        expand="block"
+        routerLink="/auth"
+        [queryParams]="{ mode: 'register' }"
+        *ngIf="!isLoggedIn"
+        [attr.aria-label]="
+          'Register to add ' + currentProduct.title + ' to your cart'
+        "
+      >
+        Register to Add to Cart
+      </ion-button>
+
+      <div class="variants-block">
+        <p class="variants-label">Available variants</p>
+        <div class="variant-card">
+          <span class="variant-weight">
+            {{ currentProduct.weight || '—' }}g
+          </span>
+          <span class="variant-price">
+            {{ (currentProduct.sale?.discountedPrice || currentProduct.price) | currency }}
+          </span>
+        </div>
+      </div>
+
+      <p id="product-description" class="description" *ngIf="currentProduct.desc">
+        {{ getDescription() }}
+        <span
+          class="see-more"
+          (click)="toggleDescription()"
+          (keydown.enter)="toggleDescription()"
+          (keydown.space)="toggleDescription()"
+          role="button"
+          tabindex="0"
+          [attr.aria-expanded]="showFullDescription"
+          [attr.aria-label]="
+            showFullDescription
+              ? 'See less of the product description'
+              : 'See more of the product description'
+          "
+        >
+          {{ showFullDescription ? 'See Less' : 'See More' }}
+        </span>
+      </p>
+
+      <span id="product-weight" class="weight" *ngIf="currentProduct.weight">
+        {{ currentProduct.weight }}g
       </span>
-    </p>
-    <span id="product-weight" class="weight">{{ currentProduct.weight }}g</span>
-  </div>
 
-  <ng-container *ngIf="isLoggedIn">
-    <div class="quantity-counter" aria-label="Select product quantity">
-      <button (click)="decrementQuantity()" aria-label="Decrease quantity">-</button>
-      <span aria-live="polite">{{ quantity }}</span>
-      <button (click)="incrementQuantity()" aria-label="Increase quantity">+</button>
+     
+
+      <div class="discounts-block" *ngIf="currentProduct.discounts?.length">
+        <p class="discounts-label">Active Deals</p>
+
+        <div class="discount-pill" *ngFor="let d of currentProduct.discounts">
+          <div class="discount-main">
+            <span class="discount-title">{{ d.title }} - </span>
+            <span class="discount-amount">{{ formatDiscountAmount(d) }}</span>
+          </div>
+
+          <p class="discount-conditions" *ngIf="d.conditions?.length">
+            {{ getDiscountConditionsSummary(d) }}
+          </p>
+        </div>
+      </div>
     </div>
-
-    <ion-button expand="block" (click)="addToCart()" [attr.aria-label]="'Add ' + currentProduct.title + ' to cart'">
-      Add to Cart
-    </ion-button>
-  </ng-container>
-
-  <ion-button
-    expand="block"
-    routerLink="/auth"
-    [queryParams]="{ mode: 'register' }"
-    *ngIf="!isLoggedIn"
-    [attr.aria-label]="'Register to add ' + currentProduct.title + ' to your cart'"
-  >
-    Register to Add to Cart
-  </ion-button>
+  </div>
 </div>

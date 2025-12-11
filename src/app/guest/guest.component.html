@@ -1,39 +1,49 @@
-<div class="guest-container">
-  <div class="guest-banner">
-    <h1>Join Our Rewards Program</h1>
-    <p>Earn points, unlock perks, and get exclusive access to member deals.</p>
-  </div>
+<ion-content [fullscreen]="true">
+  <div class="guest-page">
 
-  <div class="rewards-options">
-    <!-- Free Tier -->
-    <div class="reward-card free-tier">
-      <ion-icon name="card-outline"></ion-icon>
-      <h2>Free Rewards</h2>
-      <p class="reward-sub">No cost – instant benefits</p>
-      <ul>
-        <li>1 point per $1 spent</li>
-        <li>Redeem points on any purchase</li>
-        <li>Early access to new drops & events</li>
-      </ul>
-      <ion-button expand="block" routerLink="/auth" [queryParams]="{ mode: 'register' }">
-        Sign Up Free
-      </ion-button>
+    <!-- Brand / Header -->
+    <div class="guest-header">
+      <h1>Join the MJ Privé List</h1>
+      <p>
+        Get exclusive updates about in-store events, promotions, and more.
+      </p>
     </div>
 
-    <!-- Platinum Tier -->
-    <!-- <div class="reward-card platinum-tier">
-      <ion-icon name="medal-outline"></ion-icon>
-      <h2>Platinum</h2>
-      <p class="reward-sub">$99 / year – in-store upgrade</p>
-      <ul>
-        <li>200 bonus points upon joining</li>
-        <li>10% off $100+ orders (in-store)</li>
-        <li>50% off any item, once per quarter</li>
-        <li>Exclusive Cottonmouth events</li>
-      </ul>
-      <ion-button expand="block" color="secondary">
-        Upgrade In-Store
+    <!-- Main Card -->
+    <div class="guest-card">
+
+      <div class="perk-list">
+        <div class="perk">
+          <span>✔</span>
+          <p>Earn points with every purchase</p>
+        </div>
+
+        <div class="perk">
+          <span>✔</span>
+          <p>Redeem rewards whenever you’d like</p>
+        </div>
+
+        <div class="perk">
+          <span>✔</span>
+          <p>Access member-only drops, events, and offers</p>
+        </div>
+      </div>
+
+      <ion-button
+        expand="block"
+        class="primary-cta"
+        routerLink="/auth"
+        [queryParams]="{ mode: 'register' }"
+      >
+        Join the List
       </ion-button>
-    </div> -->
+
+      <p class="secondary-link">
+        Already a member?
+        <a routerLink="/auth" [queryParams]="{ mode: 'login' }">Log in</a>
+      </p>
+
+    </div>
+
   </div>
-</div>
+</ion-content>

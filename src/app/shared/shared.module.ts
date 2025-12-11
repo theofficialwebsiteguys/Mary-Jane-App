@@ -11,6 +11,7 @@ import { ProductCategoryComponent } from '../product-category/product-category.c
 import { ProductFiltersComponent } from '../product-filters/product-filters.component';
 import { BannerCarouselComponent } from '../banner-carousel/banner-carousel.component';
 import { RouterModule } from '@angular/router';
+import { AnnouncementComponent } from '../announcement/announcement.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { RouterModule } from '@angular/router';
     ProductCategoriesComponent,
     ProductCategoryComponent,
     ProductFiltersComponent,
-    BannerCarouselComponent
+    BannerCarouselComponent,
+    AnnouncementComponent
   ],
   imports: [CommonModule, IonicModule, FormsModule, RouterModule],
   exports: [
@@ -30,7 +32,8 @@ import { RouterModule } from '@angular/router';
     ProductCategoriesComponent,
     ProductCategoryComponent,
     ProductFiltersComponent,
-    BannerCarouselComponent
+    BannerCarouselComponent,
+    AnnouncementComponent
   ],
 })
 export class SharedModule {}

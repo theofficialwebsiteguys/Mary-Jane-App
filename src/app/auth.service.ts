@@ -22,7 +22,7 @@ export class AuthService {
 
   private enrichedOrders = new BehaviorSubject<any[]>([]);
 
-  private apiUrl = `${environment.apiUrl}/alpine`;
+  private apiUrl = `${environment.apiUrl}/users`;
 
   constructor(private http: HttpClient, private router: Router, @Inject(FcmService) private fcmService: FcmService, private productsService: ProductsService) {
     const user = localStorage.getItem('user_info');
@@ -48,7 +48,6 @@ export class AuthService {
     };
   }
   
-
   getUserInfo(): any {
     return this.userSubject.asObservable();
   }
@@ -70,7 +69,7 @@ export class AuthService {
 
     return new Observable((observer) => {
       CapacitorHttp.post({
-        url: `${this.apiUrl}/register?venue_id=${environment.aiq_venue_id}`,
+        url: `${this.apiUrl}/register`,
       headers: { 
         'x-auth-api-key': environment.db_api_key,
         'Content-Type': 'application/json'  // ✅ Ensure correct content type
@@ -97,7 +96,7 @@ export class AuthService {
 
     return new Observable((observer) => {
       CapacitorHttp.post({
-        url: `${this.apiUrl}/login?venue_id=${environment.aiq_venue_id}`,
+        url: `${this.apiUrl}/login`,
         headers: { 
           'x-auth-api-key': environment.db_api_key,
           'Content-Type': 'application/json'  // ✅ Ensure correct content type
@@ -106,17 +105,33 @@ export class AuthService {
       })
         .then((response) => {
           if (response.status === 200) {
-            const { sessionId, user, expiresAt } = response.data;
-            this.storeSessionData(sessionId, expiresAt);
-            this.authStatus.next(true);
-            this.userSubject.next(user);
-            this.storeUserInfo(user);
-            this.router.navigateByUrl('/rewards');
-            this.validateSession();
-            this.fcmService.initPushNotifications(user.email);
+
+          // ⭐ CASE 1 — User exists in AlpineIQ but NOT in our DB
+          if (response.data.requiresPasswordSetup && response.data.aiqFoundUser) {
+            observer.next(response.data); // Pass data back to component
+            observer.complete();
+            return;
+          }
+
+          // ⭐ CASE 2 — Legacy migrated user in our DB WITH NO PASSWORD
+          if (response.data.requiresPasswordSetup && !response.data.aiqFoundUser) {
             observer.next(response.data);
             observer.complete();
-          } else {
+            return;
+          }
+
+          // ⭐ CASE 3 — Normal successful login
+          const { sessionId, user, expiresAt } = response.data;
+          this.storeSessionData(sessionId, expiresAt);
+          this.authStatus.next(true);
+          this.userSubject.next(user);
+          this.storeUserInfo(user);
+          this.router.navigateByUrl('/rewards');
+          this.validateSession();
+          this.fcmService.initPushNotifications(user.email);
+          observer.next(response.data);
+          observer.complete();
+        } else {
             observer.error(response);
           }
         })
@@ -317,23 +332,21 @@ export class AuthService {
     return this.enrichedOrders.asObservable(); // ✅ Always emits, even if empty
   }
   
-
-
   handleRecentOrders(orders: any[]) {
-    this.productsService.getProducts().subscribe((products: Product[]) => {
-      const enrichedOrders = orders.map((order) => ({
-        ...order,
-        items: Object.entries(order.items)
-          // .map(([posProductId, quantity]) => {
-          //   const product = products.find((p) => p.posProductId == posProductId);
-          //   return product ? { ...product, quantity } : null;
-          // })
-          .filter((item) => item !== null),
-      }));
-      this.enrichedOrders.next(enrichedOrders);
-    });
+    const normalized = orders.map(o => ({
+      orderId: o.pos_order_id,
+      orderDate: o.createdAt,
+      total: Number(o.total_amount) || 0,
+      complete: Boolean(o.complete),
+      orderType: o.order_type === "pickup" ? "Pickup" : "Delivery",
+      status: o.status || "Pending", // fallback
+      status_list: o.status_list || [], // future Treez statuses
+      items: o.items || [], // for now empty until you map product items
+    }));
+
+    this.enrichedOrders.next(normalized);
   }
-  
+
   setAuthTokensAlleaves(alleaves: any): void {
     sessionStorage.removeItem('authTokensAlleaves');
     if (alleaves) {
@@ -344,7 +357,7 @@ export class AuthService {
   async getUserOrders(): Promise<any> {
     try {
       const response = await CapacitorHttp.get({
-        url: `${environment.apiUrl}/dutchie/userOrders`,
+        url: `${environment.apiUrl}/treez/userOrders`,
         headers: {'x-auth-api-key': environment.db_api_key},
         params: { user_id: String(this.getCurrentUser().id) }, // Ensure it's a string
       });

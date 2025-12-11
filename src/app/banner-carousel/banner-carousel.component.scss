@@ -1,54 +1,39 @@
-:root {
-  --page-bg: #f8f8f8;      /* match your page background */
+.carousel-wrapper {
+  display: flex;
+  justify-content: center;
 }
 
 .carousel-container {
-  position: relative;
-  height: 250px;
+  width: 100%;
   overflow: hidden;
-  background: var(--page-bg); /* where the image will fade into */
+  position: relative;
+  touch-action: pan-y;
 }
 
-/* remove the old overlay gradient */
-.carousel-container::after { display: none; }
+.carousel-track {
+  display: flex;
+  height: 200px;
+  will-change: transform;
+}
 
 .carousel-slide {
-  position: absolute; inset: 0;
-  display: flex; justify-content: center; align-items: center;
-  opacity: 0; transition: opacity .5s ease;
+  flex: 0 0 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
-.carousel-slide.active { opacity: 1; }
 
-.banner-content {
-  width: 100%; height: 100%;
-  display: flex; justify-content: center; align-items: center;
+.banner-card {
+  width: 92%;
+  height: 100%;
+  border-radius: 14px;
   overflow: hidden;
-  background: var(--page-bg); /* important: NOT black */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  background: #fff;
 }
 
-.banner-content img {
-  width: 100%; height: 100%;
-  object-fit: cover; object-position: center;
-
-  /* smooth fade-out of the bottom 25–30% of the image */
-  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%);
-          mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%);
-}
-
-@media (min-width: 600px) {
-  .carousel-container { height: 350px; }
-}
-
-/* panel that holds categories and overlaps the fade slightly */
-.stacked-panel {
-  position: relative;
-  z-index: 2;
-  margin-top: -14px;                     /* overlap the faded area */
-  background: var(--page-bg);
-  border-top-left-radius: 18px;
-  border-top-right-radius: 18px;
-  box-shadow:
-    0 -6px 18px rgba(0,0,0,.06) inset,
-    0 6px 18px rgba(0,0,0,.06);
-  padding-top: 10px;
+.banner-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }

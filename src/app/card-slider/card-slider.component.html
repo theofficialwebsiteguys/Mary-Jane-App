@@ -1,75 +1,40 @@
 <div>
-  <div *ngFor="let category of categories" class="category-section">
+  <div *ngFor="let section of homeSections" class="category-section">
+
     <div class="section-header">
-      <a (click)="updateCategory(category.category)" class="view-all" role="button"
-        [attr.aria-label]="'View all products in ' + category.category">
-       <h2>
-          {{
-            category.category === "Pre-Roll"
-              ? "Pre Rolls"
-              : category.category === "CBD"
-                ? "CBD"
-                : category.category.toLowerCase()
-          }}
-        </h2>
+      <a (click)="goToSection(section.key)" class="view-all" role="button"
+        [attr.aria-label]="'View all products in ' + section.label">
+        <h2>{{ section.label }}</h2>
         <ion-icon name="arrow-forward-outline" class="arrow-icon" aria-hidden="true"></ion-icon>
       </a>
     </div>
-    <!-- <div *ngIf="loading" class="loading-container">
-      <ion-spinner name="crescent"></ion-spinner>
-    </div> -->
+
     <div *ngIf="loading" class="loading-container">
-      <img src="assets/snake-spinner.png" class="custom-spinner" alt="Loading..." />
+      <div class="spinner"></div>
     </div>
 
-
     <!-- Scrollable Product Slider -->
-    <div class="slider-container" tabindex="0" [attr.aria-label]="'Product slider for ' + category.category">
+    <div class="slider-container" tabindex="0"
+         [attr.aria-label]="'Product slider for ' + section.label">
+
       <div class="slider">
-        <ng-container *ngFor="let product of getLimitedProducts(category.category)">
+
+        <ng-container *ngFor="let product of getLimitedProducts(section.key); let i = index">
           <div class="slide">
-          <div class="card" (click)="updateProductDisplay(product)" role="button"
-            [attr.aria-label]="'View details for ' + product.title">
-            <div class="image-container">
-              <img [src]="getProductImage(product)" [alt]="product.title + ' image'" />
-              
-              <!-- 🔴 SALE TAG -->
-              <div class="sale-tag" *ngIf="product.sale">
-                {{ (product.sale.discountValue * 100) | number: '1.0-0' }}% OFF
-              </div>
-
-              <div class="card-details">
-                <!-- <p class="product-brand" title="{{ product.brand }}">
-                  {{ product.brand | slice:0:25 }}{{ product.brand.length > 25 ? '…' : '' }}
-                </p> -->
-                <p class="product-title" title="{{ product.title }}">
-                  {{ product.title | slice:0:30 }}{{ product.title.length > 30 ? '…' : '' }}
-                </p>
-
-                <!-- 🏷 Discounted vs Regular Price -->
-                <ng-container *ngIf="product.sale; else regularPrice">
-                  <p class="product-price sale-price">
-                    <span class="original-price">{{ product.price | currency }}</span>
-                    {{ product.sale.discountedPrice | currency }}
-                  </p>
-                </ng-container>
-                <ng-template #regularPrice>
-                  <p class="product-price">{{ product.price | currency }}</p>
-                </ng-template>
-              </div>
-            </div>
-          </div>
+            <app-product [product]="product" [index]="i"></app-product>
           </div>
         </ng-container>
 
-        <!-- View More Button (Placed Inline) -->
-        <div *ngIf="getTotalProducts(category.category) > 8" class="slide view-more-slide">
-          <button class="view-more-button" (click)="updateCategory(category.category)">
+        <div *ngIf="getLimitedProducts(section.key).length > 8"
+             class="slide view-more-slide">
+          <button class="view-more-button" (click)="goToSection(section.key)">
             View More
             <ion-icon name="arrow-forward-outline"></ion-icon>
           </button>
         </div>
+
       </div>
     </div>
+
   </div>
 </div>

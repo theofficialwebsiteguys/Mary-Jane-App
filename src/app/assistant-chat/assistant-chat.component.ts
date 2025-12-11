@@ -35,14 +35,12 @@ export class AssistantChatComponent {
 
     if (this.chatOpen) {
       setTimeout(() => {
-        const chatForm = document.getElementById('chat-form');
-        if (chatForm) {
-          chatForm.setAttribute('tabindex', '-1');
-          chatForm.focus();
-        }
-      }, 100);
+        const panel = document.getElementById('chat-panel');
+        if (panel) panel.focus();
+      }, 120);
     }
   }
+
 
   async sendMessage() {
     try {

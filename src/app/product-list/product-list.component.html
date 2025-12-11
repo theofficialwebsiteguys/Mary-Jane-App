@@ -1,22 +1,48 @@
-<ion-col class="list" role="list" aria-label="Filtered product list">
+<ion-col class="list" role="list">
 
-  <ng-container *ngIf="(products$ | async) as products; else loading">
-    <ng-container *ngIf="products.length > 0; else loading">
-      <ng-container *ngFor="let product of products; let i = index">
-        <app-product
-          *ngIf="isCategoryVisible(product.category ?? '', product.masterCategory ?? '')"
-          [product]="product"
-          [index]="i"
-          role="listitem"
-          [attr.aria-label]="'View details for ' + product.title"
-        ></app-product>
-      </ng-container>
-    </ng-container>
+  <!-- SIMILAR ITEMS SECTION -->
+  <ng-container *ngIf="showSimilarItems && (similarItems$ | async)?.length">
+    <h2 class="section-title">Similar Items</h2>
+    <div class="product-grid">
+      <app-product
+        *ngFor="let product of (similarItems$ | async) || []"
+        [product]="product"
+        role="listitem"
+      ></app-product>
+    </div>
   </ng-container>
 
-  <ng-template #loading>
-    <div class="loading-container">
-      <ion-spinner name="crescent"></ion-spinner>
+
+  <!-- SAME BRAND SECTION -->
+  <ng-container *ngIf="showSimilarItems && (brandItems$ | async) as brandItems">
+    <h2 class="section-title">More from {{ brandItems[0].brand }}</h2>
+
+    <div class="product-grid">
+      <app-product
+        *ngFor="let product of brandItems"
+        [product]="product"
+        role="listitem"
+      ></app-product>
     </div>
-  </ng-template>
+  </ng-container>
+
+  <ng-container *ngIf="!showSimilarItems && (products$ | async) as products">
+
+    <!-- <p>Showing {{products.length}}</p> -->
+     
+    <ng-container *ngIf="products.length > 0">
+      <div class="product-grid">
+        <ng-container *ngFor="let product of products; let i = index">
+          <app-product
+            [product]="product"
+            [index]="i"
+            role="listitem"
+            [attr.aria-label]="'View details for ' + product.title"
+          ></app-product>
+        </ng-container>
+      </div>
+    </ng-container>
+
+  </ng-container>
+
 </ion-col>

@@ -1,77 +1,161 @@
-.checkout-container{
-    width: 100%;
-    text-align: right;
-    padding: 16px;
-    .checkout-button{
-      text-transform: capitalize;
-      margin-left: auto;
-      width: 40%;
+/* --- CART TOTALS SECTION --- */
+
+.totals-container {
+  width: 100%;
+  padding: 16px;
+  margin-top: 8px;
+}
+
+.totals-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #555;
+  font-size: 0.9rem;
+  padding: 12px 0;
+}
+
+.totals-error {
+  color: #b91c1c;
+  font-size: 0.9rem;
+  padding: 12px 0;
+  text-align: center;
+}
+
+.totals-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 16px 18px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+  margin-bottom: 12px;
+
+  .row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 0.95rem;
+    color: #374151;
+
+    &.total {
+      padding-top: 10px;
+      margin-top: 8px;
+      border-top: 1px solid #e5e7eb;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #111827;
     }
   }
 
-  .empty-cart-message {
-    text-align: center;
-    padding: 40px 20px;
-  
-    ion-icon {
-      font-size: 64px;
-      color: #ccc;
-    }
-  
-    p {
-      font-size: 18px;
-      color: #666;
-      margin-top: 10px;
-    }
-  
-    ion-button {
-      margin-top: 20px;
-    }
+  .discount {
+    color: #b91c1c;
+    font-weight: 600;
   }
-  
-  .checkout-container {
-    width: 100%;
-    text-align: right;
-    padding: 16px;
-    
-    .checkout-button {
-      text-transform: capitalize;
-      margin-left: auto;
-      width: 40%;
-    }
+}
+
+/* --- EXISTING STYLES (unchanged, just reorganized) --- */
+
+.checkout-container {
+  width: 100%;
+  text-align: right;
+  padding: 16px;
+
+  .checkout-button {
+    text-transform: capitalize;
+    margin-left: auto;
+    width: 40%;
   }
-  
-  .empty-cart-message {
-    text-align: center;
-    padding: 40px 20px;
-  
-    ion-icon {
-      font-size: 64px;
-      color: #ccc;
-    }
-  
-    p {
-      font-size: 18px;
-      color: #666;
-      margin-top: 10px;
-    }
-  
-    ion-button {
-      margin-top: 20px;
-    }
+}
+
+.empty-cart-message {
+  text-align: center;
+  padding: 40px 20px;
+
+  ion-icon {
+    font-size: 64px;
+    color: #ccc;
   }
-  
-  /* Smooth refresh effect */
-  .loading-overlay {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 100;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.8);
-    width: 100%;
-    height: 100%;
+
+  p {
+    font-size: 18px;
+    color: #666;
+    margin-top: 10px;
   }
+
+  ion-button {
+    margin-top: 20px;
+  }
+}
+
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+/* --- BLENDED DESIGN --- */
+
+.totals-container.soft {
+  padding: 8px 20px 4px;
+  margin-top: 4px;
+}
+
+/* Total rows blend into the page */
+.totals-blended {
+  padding: 8px 0;
+  border-top: 1px solid #e5e5e5;
+}
+
+/* Each line is soft and subtle */
+.totals-blended .row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 15px;
+  color: #3a3a3a;
+}
+
+/* Total line slightly stronger but not bold or jarring */
+.totals-blended .row.total {
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 1px solid #dcdcdc;
+  font-weight: 600;
+  font-size: 16px;
+  color: #111;
+}
+
+/* Discount styling */
+.discount {
+  color: #b91c1c;
+  font-weight: 500;
+}
+
+/* --- Fade transitions --- */
+.fade {
+  opacity: 0;
+  transition: opacity 0.25s ease-in-out;
+}
+
+.fade.visible {
+  opacity: 1;
+}
+
+/* Hide entire totals when cart empty */
+.totals-container.hidden {
+  display: none;
+}
+
+/* Loading line blends in */
+.totals-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #777;
+  font-size: 14px;
+  padding: 4px 0;
+}

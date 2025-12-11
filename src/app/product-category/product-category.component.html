@@ -1,14 +1,14 @@
 <button
   type="button"
-  class="container-category"
+  class="category-button"
   [class.selected]="isSelectedCategory(category.category)"
   (click)="handleCategorySelect(category.category)"
-  [attr.aria-label]="'Select ' + (category.category === 'Pre-Roll' ? 'Pre Rolls' : category.category.toLowerCase()) + ' category'"
 >
-  <div class="icon-wrapper">
+  <div class="circle">
     <img [src]="category.imageUrl" [alt]="category.category + ' icon'" />
-    <p class="category-title">
-      {{ category.category === 'Pre-Roll' ? 'Pre Rolls' : category.category.toLowerCase() }}
-    </p>
   </div>
+
+  <p class="label">
+    {{ category.category === 'Pre-Roll' ? 'Pre Rolls' : category.category.toLowerCase() }}
+  </p>
 </button>

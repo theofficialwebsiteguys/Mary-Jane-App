@@ -1,58 +1,39 @@
 <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-  <!-- Chat Button -->
-  <ion-fab-button class="custom-chat-button"
-    (click)="toggleChat()" 
-    aria-label="Open chat assistant"
-    [attr.aria-expanded]="chatOpen"
-    [attr.aria-controls]="chatOpen ? 'chat-form' : null">
-    <ion-icon name="chatbubble-ellipses"></ion-icon>
+  <!-- CHAT BUTTON -->
+  <ion-fab-button 
+    class="chat-fab"
+    (click)="toggleChat()"
+    aria-label="Open chat assistant">
+    <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
   </ion-fab-button>
 
-  <!-- Chat Form (Appears from Bubble) -->
+  <!-- FLOATING CHAT PANEL -->
   <div 
-    class="chat-form" 
-    *ngIf="chatOpen" 
-    id="chat-form"
-    role="dialog" 
-    aria-labelledby="chat-title"
-    aria-describedby="chat-description"
-    tabindex="-1">
-    
-    
-    <ion-card>
-      <ion-card-header class="chat-header">
-        <ion-card-title id="chat-title">Need Help?</ion-card-title>
-        <ion-button 
-          fill="clear" 
-          color="danger" 
-          size="small" 
-          (click)="toggleChat()"
-          aria-label="Close chat assistant">
-          <ion-icon name="close"></ion-icon>
-        </ion-button>
-      </ion-card-header>
-      
-      <ion-card-content>
-        <p id="chat-description" class="sr-only">
-          Enter your name, email, and message in the fields below, then press Send.
-        </p>
+    *ngIf="chatOpen"
+    class="chat-panel animated fadeInUp"
+    id="chat-panel"
+    role="dialog"
+    tabindex="-1"
+  >
 
-        <form (ngSubmit)="sendMessage()">
-          <ion-item class="input-item">
-            <ion-input id="name" [(ngModel)]="formData.name" name="name" placeholder="Your Name" required aria-required="true"></ion-input>
-          </ion-item>
+    <div class="chat-header">
+      <h2>Need Help?</h2>
+      <button class="close-btn" (click)="toggleChat()">
+        <ion-icon name="close-outline"></ion-icon>
+      </button>
+    </div>
 
-          <ion-item class="input-item">
-            <ion-input id="email" [(ngModel)]="formData.email" name="email" type="email" placeholder="Your Email" required aria-required="true"></ion-input>
-          </ion-item>
+    <form class="chat-body" (ngSubmit)="sendMessage()">
+      <ion-input class="chat-input" [(ngModel)]="formData.name" name="name" placeholder="Your Name" required></ion-input>
 
-          <ion-item class="input-item textarea-item">
-            <ion-textarea id="message" [(ngModel)]="formData.message" name="message" placeholder="Your Message" required aria-required="true"></ion-textarea>
-          </ion-item>
+      <ion-input class="chat-input" [(ngModel)]="formData.email" name="email" type="email" placeholder="Email" required></ion-input>
 
-          <ion-button expand="full" type="submit" aria-label="Send message">Send</ion-button>
-        </form>
-      </ion-card-content>
-    </ion-card>
+      <ion-textarea class="chat-textarea" [(ngModel)]="formData.message" name="message" placeholder="How can we help?" auto-grow="true" required></ion-textarea>
+
+      <ion-button expand="block" type="submit" class="send-btn">
+        Send Message
+      </ion-button>
+    </form>
+
   </div>
 </ion-fab>

@@ -28,6 +28,14 @@ export interface CartItem {
   };
 }
 
+export interface AppliedDiscount {
+  id: string;
+  posDiscountID: string;
+  dollarValue?: number;
+  percentageValue?: number;
+  name: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -40,6 +48,10 @@ export class CartService {
   private userId: number | null = null; // Store user ID
   private lastNotificationKey = 'lastCartAbandonmentNotification';
 
+  private appliedDiscountSubject =
+  new BehaviorSubject<AppliedDiscount | null>(null);
+
+  appliedDiscount$ = this.appliedDiscountSubject.asObservable();
   private inactivityTimer: any;
 
   constructor(private http: HttpClient, private authService: AuthService) {
@@ -59,6 +71,14 @@ export class CartService {
       }
     });
     
+  }
+
+  setDiscount(discount: AppliedDiscount | null) {
+    this.appliedDiscountSubject.next(discount);
+  }
+
+  getAppliedDiscount(): AppliedDiscount | null {
+    return this.appliedDiscountSubject.value;
   }
 
   private setupTracking() {
@@ -172,62 +192,89 @@ export class CartService {
     this.saveCart([]);
   }
 
-   async checkout(
-    points_redeem: number,
-    orderType: string,
-    deliveryAddress: any
-  ): Promise<{ orderResult: any }> {
-    const cartItems = this.getCart();
+  async submitTreezOrder(orderPayload: any): Promise<any> {
+    const sessionData = localStorage.getItem('sessionData');
+    const token = sessionData ? JSON.parse(sessionData).token : null;
 
-    // 1) Get user info as a promise
-    const user_info: any = await firstValueFrom(this.authService.getUserInfo());
+    if (!token) throw new Error("Not logged in");
 
-    // 2) Build preorder payload
-    const preorder: any = {
-      items: cartItems.map(item => ({
-        productId: item.id,
-        quantity: item.quantity,
-      })),
-      isDelivery: orderType === 'delivery',
-      notes: '',
-      ...(orderType === 'delivery' && deliveryAddress ? {
-        deliveryInfo: {
-          street: deliveryAddress.street,
-          street2: deliveryAddress.street2 || '',
-          city: deliveryAddress.city,
-          state: deliveryAddress.state,
-          zip: deliveryAddress.zip,
-        }
-      } : {})
+    const headers = {
+      'Content-Type': 'application/json',
+      'x-auth-api-key': environment.db_api_key,
     };
 
-    const userInfo = {
-      firstName: user_info.fname,
-      lastName: user_info.lname,
-      emailAddress: user_info.email,
-      phone: user_info.phone,
-      dateOfBirth: user_info.dob,
+    const options = {
+      url: `${environment.apiUrl}/treez/order`,
+      method: 'POST',
+      headers,
+      data: orderPayload,
     };
 
-    const payload = { preorder, userInfo, pointsRedeem: points_redeem };
-
-    // 3) Call API with await
-    const res = await CapacitorHttp.post({
-      url: `${environment.apiUrl}/dutchie/submitOrder`,
-      headers: {
-        'x-auth-api-key': environment.db_api_key,
-        'Content-Type': 'application/json'
-      },
-      data: payload,
-    });
-
-    console.log('Dutchie preorder submitted successfully:', res.data);
-
-    this.clearCart();
-
-    // 4) Return result in expected shape
-    return res.data;
+    return CapacitorHttp.request(options)
+      .then(res => res.data)
+      .catch(err => {
+        console.error("Treez order submit error:", err);
+        throw err;
+      });
   }
+
+
+  // async checkout(
+  //   points_redeem: number,
+  //   orderType: string,
+  //   deliveryAddress: any
+  // ): Promise<{ orderResult: any }> {
+  //   const cartItems = this.getCart();
+
+  //   // 1) Get user info as a promise
+  //   const user_info: any = await firstValueFrom(this.authService.getUserInfo());
+
+  //   // 2) Build preorder payload
+  //   const preorder: any = {
+  //     items: cartItems.map(item => ({
+  //       productId: item.id,
+  //       quantity: item.quantity,
+  //     })),
+  //     isDelivery: orderType === 'delivery',
+  //     notes: '',
+  //     ...(orderType === 'delivery' && deliveryAddress ? {
+  //       deliveryInfo: {
+  //         street: deliveryAddress.street,
+  //         street2: deliveryAddress.street2 || '',
+  //         city: deliveryAddress.city,
+  //         state: deliveryAddress.state,
+  //         zip: deliveryAddress.zip,
+  //       }
+  //     } : {})
+  //   };
+
+  //   const userInfo = {
+  //     firstName: user_info.fname,
+  //     lastName: user_info.lname,
+  //     emailAddress: user_info.email,
+  //     phone: user_info.phone,
+  //     dateOfBirth: user_info.dob,
+  //   };
+
+  //   const payload = { preorder, userInfo, pointsRedeem: points_redeem };
+
+  //   // 3) Call API with await
+  //   const res = await CapacitorHttp.post({
+  //     url: `${environment.apiUrl}/dutchie/submitOrder`,
+  //     headers: {
+  //       'x-auth-api-key': environment.db_api_key,
+  //       'Content-Type': 'application/json'
+  //     },
+  //     data: payload,
+  //   });
+
+  //   console.log('Dutchie preorder submitted successfully:', res.data);
+
+  //   this.clearCart();
+
+  //   // 4) Return result in expected shape
+  //   return res.data;
+  // }
 
   
 
@@ -237,10 +284,7 @@ export class CartService {
     this.cartSubject.next(cart); // Emit the updated cart
   }
 
-  async placeOrder(user_id: number, pos_order_id: number, points_add: number, points_redeem: number, amount: number, cart: any) {
-    const payload = { user_id, pos_order_id, points_add, points_redeem, amount, cart };
-  
-  
+  async placeOrder(payload: any) {
     const sessionData = localStorage.getItem('sessionData');
     const token = sessionData ? JSON.parse(sessionData).token : null;
   
@@ -272,12 +316,24 @@ export class CartService {
   }
   
   
-  async checkCartPrice(cartItems: any[], isDelivery: boolean, customerTypeId: number) {
-    const payload = {
-      cart: cartItems,
-      delivery: isDelivery,
-      customerTypeId: customerTypeId
-    };
+  async checkCartPrice(cartItems: any[], isDelivery: boolean) {
+    const appliedDiscount = this.getAppliedDiscount();
+
+    const payload: any = {
+        cart: cartItems.map(item => ({
+          ...item,
+          apply_automatic_discounts: true
+        })),
+        delivery: isDelivery
+      };
+
+    if (appliedDiscount?.posDiscountID) {
+      payload.discounts = [
+        {
+          discountId: appliedDiscount.posDiscountID
+        }
+      ];
+    }
 
     const sessionData = localStorage.getItem('sessionData');
     const token = sessionData ? JSON.parse(sessionData).token : null;
@@ -293,7 +349,7 @@ export class CartService {
     };
 
     const options = {
-      url: `${environment.apiUrl}/dutchie/cartPrice`,
+      url: `${environment.apiUrl}/treez/cartPrice`,
       method: 'POST',
       headers: headers,
       data: payload,
@@ -306,4 +362,5 @@ export class CartService {
         throw error;
       });
   }
+
 }

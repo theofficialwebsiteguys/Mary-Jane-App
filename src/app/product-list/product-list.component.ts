@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
-import { Observable, of, startWith } from 'rxjs';
+import { Observable, of, startWith, switchMap } from 'rxjs';
 
 import { ProductsService } from '../products.service';
 
@@ -22,6 +22,10 @@ export class ProductListComponent implements OnInit {
   currentCategory: ProductCategory = 'Pre-Roll';
   products$: Observable<Product[]> = of([]);
 
+  similarItems$: Observable<Product[]> = of([]);
+  brandItems$: Observable<Product[]> = of([]);
+
+
   ngOnInit() {
     this.updateProducts();
 
@@ -39,27 +43,49 @@ export class ProductListComponent implements OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['searchQuery']) {
-      this.updateProducts();
+    if (changes['showSimilarItems']) {
+
+      // When user selects a product
+      if (this.showSimilarItems) {
+
+        // Load similar items first
+        this.similarItems$ = this.productService.getSimilarItemsByCategoryAndPrice().pipe(startWith([]));
+
+        // Then load brand items with duplicate exclusion
+        this.brandItems$ = this.similarItems$.pipe(
+          switchMap(similarList => {
+            const similarIds = similarList.map(p => p.id);
+            return this.productService.getMoreFromBrand(similarIds);
+          })
+        );
+
+        return;
+      }
+
+
+      // Announce UI change
+      const msg = this.showSimilarItems
+        ? 'Displaying similar items.'
+        : 'Displaying filtered products.';
+      this.accessibilityService.announce(msg, 'polite');
     }
 
-    if (changes['showSimilarItems']) {
+    if (changes['searchQuery']) {
       this.updateProducts();
-      const message = this.showSimilarItems ? 'Displaying similar items.' : 'Displaying filtered products.';
-      this.accessibilityService.announce(message, 'polite');
     }
   }
 
   private updateProducts() {
     if (this.showSimilarItems) {
-      this.products$ = this.productService.getSimilarItems().pipe(startWith([]));
-    } else {
-      this.products$ = this.productService.getFilteredProducts(this.searchQuery).pipe(startWith([]));
-      this.products$.subscribe((products) => {
-        console.log('Filtered Products:', products); // <-- This will print the products array
-      });
+      this.similarItems$ = this.productService.getSimilarItemsByCategoryAndPrice().pipe(startWith([]));
+      return;
     }
+
+    this.products$ = this.productService
+      .getFilteredProducts(this.searchQuery)
+      .pipe(startWith([]));
   }
+
 
   onSearch(event: Event) {
     const target = event.target as HTMLInputElement;
@@ -67,11 +93,9 @@ export class ProductListComponent implements OnInit {
     this.updateProducts();
   }
 
-  isCategoryVisible(category: string, masterCategory: string): boolean {
-    return (
-      this.searchQuery.trim() !== '' ||
-      this.productService.getEffectiveCategory(category, masterCategory) === this.currentCategory
-    );
-  }
+  // isCategoryVisible(product: Product): boolean {
+  //   return product.category === this.currentCategory || this.currentCategory === 'All';
+  // }
+
 
 }

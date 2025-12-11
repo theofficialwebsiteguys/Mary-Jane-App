@@ -7,39 +7,208 @@ $border-radius: 8px;
 $box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 $padding: 20px;
 $spacing: 16px;
-/* Log In Page */
-/* Log In Page */
+
+:host {
+  --background: transparent;
+}
+
+ion-content {
+  --background: url('../../assets/background.png') no-repeat center/cover;
+  background: url('../../assets/background.png') no-repeat center/cover;
+}
+
+/* ============================
+   PAGE WRAPPER (FULL CENTERING)
+=============================== */
 .log-in-page {
+  min-height: 100vh;
+  width: 100%;
+  overflow-y: auto;   /* ⭐ FIX: enables scrolling */
+  -webkit-overflow-scrolling: touch;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: $padding;
-  padding-top: calc(env(safe-area-inset-top, 20px) + 20px);
-  overflow-y: auto; /* Allows scrolling if content overflows */
 
-  /* Handle safe area insets and keyboard appearance */
-  @supports (padding-bottom: env(safe-area-inset-bottom)) {
-    padding-bottom: calc(env(safe-area-inset-bottom) + 50px); /* Prevents cutoff */
-  }
+  padding: 24px;
+  position: relative;
+
+  /* Smooth background fade */
+  animation: fadeBackground 0.6s ease;
+
+  /* Ensures proper safe-area handling */
+  padding-top: calc(env(safe-area-inset-top, 20px) + 10px);
+  padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 115px);
 }
 
-/* Login Container */
+
+/* ============================
+   LOGIN CONTAINER (NEW DESIGN)
+=============================== */
 .login-container {
   width: 100%;
-  max-width: 500px;
-  padding: $padding;
-  background-color: var(--ion-color-secondary);
-  border-radius: $border-radius;
-  box-shadow: $box-shadow;
-  animation: fadeInUp 0.4s ease-in-out;
+  max-width: 420px;
+  max-height: unset;  
+  backdrop-filter: blur(14px);
+  background: rgba(255, 255, 255, 0.85);
+
+  border-radius: 18px;
+  padding: 28px 26px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+
+  animation: fadeUp 0.45s ease;
 
   display: flex;
   flex-direction: column;
   align-items: stretch;
+}
+
+/* Dark Mode Support */
+:host-context(.dark) .login-container {
+  background: rgba(40, 40, 40, 0.85);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+}
 
 
-  overflow-y: auto; /* Allows scrolling when necessary */
-  padding-bottom: 20px; /* Extra space for scrolling */
+/* ============================
+   LOGO
+=============================== */
+.login-header-logo {
+  text-align: center;
+  margin-bottom: 24px;
+
+  .logo {
+    width: 190px;
+    height: auto;
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeSlideIn 0.6s ease forwards;
+  }
+}
+
+
+/* ============================
+   INPUTS
+=============================== */
+
+.form-group {
+  margin-bottom: 18px;
+
+  label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+    color: #333;
+
+    &.required::after {
+      content: "*";
+      color: var(--ion-color-danger);
+      margin-left: 3px;
+    }
+  }
+
+  input {
+    width: 100%;
+    padding: 14px;
+    font-size: 15px;
+
+    background: #f7f7f7;
+    border: 2px solid #e2e2e2;
+    border-radius: 10px;
+    transition: all 0.25s ease;
+
+    &:focus {
+      border-color: var(--ion-color-primary);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(var(--ion-color-primary-rgb), 0.15);
+    }
+  }
+}
+
+/* Dark Mode Inputs */
+:host-context(.dark) input {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid #555;
+  color: white;
+}
+
+
+/* ============================
+   PASSWORD VISIBILITY ICON
+=============================== */
+.password-toggle-icon {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 22px;
+  opacity: 0.7;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+
+/* ============================
+   ERROR MESSAGE
+=============================== */
+.error-message {
+  background: rgba(var(--ion-color-danger-rgb), 0.15);
+  border-left: 4px solid var(--ion-color-danger);
+  padding: 12px;
+  font-size: 0.85rem;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+
+/* ============================
+   BUTTON
+=============================== */
+
+ion-button {
+  margin-top: 14px;
+  height: 48px;
+  font-size: 1rem;
+  --border-radius: 12px;
+}
+
+
+/* ============================
+   FOOTER TEXT
+=============================== */
+.login-link {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 0.9rem;
+
+  a {
+    color: var(--ion-color-primary);
+    font-weight: 600;
+  }
+}
+
+
+/* ============================
+   ANIMATIONS
+=============================== */
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeBackground {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 
@@ -56,51 +225,6 @@ $spacing: 16px;
   }
 }
 
-
-/* Logo */
-.login-header-logo {
-  text-align: center;
-  margin: $spacing auto;
-
-  .logo {
-    width: 200px; // Slightly larger for emphasis
-    height: auto;
-  }
-}
-
-/* Form Group */
-.form-group {
-  margin-bottom: $spacing;
-
-  label {
-    display: block;
-    margin-bottom: 6px;
-    font-weight: 600;
-    color: white;
-
-    &.required::after {
-      content: "*";
-      color: var(--ion-color-danger);
-      margin-left: 2px;
-    }
-  }
-
-  input[type="email"],
-  .password-input-wrapper input { 
-    width: 100%;
-    padding: 12px;
-    border: 1px solid $input-border-color;
-    border-radius: $border-radius;
-    font-size: $font-size-input;
-    background-color: #f9f9f9; /* Apply the light background */
-    color: black; /* Apply the dark text color */
-
-    &:focus {
-      border-color: var(--ion-color-primary);
-      outline: none;
-    }
-  }
-}
 
 /* Forgot Password Section */
 .forgot-password {
@@ -119,18 +243,6 @@ $spacing: 16px;
   }
 }
 
-/* Error Message */
-.error-message {
-  color: var(--ion-color-danger);
-  background: rgba(var(--ion-color-danger-rgb), 0.12);
-  padding: 0.8rem;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-  font-size: 0.9rem;
-  text-align: center;
-}
-
-
 
 /* 1. Wrapper establishes the positioning context */
 .password-input-wrapper {
@@ -146,13 +258,3 @@ $spacing: 16px;
   padding-right: 40px; 
 }
 
-/* 3. Icon is placed on top of the input and does not affect flow */
-.password-toggle-icon {
-  position: absolute; /* Takes the icon out of the normal document flow */
-  right: 10px; 
-  top: 50%;
-  transform: translateY(-50%); /* Vertically centers the icon */
-  cursor: pointer;
-  /* Ensure the icon is placed over the input field's boundaries */
-  z-index: 10; 
-}

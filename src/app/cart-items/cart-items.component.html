@@ -16,21 +16,34 @@
         </ng-template>
       </div>
 
-      <div class="quantity-controls">
-        <button (click)="updateQuantity(item, -1)" [attr.aria-label]="'Decrease quantity of ' + item.title">-</button>
-        <span aria-live="polite" aria-atomic="true">{{ item.quantity }}</span>
-        <button (click)="updateQuantity(item, 1)" [attr.aria-label]="'Increase quantity of ' + item.title">+</button>
+     <div class="quantity-row">
+
+        <!-- Trash icon -->
+        <button class="qty-btn-icon delete" (click)="removeItem(item)">
+          <ion-icon name="trash-outline"></ion-icon>
+        </button>
+
+        <!-- Minus -->
+        <button class="qty-btn-icon" (click)="updateQuantity(item, -1)">
+          <ion-icon name="remove-outline"></ion-icon>
+        </button>
+
+        <!-- Quantity number -->
+        <span class="qty-value">{{ item.quantity }}</span>
+
+        <!-- Plus -->
+        <button class="qty-btn-icon" (click)="updateQuantity(item, 1)">
+          <ion-icon name="add-outline"></ion-icon>
+        </button>
+
       </div>
+
+
     </div>
   </div>
 
   <ion-button class="add-more-button" routerLink="/home" aria-label="Add more items to your cart"
     >+ Add more items</ion-button
   >
-
-  <div class="subtotal" aria-live="polite">
-    <span>Subtotal</span>
-    <span>{{ calculateSubtotal() | currency }}</span>
-  </div>
 
 </div>

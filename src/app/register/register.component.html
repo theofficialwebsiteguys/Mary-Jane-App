@@ -1,3 +1,4 @@
+<ion-content [fullscreen]="true">
 <div class="log-in-page" role="main" aria-labelledby="login-heading">
   <div class="login-container">
     <div class="login-header">
@@ -12,7 +13,7 @@
       </div>
     </div>
 
-    <h1 id="login-heading" class="sr-only">Register for CottonMouth Dispensary</h1>
+    <h1 id="login-heading" class="sr-only">Register for Mary Jane Cannabis Co.</h1>
 
     <div *ngIf="error" class="error-message" aria-live="assertive">{{ error }}</div>
 
@@ -113,6 +114,7 @@
             placeholder="Enter your phone number"
             required
             [attr.aria-invalid]="submitted && registerForm.get('phone')?.invalid"
+            (input)="onPhoneInput($event)"
           />
         </div>
       
@@ -139,6 +141,7 @@
             required
             aria-required="true"
             [attr.aria-invalid]="submitted && registerForm.get('month')?.invalid"
+            (input)="autoAdvanceDOB('month', $event)"
           />
           <input
             type="tel"
@@ -151,6 +154,7 @@
             required
             aria-required="true"
             [attr.aria-invalid]="submitted && registerForm.get('day')?.invalid"
+            (input)="autoAdvanceDOB('day', $event)"
           />
           <input
             type="tel"
@@ -282,3 +286,4 @@
     </p>
   </div>
 </div>
+</ion-content>

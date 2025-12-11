@@ -1,12 +1,25 @@
-<div class="carousel-container" role="region" aria-label="Image Carousel">
+<div class="carousel-wrapper">
   <div
-    *ngFor="let banner of banners; let i = index"
-    [ngClass]="{'active': i === currentIndex}"
-    class="carousel-slide"
-    [attr.aria-hidden]="i === currentIndex ? 'false' : 'true'"
+    class="carousel-container"
+    #dragArea
+    (mousedown)="onDragStart($event)"
+    (mousemove)="onDragMove($event)"
+    (mouseup)="onDragEnd()"
+    (mouseleave)="onDragEnd()"
+    (touchstart)="onDragStart($event)"
+    (touchmove)="onDragMove($event)"
+    (touchend)="onDragEnd()"
   >
-    <div class="banner-content">
-      <img [src]="banner.image" [alt]="banner.title" />
+    <div
+      class="carousel-track"
+      [style.transform]="trackTransform"
+      [style.transition]="trackTransition"
+    >
+      <div class="carousel-slide" *ngFor="let banner of banners">
+        <div class="banner-card">
+          <img [src]="banner.image" [alt]="banner.title" />
+        </div>
+      </div>
     </div>
   </div>
 </div>

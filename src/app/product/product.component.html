@@ -1,41 +1,61 @@
-<ion-item (click)="updateProductDisplay()" role="button" [attr.aria-label]="'View details for ' + product.title" [ngClass]="{ 'odd-item': index % 2 !== 0, 'even-item': index % 2 === 0 }">
-  <ion-row class="container">
-    <div class="image-wrapper">
-      <img [src]="getProductImage(product)" [alt]="product.title + ' image'" />
-      <div class="sale-tag" *ngIf="product.sale">
-        {{ (product.sale.discountValue * 100) | number: '1.0-0' }}% OFF
-      </div>
+<div
+  class="product-card"
+  (click)="updateProductDisplay()"
+  role="button"
+  [attr.aria-label]="'View details for ' + product.title"
+>
+  <!-- Image -->
+  <div class="image-wrapper">
+    <img [src]="getProductImage(product)" [alt]="product.title + ' image'" />
+
+    <!-- Bundle Tag -->
+    <div class="bundle-tag" *ngIf="product['isBundle']">
+      BUNDLE
     </div>
 
-    <ion-label class="info">
-      <p>{{ product.brand }}</p>
-      <h1 class="product-title">{{ product.title }}</h1>
-      <p class="capitalize">{{ product.strainType | lowercase }}</p>
-      <p>{{ product.thc }}</p>
+    <!-- Sale Tag -->
+    <div class="sale-tag" *ngIf="product.sale">
+      {{ (product.sale.discountValue * 100) | number:'1.0-0' }}% OFF
+    </div>
+  </div>
 
-      <ion-row class="weightAndPrice">
-        <h3>{{ product.weight }}g</h3>
-        <ng-container *ngIf="product.sale; else regularPrice">
-          <h2 class="sale-price">
-            <span class="original-price">{{ product.price | currency }}</span>
-            {{ product.sale.discountedPrice | currency }}
-          </h2>
-        </ng-container>
-        <ng-template #regularPrice>
-          <h2>{{ product.price | currency }}</h2>
-        </ng-template>
-      </ion-row>
+  <!-- Content -->
+  <div class="card-body">
 
-      <ng-container *ngIf="isLoggedIn">
-        <ion-row class="quantity-controls">
-          <button (click)="adjustQuantity(-1, $event)" [attr.aria-label]="'Decrease quantity of ' + product.title">-</button>
-          <span aria-live="polite">{{ quantity }}</span>
-          <button (click)="adjustQuantity(1, $event)" [attr.aria-label]="'Increase quantity of ' + product.title">+</button>
-        </ion-row>
-        <ion-button class="add-to-cart-btn" expand="block" (click)="addToCart($event)" [attr.aria-label]="'Add ' + product.title + ' to cart'">
-          Add to Cart
-        </ion-button>
-      </ng-container>
-    </ion-label>
-  </ion-row>
-</ion-item>
+    <p class="category">{{ product.category }}</p>
+    <p class="brand">{{ product.brand }}</p>
+
+    <div class="strain-pill" [ngClass]="product.strainType">
+      {{ product.strainType || '-' | uppercase }}
+    </div>
+
+    <h2 class="title">
+      {{ product.title }}
+    </h2>
+
+    <p class="thc">
+      {{ product.thc }} THC
+    </p>
+
+    <div class="price-row">
+      <div class="price-block" *ngIf="product.sale; else regularPrice">
+        <span class="price-old">{{ product.price | currency }}</span>
+        <span class="price-sale">{{ product.sale.discountedPrice | currency }}</span>
+        <!-- <span class="weight"> / {{ product.weight }}</span> -->
+      </div>
+
+      <ng-template #regularPrice>
+        <span class="price">{{ product.price | currency }}</span>
+        <!-- <span class="weight"> / {{ product.weight }}</span> -->
+      </ng-template>
+
+      <button
+        *ngIf="isLoggedIn"
+        class="add-btn"
+        (click)="addToCart($event)"
+      >
+        +
+      </button>
+    </div>
+  </div>
+</div>

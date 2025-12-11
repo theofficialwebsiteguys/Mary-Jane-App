@@ -1,20 +1,34 @@
 <ion-content [fullscreen]="true">
   <app-header></app-header>
 
-  <app-banner-carousel></app-banner-carousel>
+  <app-announcement></app-announcement>
   
   <app-product-categories></app-product-categories>
-  <app-card-slider></app-card-slider>
-  <div class="guest-container" *ngIf="!isLoggedIn" aria-labelledby="rewards-heading">
-    <div class="guest-header">
-      <h1>Join Our Rewards Program!</h1>
-      <p>
-        Sign up for free or upgrade to our exclusive Membership for even more
-        perks!
-      </p>
-    </div>
 
-    <ion-button expand="block" routerLink="/auth" [queryParams]="{ mode: 'register' }" aria-label="Sign up for our free rewards program">Sign Up for Free</ion-button
-    >
+  <app-banner-carousel></app-banner-carousel>
+  <app-card-slider></app-card-slider>
+    <div
+    class="guest-container"
+    *ngIf="!isLoggedIn"
+    aria-labelledby="rewards-heading"
+  >
+    <div class="guest-card">
+      <div class="guest-text">
+        <h2 id="rewards-heading">Join the MJ Privé List</h2>
+        <p>
+          Get exclusive updates about in-store events, promotions, and more.
+        </p>
+      </div>
+
+      <ion-button
+        class="guest-cta"
+        expand="block"
+        routerLink="/auth"
+        [queryParams]="{ mode: 'register' }"
+        aria-label="Sign up for our free rewards program"
+      >
+        Join the List
+      </ion-button>
+    </div>
   </div>
 </ion-content>

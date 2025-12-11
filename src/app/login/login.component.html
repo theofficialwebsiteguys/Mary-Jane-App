@@ -1,3 +1,4 @@
+<ion-content [fullscreen]="true">
 <div class="log-in-page">
   <div class="login-container">
     <div class="login-header">
@@ -20,6 +21,7 @@
       [formGroup]="loginForm"
       (ngSubmit)="onSubmit()"
       aria-labelledby="login-heading"
+      *ngIf="mode === 'login'"
     >
       <h1 id="login-heading" class="sr-only">Login to Your Account</h1>
       <div class="form-group">
@@ -93,6 +95,39 @@
       </ion-button>
     </form>
 
+    
+    <!-- ============================ -->
+    <!-- CREATE PASSWORD FORM         -->
+    <!-- ============================ -->
+    <form *ngIf="mode === 'create-password'"
+          [formGroup]="passwordForm"
+          (ngSubmit)="submitPassword()">
+
+      <h2>Create a Password</h2>
+      <p>We found your account — just create a password to finish logging in.</p>
+
+      <div class="form-group">
+        <label class="required">Date of Birth</label>
+        <input type="date" formControlName="dob" />
+      </div>
+      
+      <div class="form-group">
+        <label>New Password</label>
+        <input type="password" formControlName="password" placeholder="Enter password">
+      </div>
+
+      <div class="form-group">
+        <label>Confirm Password</label>
+        <input type="password" formControlName="confirm" placeholder="Confirm password">
+      </div>
+
+      <ion-button expand="block" type="submit" [disabled]="loading">
+        <ion-spinner *ngIf="loading" slot="start"></ion-spinner>
+        Create Password
+      </ion-button>
+
+    </form>
+
     <p class="login-link">
       Don’t have an account?
       <a
@@ -104,3 +139,4 @@
     </p>
   </div>
 </div>
+</ion-content>

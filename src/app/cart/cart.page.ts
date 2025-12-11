@@ -23,6 +23,10 @@ export class CartPage {
 
   isLoading: boolean = false;
 
+  previewTotals: { subTotal: number; taxTotal: number; discountTotal: number; total: number } | null = null;
+  previewLoading = false;
+  previewError: string | null = null;
+
   constructor(
     private readonly cartService: CartService,
     private toastController: ToastController,
@@ -33,10 +37,61 @@ export class CartPage {
   ) {}
 
   ngOnInit(): void {
-    this.cartService.cart$.subscribe((cart) => {
-      this.cartItems = cart;
-    });
+      this.cartService.cart$.subscribe((cart) => {
+        this.cartItems = cart;
+        this.updateCartPreview();
+      });
   }
+
+  private async updateCartPreview() {
+    this.previewError = null;
+    this.previewTotals = null;
+
+    if (!this.cartItems || this.cartItems.length === 0) {
+      return;
+    }
+
+    // // Get current user info (where you have treez customer_id stored)
+    // const user = this.authService.getCurrentUser?.();
+    // const customerId =
+    //   user?.treezCustomerId ||
+    //   user?.treez_customer_id ||
+    //   user?.customerId || // fallback guesses
+    //   null;
+
+    // if (!customerId) {
+    //   console.warn('No Treez customer_id on user; skipping preview.');
+    //   return;
+    // }
+
+    this.previewLoading = true;
+
+    try {
+      const isDelivery = false; // or derive from user selection
+      const response = await this.cartService.checkCartPrice(
+        this.cartItems,
+        isDelivery
+      );
+
+      // Response shape: { success, totals, treez }
+      if (response?.success && response.totals) {
+        this.previewTotals = response.totals;
+        this.accessibilityService.announce(
+          `Cart totals updated. Total is ${response.totals.total} dollars.`,
+          'polite'
+        );
+      } else {
+        this.previewError = 'Unable to calculate totals from Treez.';
+        console.warn('Unexpected cartPrice response:', response);
+      }
+    } catch (err) {
+      console.error('Cart preview error:', err);
+      this.previewError = 'Failed to get live totals.';
+    } finally {
+      this.previewLoading = false;
+    }
+  }
+
 
   async checkout() {
     this.isLoading = true;
@@ -49,6 +104,7 @@ export class CartPage {
     this.checkoutInfo = {
       cart: this.cartItems,
       user_info: this.authService.getCurrentUser(),
+      previewTotals: this.previewTotals
     };
     this.showCheckout = true;
     loading.dismiss();
@@ -68,8 +124,7 @@ export class CartPage {
       'Your order was placed successfully.',
       'polite'
     );
-    console.log("redirecting")
-    this.redirectToCart();
+    await this.redirectToOrder();
   }
 
   ionViewDidEnter(): void {
@@ -103,12 +158,11 @@ export class CartPage {
   }
 
 
-  private async redirectToCart() {
-    await this.router.navigateByUrl('/cart');
+  private async redirectToOrder() {
+    await this.router.navigateByUrl('/orders');
     
     // Force a full page reload after navigation
     setTimeout(async () => {
-      location.reload();
       await this.presentToast('Your order has been placed successfully!');
     }, 500); // Small delay ensures the navigation completes first
   }

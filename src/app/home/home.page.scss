@@ -1,39 +1,70 @@
 .guest-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: 20px;
-    overflow-y: auto;
-  
-    .guest-header {
-      margin-bottom: 20px;
-  
-      h1 {
-        font-size: 1.8rem;
-        font-weight: 700;
-        color: #333;
-      }
-  
-      p {
-        font-size: 1rem;
-        color: #666;
-        margin-top: 10px;
-      }
-    }
-  
-    ion-button {
-      width: 100%;
-      max-width: 300px;
-      font-size: 1rem;
-      font-weight: 600;
-      padding: 12px;
-      margin-bottom: 20px;
-      align-self: center;
-    }
+  padding: 24px 16px 32px;
 }
+
+/* Pill-style banner card */
+.guest-card {
+  max-width: 1040px;
+  margin: 0 auto;
+  border-radius: 32px;
+  padding: 24px 20px;
+  text-align: center;
+
+  /* subtle textured background like your screenshot */
+  background:
+    url('../../assets/background2.png') center/cover no-repeat,
+    #dde6dd;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.guest-text h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #2f3a32;
+  margin: 0 0 6px;
+}
+
+.guest-text p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #4f5b52;
+}
+
+/* CTA button in the middle */
+.guest-cta {
+  --background: #404a3f;      /* dark olive / match brand */
+  --background-activated: #343d33;
+  --border-radius: 999px;
+  --padding-start: 24px;
+  --padding-end: 24px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-top: 8px;
+}
+
+/* Make it feel more like the wide banner on desktop */
+@media (min-width: 768px) {
+  .guest-card {
+    padding: 28px 64px;
+  }
+
+  .guest-text h2 {
+    font-size: 2.1rem;
+  }
+
+  .guest-text p {
+    font-size: 1rem;
+  }
+}
+
+/* Keep your notification popout */
 .notification-popout {
-  position: fixed; /* Ensures it stays on top */
+  position: fixed;
   top: 60px;
   right: 20px;
   background: white;
@@ -43,5 +74,5 @@
   max-height: 300px;
   overflow-y: auto;
   padding: 10px;
-  z-index: 99999; /* Ensure it's above everything */
+  z-index: 99999;
 }

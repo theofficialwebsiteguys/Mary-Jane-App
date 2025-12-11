@@ -1,0 +1,39 @@
+<div class="announcement-wrapper" *ngIf="!isHidden">
+
+  <!-- LOADING SKELETON -->
+  <ng-container *ngIf="isLoading">
+    <div class="announcement-skeleton"></div>
+  </ng-container>
+
+  <!-- ANNOUNCEMENT BAR -->
+  <ng-container *ngIf="!isLoading && !hasError && announcements.length">
+
+    <div class="announcement-bar" role="status" aria-live="polite">
+
+      <!-- ICON stays fixed -->
+      <div class="announcement-left">
+        <span class="icon">
+          <ion-icon name="megaphone-outline"></ion-icon>
+        </span>
+
+        <!-- TEXT SLIDER (only thing that moves) -->
+        <div class="text-slider">
+         <div
+            class="text-slide"
+            [style.--count]="announcements.length"
+            [style.transform]="'translateY(-' + currentIndex * 32 + 'px)'"
+          >
+
+            <div class="text-item" *ngFor="let ann of announcements">
+              <span class="title" *ngIf="ann.title">{{ ann.title }}</span>
+              <span class="message">{{ ann.message }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </ng-container>
+
+</div>

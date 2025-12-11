@@ -284,4 +284,36 @@ export class RegisterComponent {
     }
     return age;
   }
+
+  onPhoneInput(event: any) {
+    const raw = event.target.value;
+
+    // Remove everything except digits
+    let cleaned = raw.replace(/\D+/g, '');
+
+    // Remove the selected country code if the user typed it
+    const selectedCode = this.registerForm.get('countryCode')?.value; // ex: "US"
+    const dialCode = this.countries.find(c => c.code === selectedCode)?.dialCode.replace(/\D+/g, '');
+
+    if (dialCode && cleaned.startsWith(dialCode)) {
+      cleaned = cleaned.substring(dialCode.length);
+    }
+
+    this.registerForm.get('phone')?.setValue(cleaned, { emitEvent: false });
+  }
+
+  
+  autoAdvanceDOB(field: 'month' | 'day', event: any) {
+    let value = event.target.value.replace(/\D+/g, ''); // only digits
+    event.target.value = value;
+
+    if (field === 'month' && value.length === 2) {
+      document.getElementById('day')?.focus();
+    }
+
+    if (field === 'day' && value.length === 2) {
+      document.getElementById('year')?.focus();
+    }
+  }
+
 }

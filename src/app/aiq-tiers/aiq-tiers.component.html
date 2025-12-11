@@ -1,0 +1,32 @@
+<div class="aiq-card">
+  <h2>Rewards & Discounts</h2>
+  <p class="sub">Unlock and redeem rewards on your order</p>
+
+  <div class="tiers">
+    <div
+      *ngFor="let discount of displayDiscounts"
+      class="tier"
+      [class.active]="discount.unlocked"
+    >
+      <div class="tier-header">
+        <div>
+          <span class="name">{{ discount.label }}</span>
+        </div>
+
+        <span class="badge">
+          {{ discount.unlockText }}
+        </span>
+      </div>
+
+      <p class="perk">{{ discount.rewardText }}</p>
+
+      <button
+        class="redeem-btn"
+        [disabled]="!discount.redeemable"
+        (click)="redeem(discount)"
+      >
+        Redeem
+      </button>
+    </div>
+  </div>
+</div>

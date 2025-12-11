@@ -3,9 +3,10 @@ import { CartService } from '../cart.service';
 import { LoadingController, ToastController } from '@ionic/angular';
 import { AccessibilityService } from '../accessibility.service';
 import { AuthService } from '../auth.service';
-import { openWidget } from 'aerosync-web-sdk';
 import { SettingsService } from '../settings.service';
 import { FcmService } from '../fcm.service';
+import { AeropayService } from '../aeropay.service';
+import { openWidget } from 'aerosync-web-sdk';
 
 @Component({
   selector: 'app-checkout',
@@ -15,87 +16,78 @@ import { FcmService } from '../fcm.service';
 export class CheckoutComponent implements OnInit {
   @Input() checkoutInfo: any;
 
+  @Output() back = new EventEmitter<void>();
+  @Output() orderPlaced = new EventEmitter<void>();
+
+  // DELIVERY
   deliveryAddress = {
     street: '',
     apt: '',
     city: '',
     zip: '',
-    state: 'NY' // Default to New York and cannot be changed
+    state: 'NY'
   };
-  
+
+  deliveryAddressValid = false;
+  selectedOrderType: string = 'pickup';
+  selectedDeliveryDate: string | null = null;
+  selectedDeliveryTime: string = '';
+  enableDelivery = false;
   minDate: string = '';
 
- 
-  isDatePickerOpen = false;
-  selectedDate: string | null = null;
-  pointsToRedeem: number = 0;
-
-  showTooltip = false;
-  applyPoints: boolean = false;
-
-  finalSubtotal: number = 0;
-  originalSubtotal: number = 0;
-  finalTotal: number = 0;
-  finalTax: number = 0;
-
-  pointValue: number = 0.05;
-
-  selectedTime: string = '';
-
-  isLoading: boolean = false;
-
+  // TIME SELECTION
   timeOptions: { value: string; display: string }[] = [];
+  deliverySchedule: any[] = [];
+  validDeliveryDates: string[] = [];
 
+  // DISCOUNTS
+  pointsToRedeem = 0;
+  pointValue = 0.05;
+  premiumDiscountRate = 0.10;
+  employeeDiscountRate = 0.15;
+  premiumDiscountApplied = false;
+  premiumDiscountAmount = 0;
+  employeeDiscountApplied = false;
+  employeeDiscountAmount = 0;
+
+  // COUPONS
+  couponCode = '';
+  couponMessage = '';
+  isApplyingCoupon = false;
+  validCoupons: any = {};
+
+  // TOTALS BASED ON TREEZ PREVIEW
+  finalSubtotal = 0;
+  finalTax = 0;
+  finalTotal = 0;
+  originalTreezSubtotal = 0;
+  originalTreezTax = 0;
+
+  isLoading = false;
+
+  discountTotal = 0;
+
+  // --- AEROPAY ---
   selectedPaymentMethod: string = 'cash';
-
-  selectedOrderType: string = 'pickup';
-
-  aeropayButtonInstance: any;
-
-  enableDelivery: boolean = false;
-
+  aeropayUserId: string | null = null;
   verificationRequired: boolean = false;
   verificationCode: string = '';
   existingUserId: string = '';
+  isFetchingAeroPay = false;
 
-  @Output() back: EventEmitter<void> = new EventEmitter<void>();
-  @Output() orderPlaced = new EventEmitter<void>();
+  userBankAccounts: any[] = [];
+  showBankSelection: boolean = false;
+  selectedBankId: string | null = null;
 
-  selectedDeliveryDate: string | null = null;
-  selectedDeliveryTime: string = '';
+  aerosyncURL: string | null = null;
+  aerosyncToken: string | null = null;
+  aerosyncUsername: string | null = null;
+  loadingAerosync = false;
 
-  deliveryHoursByDay: { [key: number]: { start: number; end: number } } = {
-    0: { start: 11, end: 21 }, // Sunday
-    1: { start: 8, end: 22 },  // Monday
-    2: { start: 8, end: 22 },  // Tuesday
-    3: { start: 8, end: 22 },  // Wednesday
-    4: { start: 8, end: 22 },  // Thursday
-    5: { start: 8, end: 23 },  // Friday
-    6: { start: 10, end: 23 }, // Saturday
-  };
+  showAeropay = true; // optional depending on business rules
 
-  premiumDiscountRate: number = 0.10;
-  premiumDiscountApplied: boolean = false;
-  premiumDiscountAmount: number = 0;
+  appliedDiscount: any = null;
 
-  employeeDiscountApplied = false;
-  employeeDiscountAmount = 0;
-  employeeDiscountRate = 0.15; // fallback default
-    
-  deliverySchedule: { day: string; startTime: string; endTime: string }[] = [];
-  validDeliveryDates: string[] = [];
-
-  deliveryAddressValid: boolean = false;
-  originalPricing: any;
-
-  stateTaxAmount: number = 0;
-  cannabisTaxAmount: number = 0;
-
-  private readonly STATE_TAX_RATE = 6.625;
-  private readonly CANNABIS_TAX_RATE = 2.0;
-
-  private readonly TOTAL_TAX_RATE = this.STATE_TAX_RATE + this.CANNABIS_TAX_RATE;
-  
   constructor(
     private cartService: CartService,
     private loadingController: LoadingController,
@@ -103,418 +95,393 @@ export class CheckoutComponent implements OnInit {
     private toastController: ToastController,
     private authService: AuthService,
     private settingsService: SettingsService,
-    private fcmService: FcmService
+    private fcmService: FcmService,
+    private aeropayService: AeropayService  
   ) {}
 
   async ngOnInit() {
-    this.calculateDefaultTotals();
-    this.checkDeliveryEligibility();
-  
-    try {
-      const res: any = await this.settingsService.getDeliveryZone();
-  
-      if (res.schedule) {
-        this.deliverySchedule = res.schedule;
-  
-        const availableDates = this.getAvailableDeliveryDates(res.schedule);
-        this.validDeliveryDates = availableDates;
-  
-        if (availableDates.length === 0) {
-          this.presentToast('No available delivery days found.', 'danger');
-          return;
-        }
-  
-        // Set first available date
-        this.selectedDeliveryDate = availableDates[0];
-  
-        const selectedDate = new Date(this.selectedDeliveryDate);
-        const dayOfWeek = selectedDate.getDay(); // 0 = Sunday
-        this.generateTimeOptionsFromSchedule(dayOfWeek);
-        this.selectNearestFutureTime(selectedDate, dayOfWeek);
-      }
-    } catch (err) {
-      console.error('Failed to load delivery zone', err);
-      this.presentToast('Unable to load delivery schedule.', 'danger');
-    }
-  
-    // Set min selectable date
-    const now = new Date();
-    const tomorrow = new Date(now);
-    tomorrow.setDate(now.getDate() + 1);
+    console.log(this.checkoutInfo)
+    // ------------------------------
+    // USE TREEZ PREVIEW TOTALS ONLY
+    // ------------------------------
+    const t = this.checkoutInfo.previewTotals;
+    this.originalTreezSubtotal = t.subTotal;
+    this.originalTreezTax = t.taxTotal;
+
+    // Live values
+    this.finalSubtotal = t.subTotal;
+    this.finalTax = t.taxTotal;
+    this.finalTotal = t.total;
+    this.discountTotal = t.discountTotal;
+
+    // Compute available delivery schedule + dates
+    this.loadDeliverySchedule();
+
+    // Set next day as minimum date
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
     this.minDate = tomorrow.toISOString().split('T')[0];
-  }
-  
 
-  isDateValid = (dateIsoString: string) => {
-    return this.validDeliveryDates.includes(dateIsoString.split('T')[0]);
-  };  
-
-  selectNearestFutureTime(current: Date, dayOfWeek: number) {
-    const currentMinutes = current.getHours() * 60 + current.getMinutes() + 30; // add 30-minute buffer
-    const hours = this.deliveryHoursByDay[dayOfWeek];
-  
-    for (let hour = hours.start; hour <= hours.end; hour++) {
-      for (let minute of [0, 30]) {
-        const timeMinutes = hour * 60 + minute;
-        if (timeMinutes >= currentMinutes) {
-          const formattedHour = hour < 10 ? `0${hour}` : `${hour}`;
-          const formattedMinute = minute === 0 ? '00' : '30';
-          this.selectedDeliveryTime = `${formattedHour}:${formattedMinute}`;
-          return;
-        }
-      }
-    }
-  
-    // If no valid slot today, go to next day
-    const nextDay = (dayOfWeek + 1) % 7;
-    const tomorrow = new Date(current.getTime() + 86400000); // +1 day
-    this.selectedDeliveryDate = tomorrow.toISOString().split('T')[0];
-    this.generateTimeOptionsForDay(nextDay);
-  
-    const nextDayHours = this.deliveryHoursByDay[nextDay];
-    const fallbackHour = nextDayHours.start;
-    this.selectedDeliveryTime = `${fallbackHour < 10 ? '0' + fallbackHour : fallbackHour}:00`;
-  }
-  
-
-  get maxRedeemablePoints(): number {
-    const maxPoints = Math.min(this.checkoutInfo.user_info.points, this.originalSubtotal * 20);
-    return Math.ceil(maxPoints);
-  }
-  
-  
-  
-  checkDeliveryEligibility() {
-    this.settingsService.checkDeliveryEligibility().subscribe({
-      next: (response) => {
-        this.enableDelivery = response.deliveryAvailable;
-        console.log('Delivery availability:', this.enableDelivery);
-      },
-      error: (error) => {
-        console.error('Error fetching delivery eligibility:', error);
-        this.enableDelivery = false; // Fallback if the request fails
-      }
+     this.cartService.appliedDiscount$.subscribe(d => {
+      this.appliedDiscount = d;
+      this.updateTotals();
     });
   }
 
+  // --------------------------------------------------------------------------
+  // DELIVERY SCHEDULE + VALIDATION
+  // --------------------------------------------------------------------------
+
+  async loadDeliverySchedule() {
+    try {
+      const res: any = await this.settingsService.getDeliveryZone();
+      if (res.schedule) {
+        this.deliverySchedule = res.schedule;
+
+        this.validDeliveryDates = this.getAvailableDeliveryDates(res.schedule);
+
+        if (this.validDeliveryDates.length) {
+          this.selectedDeliveryDate = this.validDeliveryDates[0];
+
+          const d = new Date(this.selectedDeliveryDate);
+          this.generateTimeOptionsForDay(d.getDay());
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load delivery schedule', err);
+    }
+
+    // Delivery eligibility
+    this.settingsService.checkDeliveryEligibility().subscribe({
+      next: (r) => (this.enableDelivery = r.deliveryAvailable),
+      error: () => (this.enableDelivery = false)
+    });
+  }
+
+  getAvailableDeliveryDates(schedule: any[]): string[] {
+    const valid: string[] = [];
+    const today = new Date();
+
+    for (let i = 0; i < 30; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + i);
+
+      const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
+
+      if (schedule.some((s) => s.day === dayName)) {
+        valid.push(date.toISOString().split('T')[0]);
+      }
+    }
+    return valid;
+  }
+
+  isDateValid = (dateIsoString: string) =>
+    this.validDeliveryDates.includes(dateIsoString.split('T')[0]);
+
+  onDateSelected(event: any) {
+    const iso = event.detail.value;
+    if (!iso) return;
+
+    this.selectedDeliveryDate = iso.split('T')[0];
+    const d = new Date(this.selectedDeliveryDate || '');
+    this.generateTimeOptionsForDay(d.getDay());
+  }
+
   generateTimeOptionsForDay(dayOfWeek: number) {
-    this.timeOptions = [];
-  
-    const hours = this.deliveryHoursByDay[dayOfWeek];
-    const startHour = hours.start;
-    const endHour = hours.end;
-  
-    for (let hour = startHour; hour <= endHour; hour++) {
-      for (let minute of [0, 30]) {
-        // Don't exceed endHour if it's the last half-hour
-        if (hour === endHour && minute === 30) break;
-  
-        const displayHour = hour % 12 === 0 ? 12 : hour % 12;
-        const amPm = hour < 12 ? 'AM' : 'PM';
-        const formattedHour = hour < 10 ? `0${hour}` : `${hour}`;
-        const formattedMinute = minute === 0 ? '00' : '30';
-  
-        this.timeOptions.push({
-          value: `${formattedHour}:${formattedMinute}`,
-          display: `${displayHour}:${formattedMinute} ${amPm}`,
+    const name = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][dayOfWeek];
+    const schedule = this.deliverySchedule.find((d) => d.day === name);
+
+    if (!schedule) return;
+
+    const [sH, sM] = schedule.startTime.split(':').map(Number);
+    const [eH, eM] = schedule.endTime.split(':').map(Number);
+
+    const opts = [];
+    for (let h = sH; h <= eH; h++) {
+      for (let m of [0,30]) {
+        if (h === eH && m >= eM) continue;
+
+        const displayH = h % 12 === 0 ? 12 : h % 12;
+        const ampm = h < 12 ? 'AM' : 'PM';
+        const HH = h < 10 ? `0${h}` : `${h}`;
+        const MM = m === 0 ? '00' : '30';
+
+        opts.push({
+          value: `${HH}:${MM}`,
+          display: `${displayH}:${MM} ${ampm}`
         });
       }
     }
-  }
-  
-  
-  async calculateDefaultTotals() {
-    const cartItems = this.checkoutInfo.cart.map((item: any) => ({
-      productId: item.id,
-      quantity: item.quantity
-    }));
 
-    const isDelivery = this.selectedOrderType === 'delivery';
-    const customerTypeId = 2;
-
-    const pricing = await this.cartService.checkCartPrice(cartItems, isDelivery, customerTypeId);
-    this.originalPricing = pricing.pricing;
-
-    // ✅ Manually calculate subtotal using sale price (if available)
-    const calculatedSubtotal = this.checkoutInfo.cart.reduce((total: number, item: any) => {
-      const price = item.sale?.discountedPrice ?? item.price;
-      return total + price * item.quantity;
-    }, 0);
-
-    this.finalSubtotal = calculatedSubtotal;
-
-    // ✅ Manually calculate tax based on discounted subtotal
-    this.finalTax = this.finalSubtotal * (this.TOTAL_TAX_RATE / 100); // convert % to decimal
-
-    // ✅ Total = subtotal + tax
-    this.finalTotal = this.finalSubtotal + this.finalTax;
-
-    this.updateTotals(); // ⬅️ will reapply discounts and recalculate tax breakdown
+    this.timeOptions = opts;
   }
 
+  async onAddressInputChange() {
+    const { street, city, zip } = this.deliveryAddress;
+
+    if (!street.trim() || !city.trim() || zip.trim().length < 5) {
+      this.deliveryAddressValid = false;
+      return;
+    }
+
+    try {
+      const full = `${street}, ${city}, NY ${zip}`;
+      const res = await this.settingsService.checkAddressInZone(this.checkoutInfo.business_id, full);
+
+      this.deliveryAddressValid = res.inZone;
+      if (!res.inZone) this.presentToast('Outside delivery zone.');
+    } catch (e) {
+      console.error(e);
+      this.presentToast('Unable to validate address.');
+      this.deliveryAddressValid = false;
+    }
+  }
+
+  onOrderTypeChange(event: any) {
+    this.selectedOrderType = event.detail.value;
+
+    if (this.selectedOrderType === 'delivery') {
+      this.selectedPaymentMethod = 'aeropay';
+      this.startAeroPayProcess();
+    }
+  }
+  
+  onPaymentMethodChange(method: string) {
+    this.selectedPaymentMethod = method;
+
+    if (method === 'aeropay') {
+      this.startAeroPayProcess();
+    } else {
+      this.showBankSelection = false;
+    }
+  }
+
+
+  // --------------------------------------------------------------------------
+  // TREEZ TOTAL ADJUSTMENTS (POINTS / COUPON / PREMIUM / EMPLOYEE)
+  // --------------------------------------------------------------------------
+
+  get maxRedeemablePoints(): number {
+    return Math.min(
+      this.checkoutInfo.user_info.points,
+      Math.ceil(this.originalTreezSubtotal * 20)
+    );
+  }
 
   updateTotals() {
-  const pointsValue = this.pointsToRedeem * this.pointValue;
+    // Start from Treez preview subtotal
+    let subtotal = this.originalTreezSubtotal;
 
-  this.originalSubtotal = this.checkoutInfo.cart.reduce(
-    (total: number, item: any) => {
-      const price = item.sale?.discountedPrice ?? item.price;
-      return total + price * item.quantity;
-    },
-    0
-  );
+    // Apply points
+    const pointsDiscount = this.pointsToRedeem * this.pointValue;
+    subtotal -= pointsDiscount;
+    if (subtotal < 0) subtotal = 0;
 
-  this.premiumDiscountApplied = false;
-  this.premiumDiscountAmount = 0;
-  this.employeeDiscountApplied = false;
-  this.employeeDiscountAmount = 0;
+    // Premium discount
+    this.premiumDiscountApplied = false;
+    if (this.checkoutInfo.user_info.premium && subtotal > 100) {
+      this.premiumDiscountAmount = subtotal * this.premiumDiscountRate;
+      subtotal -= this.premiumDiscountAmount;
+      this.premiumDiscountApplied = true;
+    }
 
-  let subtotalAfterPoints = this.originalSubtotal - pointsValue;
-  if (subtotalAfterPoints < 0) subtotalAfterPoints = 0;
+    // Staff discount
+    this.employeeDiscountApplied = false;
+    if (['employee', 'admin'].includes(this.checkoutInfo.user_info.role)) {
+      this.employeeDiscountAmount = subtotal * this.employeeDiscountRate;
+      subtotal -= this.employeeDiscountAmount;
+      this.employeeDiscountApplied = true;
+    }
 
-  if (this.checkoutInfo.user_info.premium && this.originalSubtotal > 100) {
-    this.premiumDiscountAmount = subtotalAfterPoints * this.premiumDiscountRate;
-    this.premiumDiscountApplied = true;
-    subtotalAfterPoints -= this.premiumDiscountAmount;
+    // Reapply Treez tax proportional snapshot
+    const taxRatio = this.originalTreezTax / this.originalTreezSubtotal;
+    this.finalSubtotal = subtotal;
+    this.finalTax = subtotal * taxRatio;
+    this.finalTotal = this.finalSubtotal + this.finalTax;
   }
 
-  if (['employee', 'admin'].includes(this.checkoutInfo.user_info.role)) {
-    this.employeeDiscountAmount = subtotalAfterPoints * this.employeeDiscountRate;
-    this.employeeDiscountApplied = true;
-    subtotalAfterPoints -= this.employeeDiscountAmount;
+  applyCoupon() {
+    if (!this.couponCode.trim()) {
+      this.couponMessage = "Enter a code.";
+      return;
+    }
+
+    const code = this.couponCode.trim().toUpperCase();
+    const discountRate = this.validCoupons[code];
+
+    if (!discountRate) {
+      this.couponMessage = "Invalid code.";
+      return;
+    }
+
+    // Coupon applies as a percent off subtotal
+    const discount = this.finalSubtotal * discountRate;
+    this.finalSubtotal -= discount;
+
+    const taxRatio = this.originalTreezTax / this.originalTreezSubtotal;
+    this.finalTax = this.finalSubtotal * taxRatio;
+    this.finalTotal = this.finalSubtotal + this.finalTax;
+
+    this.couponMessage = `Coupon applied! -${discount.toFixed(2)}`;
   }
 
-  // ✅ Recalculate tax from adjusted subtotal
-  this.finalTax = subtotalAfterPoints * (this.TOTAL_TAX_RATE / 100);
-  this.finalTotal = subtotalAfterPoints + this.finalTax;
+  // --------------------------------------------------------------------------
+  // PLACE ORDER (TREEZ ONLY)
+  // --------------------------------------------------------------------------
 
-  // ✅ Tax breakdown
-  this.stateTaxAmount = (this.STATE_TAX_RATE / this.TOTAL_TAX_RATE) * this.finalTax;
-  this.cannabisTaxAmount = (this.CANNABIS_TAX_RATE / this.TOTAL_TAX_RATE) * this.finalTax;
-
-  this.accessibilityService.announce(
-    `Subtotal updated to ${subtotalAfterPoints.toFixed(2)} dollars.`,
-    'polite'
-  );
-  }
-
-
-  goBack() {
-    this.back.emit();
-    this.accessibilityService.announce(
-      'Returned to the previous page.',
-      'polite'
-    );
-  }
-
-  toggleDatePicker() {
-    this.isDatePickerOpen = !this.isDatePickerOpen;
-    const message = this.isDatePickerOpen
-      ? 'Date picker opened.'
-      : 'Date picker closed.';
-    this.accessibilityService.announce(message, 'polite');
-  }
-
-  toggleTooltip() {
-    this.showTooltip = !this.showTooltip;
-  }
-
-  onDateSelected(event: any) {
-    const isoString = event.detail.value; // "YYYY-MM-DDTHH:mm:ss.sssZ"
-  
-    if (!isoString) return; // Exit early if event has no value
-  
-    this.selectedDeliveryDate = isoString.split('T')[0]; // "YYYY-MM-DD"
-  
-    if (!this.selectedDeliveryDate) return;
-  
-    const [year, month, day] = this.selectedDeliveryDate.split('-');
-    const date = new Date(this.selectedDeliveryDate);
-    const dayOfWeek = date.getDay(); // Sunday = 0 ... Saturday = 6
-  
-    this.generateTimeOptionsForDay(dayOfWeek);
-  
-    this.accessibilityService.announce(
-      `Selected date is ${month}-${day}-${year}.`,
-      'polite'
-    );
-  }
-  
-  
   async placeOrder() {
     this.isLoading = true;
     const loading = await this.loadingController.create({
       spinner: 'crescent',
-      message: 'Please wait while we process your order...',
-      cssClass: 'custom-loading',
+      message: 'Processing your order...',
     });
     await loading.present();
-  
+
     try {
       const user_id = this.checkoutInfo.user_info.id;
       const points_redeem = this.pointsToRedeem;
-      let pos_order_id = 0;
       let points_add = 0;
-  
+      let pos_order_id = 0;
+
+      // ----------------------------------------------------
+      // 1️⃣ Build delivery address for backend + Treez
+      // ----------------------------------------------------
       const deliveryAddress =
         this.selectedOrderType === 'delivery'
           ? {
               address1: this.deliveryAddress.street.trim(),
-              address2: this.deliveryAddress.apt ? this.deliveryAddress.apt.trim() : null,
+              address2: this.deliveryAddress.apt?.trim() || null,
               city: this.deliveryAddress.city.trim(),
-              state: this.deliveryAddress.state.trim(),
+              state: this.deliveryAddress.state,
               zip: this.deliveryAddress.zip.trim(),
               delivery_date: this.selectedDeliveryDate,
               delivery_eta_start: this.selectedDeliveryTime
             }
           : null;
 
-      console.log(user_id)
-      console.log(this.finalSubtotal)
-      console.log(this.checkoutInfo.cart)
+      // ----------------------------------------------------
+      // 2️⃣ Treez order payload
+      // ----------------------------------------------------
+     const appliedDiscount = this.cartService.getAppliedDiscount();
 
-      const cartItems = this.checkoutInfo.cart.map((item: any) => ({
-        productId: item.id,
-        quantity: item.quantity
-      }));
+      const treezPayload = {
+        type: this.selectedOrderType === 'pickup' ? 'PICKUP' : 'DELIVERY',
+        order_source: 'ECOMMERCE',
+        order_status: 'AWAITING_PROCESSING',
+        delivery_address: deliveryAddress,
+        customner_id: this.checkoutInfo.user.pos_customer_id,
 
-      const response = await this.cartService.checkout(points_redeem, this.selectedOrderType, deliveryAddress);
-  
-      pos_order_id = response.orderResult.orderId;
+        items: this.checkoutInfo.cart.map((i: any) => ({
+          size_id: i.id,
+          quantity: i.quantity,
+          apply_automatic_discounts: true
+        })),
+
+        discounts: appliedDiscount
+          ? [{ discountId: appliedDiscount.posDiscountID }]
+          : []
+      };
+
+      // --- AEROPAY PAYMENT ---
+      if (this.selectedPaymentMethod === "aeropay" && this.selectedBankId) {
+        try {
+          await this.aeropayService.fetchUsedForMerchantToken(this.aeropayUserId).toPromise();
+          const tx = await this.aeropayService.createTransaction(
+            this.finalTotal.toFixed(2),
+            this.selectedBankId
+          ).toPromise();
+
+          if (!tx?.data?.success) {
+            await this.presentToast("Payment failed.");
+            this.isLoading = false;
+            return;
+          }
+
+          this.presentToast("Payment successful!", "success");
+
+        } catch (err) {
+          console.error(err);
+          await this.presentToast("Payment error.");
+          this.isLoading = false;
+          return;
+        }
+      }
+
+
+      // ----------------------------------------------------
+      // 3️⃣ Submit to TREEZ
+      // ----------------------------------------------------
+      const treezRes = await this.cartService.submitTreezOrder(treezPayload);
+      console.log('TREEZ ORDER SUCCESS:', treezRes);
+
+      pos_order_id = treezRes.order.data.order_number || 0;
       points_add = this.finalSubtotal;
 
-      await this.cartService.placeOrder(user_id, pos_order_id, points_redeem ? 0 : points_add, points_redeem, this.finalSubtotal, this.checkoutInfo.cart);
-  
-      this.orderPlaced.emit();
+      // ----------------------------------------------------
+      // 4️⃣ Save to LOCAL DATABASE (THIS WAS MISSING)
+      // ----------------------------------------------------
+      await this.cartService.placeOrder(
+        {
+          user_id,
+          pos_order_id,
+          points_add: points_redeem ? 0 : points_add,
+          points_redeem,
+          amount: this.finalSubtotal,
+          cart: this.checkoutInfo.cart,
 
-       await this.authService.getUserOrders();
-      
-      this.accessibilityService.announce('Your order has been placed successfully.', 'polite');
+          // NEW ➜ customer fields
+          customer_name: `${this.checkoutInfo.user_info.fname} ${this.checkoutInfo.user_info.lname}`,
+          customer_email: this.checkoutInfo.user_info.email,
+          customer_phone: this.checkoutInfo.user_info.phone,
+          customer_dob: this.checkoutInfo.user_info.dob,
 
-      const orderTypeMessage =
-      this.selectedOrderType === 'delivery'
-        ? 'Your delivery order has been placed!'
-        : 'Your pickup order has been placed!';
-
-      await this.fcmService.sendPushNotification(
-        this.checkoutInfo.user_info.id,
-        'Order Confirmed',
-        orderTypeMessage
+          // NEW ➜ order meta fields
+          order_type: this.selectedOrderType
+        }
       );
 
-    } catch (error:any) {
-      console.error('Error placing order:', error);
-      await this.presentToast('Error placing order: ' + JSON.stringify(error.message));
-      this.accessibilityService.announce('There was an error placing your order. Please try again.', 'polite');
+      await this.authService.getUserOrders();
+
+      const msg =
+        this.selectedOrderType === 'delivery'
+          ? 'Your delivery order has been placed!'
+          : 'Your pickup order has been placed!';
+
+      await this.fcmService.sendPushNotification(
+        user_id,
+        'Order Confirmed',
+        msg
+      );
+
+      this.orderPlaced.emit();
+      this.accessibilityService.announce('Your order has been placed successfully.');
+
+    } catch (err) {
+      console.error('Order Error:', err);
+      this.presentToast('Error placing order.');
     } finally {
       this.isLoading = false;
-      console.log('Cleanup complete: Destroying subscription');
-      await loading.dismiss();
+      loading.dismiss();
     }
   }
+
+
+  // --------------------------------------------------------------------------
+  // UTIL
+  // --------------------------------------------------------------------------
 
   async presentToast(message: string, color: string = 'danger') {
-    const toast = await this.toastController.create({
-      message: message,
-      duration: 7000,
-      color: color,
-      position: 'bottom',
+    const t = await this.toastController.create({
+      message, duration: 2500, color, position: 'bottom'
     });
-    await toast.present();
+    t.present();
   }
 
-  onOrderTypeChange(event: any) {
-    this.selectedOrderType = event.detail.value;
-    if(this.selectedOrderType === 'delivery'){
-      this.selectedPaymentMethod = 'aeropay'
-    }
+  goBack() {
+    this.back.emit();
   }
 
-  onPaymentMethodChange(selectedMethod: string) {
-  }
-  
-
-  async onAddressInputChange() {
-    const { street, city, zip } = this.deliveryAddress;
-
-    this.deliveryAddressValid = false;
-
-    // Basic check to avoid premature calls
-    if (street.trim() && city.trim() && zip.trim().length >= 5) {
-      const fullAddress = `${street.trim()}, ${city.trim()}, NY ${zip.trim()}`;
-
-      try {
-        const result = await this.settingsService.checkAddressInZone(
-          this.checkoutInfo.business_id,
-          fullAddress
-        );
-
-        if (!result.inZone) {
-          this.presentToast('This address is outside the delivery zone.', 'danger');
-          this.deliveryAddressValid = false;
-        } else {
-          this.deliveryAddressValid = true;
-          console.log('Address is within delivery zone.');
-        }
-
-      } catch (err) {
-        console.error('Address check error:', err);
-        this.presentToast('Failed to verify delivery address.', 'danger');
-      }
-    }
-  }
-  getAvailableDeliveryDates(schedule: any[]): string[] {
-    const validDates: string[] = [];
-    const today = new Date();
-  
-    for (let i = 0; i < 30; i++) {
-      const date = new Date();
-      date.setDate(today.getDate() + i);
-      const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
-  
-      const match = schedule.find(d => d.day === dayName);
-      if (match) {
-        validDates.push(date.toISOString().split('T')[0]);
-      }
-    }
-    return validDates;
-  }
-  
-  generateTimeOptionsFromSchedule(dayOfWeek: number) {
-    const dayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][dayOfWeek];
-    const scheduleForDay = this.deliverySchedule.find(d => d.day === dayName);
-  
-    if (!scheduleForDay) {
-      this.timeOptions = [];
-      return;
-    }
-  
-    const [startHour, startMinute] = scheduleForDay.startTime.split(':').map(Number);
-    const [endHour, endMinute] = scheduleForDay.endTime.split(':').map(Number);
-  
-    const options = [];
-    for (let hour = startHour; hour <= endHour; hour++) {
-      for (let min of [0, 30]) {
-        if (hour === endHour && min >= endMinute) continue;
-  
-        const displayHour = hour % 12 === 0 ? 12 : hour % 12;
-        const amPm = hour < 12 ? 'AM' : 'PM';
-        const formattedHour = hour < 10 ? `0${hour}` : `${hour}`;
-        const formattedMinute = min === 0 ? '00' : '30';
-  
-        options.push({
-          value: `${formattedHour}:${formattedMinute}`,
-          display: `${displayHour}:${formattedMinute} ${amPm}`
-        });
-      }
-    }
-  
-    this.timeOptions = options;
-  }
-  
   placeholderFor(category?: string | null): string {
-    const key = (category || 'default').toLowerCase();
-    // map to your assets; provide a default fallback
     const map: Record<string, string> = {
       flower: 'assets/flower-general.png',
       'pre-roll': 'assets/pre-roll-general.png',
@@ -528,7 +495,170 @@ export class CheckoutComponent implements OnInit {
       accessories: 'assets/accessories-general.png',
       default: 'assets/default.png'
     };
-    return map[key] || map['default'];
+    return map[(category || '').toLowerCase()] || map['default'];
   }
+
   
+  //Aeropay
+  async startAeroPayProcess() {
+    this.isFetchingAeroPay = true;
+
+    this.aeropayService.fetchMerchantToken().subscribe({
+      next: (res: any) => {
+        if (!res?.data?.token) {
+          this.presentToast("AeroPay authentication failed.");
+          this.isFetchingAeroPay = false;
+          return;
+        }
+        this.createAeroPayUser();
+      },
+      error: () => {
+        this.presentToast("AeroPay auth error.");
+        this.isFetchingAeroPay = false;
+      }
+    });
+  }
+
+  async createAeroPayUser() {
+    const payload = {
+      first_name: this.checkoutInfo.user_info.fname,
+      last_name: this.checkoutInfo.user_info.lname,
+      phone_number: this.checkoutInfo.user_info.phone,
+      email: this.checkoutInfo.user_info.email
+    };
+
+    this.aeropayService.createUser(payload).subscribe({
+      next: (res: any) => {
+        this.isFetchingAeroPay = false;
+
+        // Existing user → needs verification
+        if (res?.data?.displayMessage) {
+          this.verificationRequired = true;
+          this.existingUserId = res.data.existingUser.userId;
+          this.presentToast(res.data.displayMessage, 'warning');
+          return;
+        }
+
+        // New or verified user
+        this.aeropayUserId = res.data.user.userId;
+        this.userBankAccounts = res.data.user.bankAccounts || [];
+
+        if (this.userBankAccounts.length > 0) {
+          this.showBankSelection = true;
+          this.selectedBankId = this.userBankAccounts[0].bankAccountId;
+        } else {
+          this.retrieveAerosyncCredentials();
+        }
+      },
+      error: () => {
+        this.presentToast("AeroPay user creation failed.");
+        this.isFetchingAeroPay = false;
+      }
+    });
+  }
+
+  verifyAeroPayUser() {
+    this.aeropayService.verifyUser(this.existingUserId, this.verificationCode)
+    .subscribe({
+      next: () => {
+        this.verificationRequired = false;
+        this.presentToast("Verification successful!");
+        this.createAeroPayUser(); // resume onboarding
+      },
+      error: () => this.presentToast("Invalid verification code.")
+    });
+  }
+
+
+  retrieveAerosyncCredentials() {
+    this.loadingAerosync = true;
+
+    this.aeropayService.fetchUsedForMerchantToken(this.aeropayUserId)
+    .subscribe({
+      next: () => {
+        this.aeropayService.getAerosyncCredentials().subscribe({
+          next: (res: any) => {
+            this.aerosyncToken = res.data.token;
+            this.aerosyncURL = res.data.fastlinkURL;
+            this.aerosyncUsername = res.data.username;
+            this.openAerosyncWidget();
+          },
+          error: () => this.presentToast("Error getting AeroSync."),
+          complete: () => (this.loadingAerosync = false)
+        });
+      },
+      error: () => {
+        this.presentToast("AeroPay auth failed.");
+        this.loadingAerosync = false;
+      }
+    });
+  }
+
+  openAerosyncWidget() {
+    if (!this.aerosyncToken) {
+      console.error("Missing AeroSync token");
+      return;
+    }
+
+    const widget = openWidget({
+      id: "widget",
+      token: this.aerosyncToken,
+      iframeTitle: "Connect",
+      environment: "production",
+
+      onLoad: () => {
+        console.log("AeroSync widget loaded");
+      },
+
+      onSuccess: (ev: any) => {
+        console.log("AeroSync success:", ev);
+
+        if (ev.user_id && ev.user_password) {
+          this.linkBankToAeropay(ev.user_id, ev.user_password);
+        } else {
+          console.error("Missing AeroSync credentials in event", ev);
+        }
+      },
+
+      onError: (err: any) => {
+        console.error("AeroSync widget error:", err);
+        this.presentToast("AeroPay connection error.");
+      },
+
+      onClose: () => {
+        console.log("AeroSync widget closed");
+      },
+
+      onEvent: (evt: any, type: string) => {
+        console.log("AeroSync event:", type, evt);
+      }
+    });
+
+    widget.launch();
+  }
+
+
+  linkBankToAeropay(userId: string, pass: string) {
+    this.aeropayService.linkBankAccount(userId, pass).subscribe({
+      next: (res: any) => {
+        if (res.data.success) {
+          this.presentToast("Bank linked!", "success");
+          this.createAeroPayUser(); // refresh user + banks
+        } else {
+          this.presentToast("Bank link failed.");
+        }
+      },
+      error: () => this.presentToast("Bank link error.")
+    });
+  }
+
+  selectBank(bankId: string) {
+    this.selectedBankId = bankId;
+  }
+
+
+  removeDiscount() {
+    this.cartService.setDiscount(null);
+  }
+
 }

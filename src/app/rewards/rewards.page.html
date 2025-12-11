@@ -1,49 +1,69 @@
 <app-header></app-header>
 
-<ion-content [fullscreen]="true">
-  <div *ngIf="isLoggedIn; else guestContent" aria-labelledby="user-dashboard-heading">
+<ion-content fullscreen>
+
+  <!-- LOGGED IN -->
+  <div *ngIf="isLoggedIn; else guestContent" class="rewards-page">
     <h1 id="user-dashboard-heading" class="sr-only">User Dashboard</h1>
-    <app-points
-      [points]="user.points"
-      [isExclusiveMember]="user.premium"
-      [attr.aria-label]="'You have ' + user.points + ' points. ' + user.premium ? 'You are an exclusive member.' : 'You are not an exclusive member.'"
-    ></app-points>
-    
-    <app-banner-carousel aria-label="Promotional banners carousel"></app-banner-carousel>
 
-    <app-account
-      [user]="user"
-      [attr.aria-label]="'Account settings for ' + user.name"
-    ></app-account>
+    <!-- POINTS SUMMARY -->
+    <section class="rewards-section">
+      <app-points
+        [points]="user.points"
+        [isExclusiveMember]="user.premium"
+        aria-label="Your reward points and membership status"
+      ></app-points>
+    </section>
 
-    <app-review aria-label="Leave a review"></app-review>
+    <!-- PROMOS -->
+    <section class="rewards-section">
+      <app-banner-carousel aria-label="Promotional banners carousel"></app-banner-carousel>
+    </section>
 
 
-    <div class="setting-item advanced">
-      <ion-item lines="none" class="advanced-toggle"  (click)="showAdvanced = !showAdvanced">
+    <!-- AIQ TIERS -->
+    <section class="rewards-section">
+      <app-aiq-tiers
+        [userPoints]="user.points"
+        [discounts]="discounts"
+        aria-label="Available loyalty reward tiers"
+      ></app-aiq-tiers>
+    </section>
+
+    <!-- ACCOUNT -->
+    <section class="rewards-section">
+      <app-account
+        [user]="user"
+        aria-label="Account settings"
+      ></app-account>
+    </section>
+
+    <!-- REVIEW -->
+    <!-- <section class="rewards-section">
+      <app-review aria-label="Leave a review"></app-review>
+    </section> -->
+
+    <!-- ADVANCED -->
+    <section class="rewards-section advanced">
+      <ion-item lines="none" (click)="showAdvanced = !showAdvanced">
         <ion-label>Advanced</ion-label>
-        <ion-icon name="chevron-down-outline" slot="end"></ion-icon>
+        <ion-icon slot="end" name="chevron-down-outline"></ion-icon>
       </ion-item>
-      
-      <div *ngIf="showAdvanced" class="advanced-section">
-        <ion-button class="action-button"(click)="presentDeleteModal()">
-          Delete My Account
-        </ion-button>   
-      </div>
-      
-    </div>
+
+      <ion-button
+        *ngIf="showAdvanced"
+        expand="block"
+        class="danger-btn"
+        (click)="presentDeleteModal()"
+      >
+        Delete My Account
+      </ion-button>
+    </section>
   </div>
 
+  <!-- GUEST -->
   <ng-template #guestContent>
     <app-guest aria-label="Guest content. Please log in to access your dashboard."></app-guest>
   </ng-template>
 
-  <!-- <div class="cannabis-disclaimer" role="alert">
-    <p><strong>OCM-CAURD-24-000101</strong></p>
-    <p>For use only by adults 21 years of age and older. Keep out of reach of children and pets.</p>
-    <p>In case of accidental ingestion or overconsumption, contact the <strong>National Poison Control Center</strong> hotline at <a href="tel:18002221222">1-800-222-1222</a> or call <strong>9-1-1</strong>. Please consume responsibly.</p>
-    <p><strong>Cannabis is not recommended for use by persons who are pregnant or nursing.</strong></p>
-    <p>Concerned about your cannabis use? <a href="https://oasas.ny.gov/HOPELine" target="_blank">Visit HOPELine</a>, text <strong>HOPENY</strong>, or call <a href="tel:18778846739">1-877-8-HOPENY</a>.</p>
-  </div> -->
 </ion-content>
-

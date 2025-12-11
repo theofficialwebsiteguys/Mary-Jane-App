@@ -1,11 +1,11 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.cottonmouth.app',
-  appName: 'CottonMouth Dispensary',
+  appId: 'com.maryjanecannabisco.app',
+  appName: 'Mary Jane Cannabis Co.',
   webDir: 'www',
   server: {
-    hostname: "com.cottonmouth.app",
+    hostname: "com.maryjanecannabisco.app",
     androidScheme: "https",
     allowNavigation: ["pay.aero.inc"]
   },
@@ -23,7 +23,7 @@ const config: CapacitorConfig = {
       presentationOptions: ["badge", "sound", "alert"]
     },
     DeepLinks: {
-      schemes: ["cottonmouth"],
+      schemes: ["maryjanecannabisco"],
       hosts: ["dispensary-api-ac9613fa4c11.herokuapp.com"]
     }
   },

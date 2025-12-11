@@ -9,6 +9,7 @@ import { CardSliderComponent } from '../card-slider/card-slider.component';
 import { BannerCarouselComponent } from '../banner-carousel/banner-carousel.component';
 
 import { SharedModule } from '../shared/shared.module';
+import { GuestComponent } from '../guest/guest.component';
 
 @NgModule({
   imports: [

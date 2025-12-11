@@ -9,7 +9,7 @@ import { AccessibilityService } from '../accessibility.service';
 export class ReviewComponent {
 
   reviewComment: string = '';
-  googleReviewUrl: string = 'https://search.google.com/local/writereview?placeid=ChIJO-OWy_3PxokRtZpOJIdBG7U'; // Replace with your actual Google Review link
+  googleReviewUrl: string = 'https://search.google.com/local/writereview?placeid=ChIJR6ZgaRNZwokRojYGFUnXDMY'; // Replace with your actual Google Review link
 
   constructor(private accessibilityService: AccessibilityService) {}
 

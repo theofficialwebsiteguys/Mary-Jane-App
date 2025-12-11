@@ -1,5 +1,5 @@
 {
-  "name": "CottonMouth Dispensary",
+  "name": "Mary Jane Cannabis Co.",
   "version": "0.0.1",
   "author": "Ionic Framework",
   "homepage": "https://ionicframework.com/",
@@ -40,6 +40,7 @@
     "aerosync-web-sdk": "^1.1.0",
     "bootstrap": "^5.3.3",
     "firebase": "^10.14.1",
+    "hammerjs": "^2.0.8",
     "ionicons": "^7.0.0",
     "libphonenumber-js": "^1.11.14",
     "ngx-owl-carousel-o": "^18.0.0",

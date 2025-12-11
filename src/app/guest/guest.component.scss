@@ -1,90 +1,99 @@
-.guest-container {
-  padding: 20px;
-  background: #f7f8fa;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+:host {
+  --background: transparent;
 }
 
-.guest-banner {
+/* ion-content OWNS layout + background */
+ion-content {
+  --background: url('../../assets/background.png') no-repeat center / cover;
+
+  --padding-top: env(safe-area-inset-top);
+  --padding-bottom: env(safe-area-inset-bottom);
+  --padding-start: 20px;
+  --padding-end: 20px;
+
+  --overflow: hidden;
+}
+
+/* inner wrapper NO padding */
+.guest-page {
+  min-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* HEADER */
+.guest-header {
+  margin-top: 48px;
+  margin-bottom: 28px;
   text-align: center;
-  padding: 24px 16px;
-  background: var(--ion-color-primary);
-  border-radius: 12px;
-  color: #fff;
+
   h1 {
-    font-size: 1.8rem;
-    margin-bottom: 8px;
-    font-weight: 700;
-  }
-  p {
-    font-size: 1rem;
-    opacity: 0.9;
-    color: #fff;
-  }
-}
-
-.rewards-options {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.reward-card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 20px;
-  text-align: center;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-  ion-icon {
-    font-size: 2.5rem;
-    margin-bottom: 12px;
-    color: var(--ion-color-primary);
-  }
-  h2 {
-    font-size: 1.3rem;
-    font-weight: 700;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #3e4638;
     margin-bottom: 6px;
   }
-  .reward-sub {
-    font-size: 0.9rem;
-    color: #777;
-    margin-bottom: 12px;
-  }
-  ul {
-    text-align: left;
-    list-style: none;
-    padding: 0;
-    margin: 0 0 16px;
-    li {
-      font-size: 0.95rem;
-      color: #444;
-      padding-left: 22px;
-      margin-bottom: 8px;
-      position: relative;
-      &:before {
-        content: "✔";
-        position: absolute;
-        left: 0;
-        color: var(--ion-color-primary);
-        font-size: 1rem;
-      }
-    }
+
+  p {
+    font-size: 0.95rem;
+    color: #6b7362;
+    max-width: 320px;
+    margin: 0 auto;
   }
 }
 
-.platinum-tier {
-  border: 2px solid var(--ion-color-primary);
-  background: #f0faf5;
+/* CARD */
+.guest-card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  padding: 28px 24px;
+  border-radius: 14px;
+  border: 1px solid #dde3d4;
+  box-sizing: border-box;
 }
 
-@media (min-width: 768px) {
-  .rewards-options {
-    flex-direction: row;
-    justify-content: space-between;
+/* PERKS */
+.perk-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 26px;
+}
+
+.perk {
+  display: flex;
+  gap: 10px;
+
+  span {
+    color: #6b734e;
   }
-  .reward-card {
-    flex: 1;
-    max-width: 48%;
+
+  p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #444d3d;
+  }
+}
+
+/* CTA */
+.primary-cta {
+  --background: #5c6450;
+  --border-radius: 12px;
+  height: 48px;
+}
+
+/* FOOTER LINK */
+.secondary-link {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #6b7362;
+
+  a {
+    color: #5c6450;
+    font-weight: 500;
+    text-decoration: none;
   }
 }

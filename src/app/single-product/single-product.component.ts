@@ -9,6 +9,7 @@ import { Product } from '../product/product.model';
 import { CartService } from '../cart.service';
 import { AuthService } from '../auth.service';
 import { AccessibilityService } from '../accessibility.service';
+import { ProductCategory } from '../product-category/product-category.model';
 
 @Component({
   selector: 'app-single-product',
@@ -18,18 +19,20 @@ import { AccessibilityService } from '../accessibility.service';
 export class SingleProductComponent implements OnInit {
   currentProduct: Product = {
     id: '',
-    category: 'Flower',
+    category: 'Flower' as ProductCategory,
     title: '',
-    brand: '',
     desc: '',
+    brand: '',
     strainType: 'HYBRID',
     thc: '',
+    thcMG: '',
     cbd: '',
     weight: '',
     price: '',
-    quantity: 0,
     image: '',
+    quantity: 0,
     unit: '',
+
     sale: {
       discountId: 0,
       discountName: '',
@@ -37,7 +40,25 @@ export class SingleProductComponent implements OnInit {
       discountedPrice: 0,
       menuDisplay: undefined
     },
+
+    // Added Treez-compatible fields
+    description: '',
+    subtype: '',
+    uom: '',
+    gallery: [],
+    attributes: {
+      general: [],
+      flavors: [],
+      effects: []
+    },
+    effects: [],
+    flavors: [],
+    discounts: [],
+    active: true,
+    aboveThreshold: false,
+    updatedAt: ''
   };
+
 
   showFullDescription = false;
   quantity = 1; 
@@ -81,13 +102,51 @@ export class SingleProductComponent implements OnInit {
   }
 
   getDescription(): string {
-    if (!this.currentProduct.desc) {
-      return '';
-    }
-    return this.showFullDescription || this.currentProduct.desc.length <= 75
-      ? this.currentProduct.desc
-      : this.currentProduct.desc.substring(0, 75) + '...';
+    const raw =
+      this.currentProduct.description ||
+      this.currentProduct.desc ||
+      '';
+
+    if (!raw) return '';
+
+    return this.showFullDescription || raw.length <= 150
+      ? raw
+      : raw.substring(0, 150) + '...';
   }
+
+  currentImageIndex = 0;
+
+  get primaryImage(): string {
+    const gallery = this.currentProduct.gallery || [];
+    if (gallery.length) return gallery[this.currentImageIndex];
+    if (this.currentProduct.image) return this.currentProduct.image;
+    return this.placeholderFor(this.currentProduct.category);
+  }
+
+  selectImage(i: number) {
+    this.currentImageIndex = i;
+  }
+
+  formatDiscountAmount(d: any): string {
+    if (!d) return '';
+    if (d.method === 'PERCENT') return `${d.amount}% off`;
+    if (d.method === 'DOLLAR') return `$${d.amount} off`;
+    return `${d.amount}`;
+  }
+
+  getDiscountConditionsSummary(d: any): string {
+    if (!d?.conditions?.length) return '';
+    return d.conditions.map((c: any) => `${c.type}: ${c.value}`).join(' • ');
+  }
+
+  getStockLabel(): string | null {
+    const qty = this.currentProduct.quantity;
+    if (qty <= 0) return 'Out of stock';
+    if (qty <= 10) return `Low stock – only ${qty} left`;
+    return 'In stock';
+  }
+
+
 
   goBack() {
     this.location.back();
@@ -144,4 +203,12 @@ export class SingleProductComponent implements OnInit {
     };
     return map[key] || map['default'];
   }
+
+  // shouldShowThc(product: any): boolean {
+  //   const thc = Number(product.thc || 0);
+  //   const thcMG = Number(product.thcMG || 0);
+
+  //   return thc > 0 || thcMG > 0;
+  // }
+  
 }

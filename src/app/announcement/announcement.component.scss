@@ -1,0 +1,100 @@
+/* Skeleton */
+.announcement-skeleton {
+  height: 42px;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.04),
+    rgba(0, 0, 0, 0.08),
+    rgba(0, 0, 0, 0.04)
+  );
+  animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: 200px 0; }
+}
+
+/* Announcement bar container stays still */
+.announcement-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  padding: 10px 14px;
+
+  background: var(--ion-color-primary);
+  color: var(--ion-color-primary-contrast);
+
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+  font-size: 16px;
+}
+
+.announcement-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon {
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+}
+
+/* Only the TEXT moves (vertical slide) */
+.text-slider {
+  height: 32px;
+  overflow: hidden;
+  position: relative;
+}
+
+.text-slide {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.45s ease;
+  height: calc(32px * var(--count));
+}
+
+
+.text-item {
+  height: 32px;
+  min-height: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.text-item .title {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.text-item .message {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.announcement-right {
+  display: flex;
+  align-items: center;
+}
+
+.close-button {
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 0 4px;
+}
+
+/* Mobile fit */
+@media (max-width: 400px) {
+  .announcement-bar {
+    padding-inline: 10px;
+  }
+}

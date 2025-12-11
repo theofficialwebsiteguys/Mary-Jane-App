@@ -15,37 +15,212 @@ $box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 $padding: 20px;
 $spacing: 16px;
 
+:host {
+  --background: transparent;
+}
+
+ion-content {
+  --background: url('../../assets/background.png') no-repeat center/cover;
+  background: url('../../assets/background.png') no-repeat center/cover;
+}
+
+/* ============================
+   PAGE WRAPPER (FULL CENTERING)
+=============================== */
+.log-in-page {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 24px;
+  position: relative;
+
+  /* Smooth background fade */
+  animation: fadeBackground 0.6s ease;
+
+  /* Ensures proper safe-area handling */
+  padding-top: calc(env(safe-area-inset-top, 20px) + 10px);
+  padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 115px);
+}
+
+/* ============================
+   LOGIN CONTAINER (NEW DESIGN)
+=============================== */
+.login-container {
+  width: 100%;
+  max-width: 420px;
+
+  backdrop-filter: blur(14px);
+  background: rgba(255, 255, 255, 0.85);
+
+  border-radius: 18px;
+  padding: 28px 26px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+
+  animation: fadeUp 0.45s ease;
+  overflow-y: auto; /* This enables vertical scrolling for this container only */
+  max-height: calc(100vh - 120px); /* This sets a maximum height */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* Dark Mode Support */
+:host-context(.dark) .login-container {
+  background: rgba(40, 40, 40, 0.85);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+}
+
+
+/* ============================
+   LOGO
+=============================== */
+.login-header-logo {
+  text-align: center;
+  margin-bottom: 24px;
+
+  .logo {
+    width: 190px;
+    height: auto;
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeSlideIn 0.6s ease forwards;
+  }
+}
+
+
+/* ============================
+   INPUTS
+=============================== */
+
+.form-group {
+  margin-bottom: 18px;
+
+  label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+    color: #333;
+
+    &.required::after {
+      content: "*";
+      color: var(--ion-color-danger);
+      margin-left: 3px;
+    }
+  }
+
+  input {
+    width: 100%;
+    padding: 14px;
+    font-size: 15px;
+
+    background: #f7f7f7;
+    border: 2px solid #e2e2e2;
+    border-radius: 10px;
+    transition: all 0.25s ease;
+
+    &:focus {
+      border-color: var(--ion-color-primary);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(var(--ion-color-primary-rgb), 0.15);
+    }
+  }
+}
+
+/* Dark Mode Inputs */
+:host-context(.dark) input {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid #555;
+  color: white;
+}
+
+
+/* ============================
+   PASSWORD VISIBILITY ICON
+=============================== */
+.password-toggle-icon {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 22px;
+  opacity: 0.7;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+
+/* ============================
+   ERROR MESSAGE
+=============================== */
+.error-message {
+  background: rgba(var(--ion-color-danger-rgb), 0.15);
+  border-left: 4px solid var(--ion-color-danger);
+  padding: 12px;
+  font-size: 0.85rem;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+
+/* ============================
+   BUTTON
+=============================== */
+
+ion-button {
+  margin-top: 14px;
+  height: 48px;
+  font-size: 1rem;
+  --border-radius: 12px;
+}
+
+
+/* ============================
+   FOOTER TEXT
+=============================== */
+.login-link {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 0.9rem;
+
+  a {
+    color: var(--ion-color-primary);
+    font-weight: 600;
+  }
+}
+
+
+/* ============================
+   ANIMATIONS
+=============================== */
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeBackground {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+
 html, body {
   height: 100%;
 }
 
-// Log In Page
-.log-in-page {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  padding: 16px;
-  padding-top: calc(env(safe-area-inset-top, 20px) + 60px);
-  min-height: 100vh; /* This sets the height to the full viewport */
-  overflow: hidden; /* This is the key: it prevents the page from scrolling */
-}
-
-// Login Container
-.login-container {
-  width: 100%;
-  max-width: 420px; // Slightly wider to fit two fields per row
-  padding: 16px;
-  padding-bottom: 250px; /* You can remove this if it's not needed, it adds extra space at the bottom */
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1; /* Allows the container to grow to fill space */
-  overflow-y: auto; /* This enables vertical scrolling for this container only */
-  max-height: calc(100vh - 120px); /* This sets a maximum height */
-  background-color: var(--ion-color-secondary);
-}
 
 
 // Login Header
@@ -61,52 +236,7 @@ html, body {
   }
 }
 
-// Logo
-.login-header-logo {
-  text-align: center;
 
-  .logo {
-    width: 150px; // Slightly larger for emphasis
-    height: auto;
-  }
-}
-
-// Form Group
-.form-group {
-  margin-bottom: $spacing;
-
-  label {
-    display: block;
-    margin-bottom: 6px;
-    font-weight: 600;
-    color: white;
-
-    &.required::after {
-      content: "*";
-      color: var(--ion-color-danger);
-      margin-left: 2px;
-    }
-  }
-
-  input[type="email"],
-  input[type="password"],
-  input[type="text"],
-  input[type="tel"],
-  input[type="date"] {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid $input-border-color;
-    border-radius: $border-radius;
-    font-size: $font-size-input;
-    background-color: #f9f9f9;
-    color: $text-color-dark;
-
-    &:focus {
-      border-color: var(--ion-color-primary);
-      outline: none;
-    }
-  }
-}
 
 // Name Row (First Name and Last Name on the same row)
 .name-row {
@@ -118,21 +248,6 @@ html, body {
   }
 }
 
-// Login Link
-.login-link {
-  text-align: center;
-  margin-top: $spacing;
-
-  a {
-    color: var(--ion-color-primary);
-    text-decoration: underline;
-    font-size: $font-size-footer-link;
-
-    &:hover {
-      color: var(--ion-color-primary);
-    }
-  }
-}
 
 // Animations
 @keyframes fadeInUp {
@@ -235,16 +350,6 @@ html, body {
   padding-left: 0.2rem;
 }
 
-.error-message {
-  color: var(--ion-color-danger);
-  background: rgba(var(--ion-color-danger-rgb), 0.12);
-  padding: 0.8rem;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  text-align: center;
-  margin-bottom: 1rem;
-  box-shadow: 0 2px 4px rgba(211, 47, 47, 0.1);
-}
 
 .terms-group {
   display: flex;
@@ -295,15 +400,6 @@ ion-checkbox {
   padding-right: 40px; /* Space for the icon */
 }
 
-.password-toggle-icon {
-  position: absolute; /* Takes the icon out of flow */
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-  z-index: 10;
-}
-
 /* IMPORTANT: Ensure this general selector still applies to the wrapped input */
 .form-group input[type="email"],
 .form-group input[type="password"],
@@ -320,3 +416,4 @@ ion-checkbox {
     background-color: #f9f9f9; /* The white background you want */
     color: $text-color-dark; /* The dark text color you want */
 }
+

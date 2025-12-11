@@ -1,117 +1,7 @@
-.image-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-}
-
 .view-all{
   display: flex;
   text-decoration: none;
   color: black;
-}
-
-.card-details {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 84px;
-  padding: 10px 8px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.3));
-  color: var(--ion-color-light);
-}
-
-.card-details .product-title {
-  font-size: 16px;
-  font-weight: 500;
-  margin: 0;
-}
-
-.card-details .product-price {
-  font-size: 18px;
-  font-weight: bold;
-  margin: 5px 0 0 0;
-  color: white;
-}
-
-.category-section {
-  padding: 20px 24px 16px;
-  margin: 10px;
-  border-radius: 10px;
-
-  &:nth-child(odd) {
-    background-color: rgba(var(--ion-color-primary-rgb)) !important;
-
-    .section-header h2,
-    ion-icon {
-      color: white !important;
-    }
-  }
-
-  &:nth-child(even) {
-    background-color: rgba(var(--ion-color-primary-contrast-rgb)) !important;
-
-    .section-header h2,
-    ion-icon {
-      color: white !important;
-    }
-  }
-}
-
-
-.section-header {
-  display: flex;
-  align-items: center;
-}
-
-.section-header h2 {
-  font-size: 1.7em;
-  text-transform: capitalize;
-  margin: 0 6px 0 0;
-}
-
-.slider-container {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none; /* Hides scrollbar on Firefox */
-  padding: 20px 0;
-}
-
-.slider {
-  display: flex;
-  gap: 20px;
-}
-
-.slide {
-  flex: 0 0 auto;
-  width: 196px;
-  height: 284px;
-}
-
-.card {
-  width: 100%;
-  height: 100%;
-  background-color: #fff;
-  border-radius: 8px; /* Slightly more rounded corners */
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.1); /* Enhanced shadow for depth */
-  overflow: hidden;
-  position: relative;
-  transform: scale(1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-
-  &:hover {
-    transform: scale(1.05); /* Slight zoom-in effect */
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 4px 6px rgba(0, 0, 0, 0.15); /* Larger shadow on hover */
-  }
 }
 
 .arrow-icon {
@@ -120,37 +10,12 @@
 }
 
 
-
-.product-brand,
-.product-title {
-  font-size: 13px;
-  font-weight: 500;
-  margin: 0;
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  color: white;
-}
-
-.product-title {
-  font-weight: 600;
-  margin-top: 2px;
-}
-
 .product-price {
   margin-top: auto;
   font-size: 16px;
   font-weight: bold;
   color: var(--ion-color-secondary);
   text-align: right;
-}
-
-.loading-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px; /* Adjust height as needed */
 }
 
 .custom-spinner {
@@ -173,34 +38,6 @@
 
 
 /* View More Slide (Placed at the End of Products) */
-.view-more-slide {
-  flex: 0 0 auto;
-  width: 120px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.view-more-button {
-  background-color: var(--ion-color-primary);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: bold;
-  padding: 12px;
-  cursor: pointer;
-  width: 100%;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-
-.view-more-button ion-icon {
-  font-size: 16px;
-}
 
 .sale-tag {
   position: absolute;
@@ -233,3 +70,93 @@
   font-weight: bold;
   font-size: 24px;
 }
+
+.loading-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0,0,0,0.25); /* optional dim */
+  z-index: 9999;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #d1d1d1;
+  border-top-color: #4c5a45; /* match your brand color */
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+.category-section {
+  padding: 10px 0px;
+  margin: 10px;
+  border-radius: 10px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+}
+
+.section-header h2 {
+  font-size: 1.7em;
+  text-transform: capitalize;
+  margin: 0 6px 0 0;
+}
+
+.slider-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 20px 0;
+}
+
+.slider {
+  display: flex;
+  gap: 20px;
+}
+
+.slide {
+  flex: 0 0 auto;
+  width: 196px;   /* matches your grid card width nicely */
+}
+
+
+.view-more-slide {
+  flex: 0 0 auto;
+  width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.view-more-button {
+  background-color: var(--ion-color-primary);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 12px;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Product } from './product/product.model';
+import { Product, Strain } from './product/product.model';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { BehaviorSubject, catchError, combineLatest, filter, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
@@ -21,7 +21,7 @@ export class ProductsService {
   private products = new BehaviorSubject<Product[]>([]);
   products$ = this.products.asObservable();
 
-  private currentCategory = new BehaviorSubject<ProductCategory>('Flower');
+  private currentCategory = new BehaviorSubject<ProductCategory>('All');
   currentCategory$ = this.currentCategory.asObservable();
 
   private currentProduct = new BehaviorSubject<Product | null>(null); // Start with null or a default Product
@@ -67,7 +67,7 @@ export class ProductsService {
   // }
 
   const options = {
-    url: `${environment.apiUrl}/dutchie/inventory`,
+    url: `${environment.apiUrl}/treez/inventory`,
     params: { toggleVape: String(toggleVape) },
     headers: {
       'Content-Type': 'application/json',
@@ -79,7 +79,13 @@ export class ProductsService {
     CapacitorHttp.get(options)
       .then((response) => {
         if (response.status === 200) {
-          const sortedProducts = this.sortProducts(response.data.products);
+          const normalized = response.data.products.map((p: any) => ({
+            ...p,
+            isDeal: Array.isArray(p.discounts) && p.discounts.length > 0
+          }));
+
+          const sortedProducts = this.sortProducts(normalized);
+
           this.products.next(sortedProducts);
           this.saveProductsToSessionStorage(sortedProducts);
           observer.next(sortedProducts);
@@ -112,152 +118,315 @@ export class ProductsService {
       return sorted;
   }
 
-  getFilteredProducts(searchQuery: string = ''): Observable<Product[]> {
-    return this.products$.pipe(
-      filter((productArray) => productArray.length > 0),
-      map((productArray) => {
+ getFilteredProducts(searchQuery: string = ''): Observable<Product[]> {
+  return combineLatest([
+    this.products$,
+    this.currentProductFilters$,
+    this.currentCategory$
+  ]).pipe(
+    filter(([products]) => products.length > 0),
+    map(([products, filters, currentCategory]) => {
+      const {
+        brands,
+        strains,
+        weights,
+        sizes,
+        effects,
+        flavors,
+        subtypes,
+        generals,
+        price,
+        potency,
+        sortMethod: { criterion, direction },
+      } = filters;
+
+      const isEmpty = (arr: any[]) => !arr || arr.length === 0;
+
+      const filtered = products.filter((product) => {
         const {
-          sortMethod: { criterion, direction },
-        } = this.currentProductFilters.getValue();
+          category,
+          title,
+          brand,
+          strainType,
+          weight,
+          isDeal,
+          thc,
+          sale,
+        } = product;
 
-  
-        return productArray
-          .filter(({ category, masterCategory, title, brand, strainType, weight, thc }) => {
-            const {
-              brands,
-              strains,
-              weights,
-              potency: { thc: thcRange },
-            } = this.currentProductFilters.getValue();
-  
-            const isEmpty = (arr: any) => {
-              return arr.length < 1;
-            };
-  
-            const isInRange = (value: number, range: PotencyRange): boolean => {
-              const { lower, upper } = range;
-              return value >= lower && value <= upper;
-            };
-  
-            // Default THC to 100 if null or undefined
-            const defaultThc = thc ?? '100% THC';
+        // 🔍 SEARCH
+        // 🔍 SEARCH (always applies)
+        const matchesSearch =
+          !searchQuery.trim() ||
+          title.toLowerCase().includes(searchQuery.toLowerCase());
 
-            const isMatchingSearch = searchQuery.trim() === '' || title.toLowerCase().includes(searchQuery.toLowerCase());
+        if (!matchesSearch) return false;
 
-            const isMatchingCategory =
-              searchQuery.trim() !== '' ||
-              this.getEffectiveCategory(category ?? '', masterCategory ?? '') === this.currentCategory.value;
+        // DEALS = virtual category
+        if (currentCategory === 'Deals' && !isDeal) {
+          return false;
+        }
 
-  
-            return (
-              isMatchingSearch && 
-              isMatchingCategory &&
-              (isEmpty(brands) || brands.includes(brand)) &&
-              (!strainType ||
-                isEmpty(strains) ||
-                strains.some((s) =>
-                  strainType.toUpperCase().split(' ').includes(s)
-                )) &&
-              (!weight || isEmpty(weights) || weights.includes(weight)) 
-              // (!defaultThc || isInRange(Number(defaultThc.split('%')[0]), thcRange))
-            );
-          })
-          .sort(
-            (
-              { posProductId: posProductIdA, price: priceA, thc: thcA, title: titleA },
-              { posProductId: posProductIdB, price: priceB, thc: thcB, title: titleB }
-            ) => {
-              let result = 0;
-  
-              // Default THC to 100 if null or undefined for sorting
-              const defaultThcA = thcA ?? '100';
-              const defaultThcB = thcB ?? '100';
-  
-              switch (criterion) {
-                case 'RECENT': {
-                  if (direction === 'ASC') result = Number(posProductIdA) - Number(posProductIdB);
-                  else if (direction === 'DESC') result = Number(posProductIdB) - Number(posProductIdA);
-                
-                  break;
-                }
-                case 'PRICE': {
-                  if (direction === 'ASC')
-                    result = Number(priceA) - Number(priceB);
-                  else if (direction === 'DESC')
-                    result = Number(priceB) - Number(priceA);
-                  break;
-                }
-                case 'THC': {
-                  // Extract THC percentage, ensuring null/undefined default to 100
-                  const extractThcValue = (thc: string | null | undefined): number => {
-                    return thc ? Number(thc.replace('% THC', '')) : 0;
-                  };
-                
-                  const thcValueA = extractThcValue(thcA);
-                  const thcValueB = extractThcValue(thcB);
-                
-                  if (direction === 'ASC') result = thcValueA - thcValueB;
-                  else if (direction === 'DESC') result = thcValueB - thcValueA;
-                
-                  break;
-                } 
-                case 'ALPHABETICAL': {
-                  if (direction === 'ASC')
-                    result = titleA.localeCompare(titleB);
-                  else if (direction === 'DESC')
-                    result = titleB.localeCompare(titleA);
-                  break;
-                }
-                default: {
-                  break;
-                }
-              }
-  
-              return result;
-            }
-          );
-      }),
-      tap((filteredProducts) => console.log('🟢 Filtered Products:', filteredProducts)),
-      filter((filteredProducts) => filteredProducts.length > 0) // ✅ Ensure it only emits if there are filtered products
-    );
-  }
-  
-  
-
-  getProductFilterOptions(): Observable<ProductFilterOptions> {
-    return this.products$.pipe(
-      map((productArray) => {
-        const fields = ['brand', 'weight'];
-
-        let options: { [key: string]: any } = {};
-        options = fields.reduce((acc, field) => {
-          acc[`${field}s`] = new Set();
-          return acc;
-        }, options);
-
-        productArray.forEach((product) => {
-          if (this.getEffectiveCategory(product.category ?? '', product.masterCategory ?? '') === this.currentCategory.value) { // Filter by currentCategory
-            fields.forEach((field) => {
-              if (!!product[field]) {
-                options[`${field}s`].add(product[field]);
-              }
-            });
+        // REAL CATEGORIES
+        if (currentCategory !== 'All' && currentCategory !== 'Deals') {
+          if (product.category !== currentCategory) {
+            return false;
           }
-        });
+        }
 
-        let result: ProductFilterOptions = { brands: [], weights: [] };
-        result = fields.reduce((acc, field) => {
-          acc[`${field}s`] = Array.from(options[`${field}s`]).map((o) => ({
-            label: o,
-            value: o,
-          }));
-          return acc;
-        }, result);
 
-        return result;
-      })
-    );
-  }
+
+        // 🌱 STRAINS
+        const normalizedStrain = this.normalizeStrain(strainType);
+
+        if (!isEmpty(strains) && !strains.includes(normalizedStrain)) {
+          return false;
+        }
+
+        // 🏷 BRANDS
+        if (!isEmpty(brands) && !brands.includes(brand)) {
+          return false;
+        }
+
+        // ⚖️ WEIGHTS
+        if (!isEmpty(weights) && weight && !weights.includes(weight)) {
+          return false;
+        }
+
+        // 📏 SIZES (uom / unit / weight)
+        const sizeValue =
+          (product as any).uom || product.unit || product.weight;
+        if (!isEmpty(sizes) && sizeValue && !sizes.includes(sizeValue)) {
+          return false;
+        }
+
+        // 💊 ATTRIBUTES + ROOT ARRAYS
+        const attrs = (product as any).attributes || {};
+
+        const productEffects: string[] = [
+          ...(attrs.effects || []),
+          ...(product.effects || []),
+        ];
+        const productFlavors: string[] = [
+          ...(attrs.flavors || []),
+          ...(product.flavors || []),
+        ];
+        const productGenerals: string[] = [
+          ...(attrs.general || []),
+        ];
+
+        // ✨ EFFECTS
+        if (
+          !isEmpty(effects) &&
+          !productEffects.some((e) => effects.includes(e))
+        ) {
+          return false;
+        }
+
+        // 🍓 FLAVORS
+        if (
+          !isEmpty(flavors) &&
+          !productFlavors.some((f) => flavors.includes(f))
+        ) {
+          return false;
+        }
+
+        // 🧬 SUBTYPES
+        const subtype = (product as any).subtype;
+        if (!isEmpty(subtypes) && subtype && !subtypes.includes(subtype)) {
+          return false;
+        }
+
+        // 🧾 GENERALS
+        if (
+          !isEmpty(generals) &&
+          !productGenerals.some((g) => generals.includes(g))
+        ) {
+          return false;
+        }
+
+        // 💵 PRICE RANGE (prefers sale price)
+        const numericPrice =
+          Number(sale?.discountedPrice ?? product.price) || 0;
+
+        if (numericPrice < price.min || numericPrice > price.max) {
+          return false;
+        }
+
+
+        // 🌡 THC POTENCY RANGE
+        const thcIsPercent = typeof thc === 'string' && thc.includes('%');
+
+        if (thcIsPercent) {
+          const thcNumeric = this.extractThcPercent(thc);
+          if (thcNumeric < potency.lower || thcNumeric > potency.upper) {
+            return false;
+          }
+        }
+
+
+        return true;
+      });
+
+      // 🔁 SORTING (keep your behavior, make it a bit more robust)
+      const sorted = filtered.sort((a, b) => {
+        const idA = Number((a as any).posProductId ?? a.id);
+        const idB = Number((b as any).posProductId ?? b.id);
+        const priceA = Number(a.sale?.discountedPrice ?? a.price);
+        const priceB = Number(b.sale?.discountedPrice ?? b.price);
+        const thcA = this.extractThcPercent(a.thc);
+        const thcB = this.extractThcPercent(b.thc);
+        const titleA = a.title || '';
+        const titleB = b.title || '';
+
+        switch (criterion) {
+          case 'recent':
+            return direction === 'ASC' ? idA - idB : idB - idA;
+
+          case 'price':
+            return direction === 'ASC' ? priceA - priceB : priceB - priceA;
+
+          case 'thc':
+            return direction === 'ASC' ? thcA - thcB : thcB - thcA;
+
+          case 'alphabetical':
+            return direction === 'ASC'
+              ? titleA.localeCompare(titleB)
+              : titleB.localeCompare(titleA);
+
+          default:
+            return 0;
+        }
+      });
+
+      return sorted;
+    })
+  );
+}
+
+private normalizeStrain(strain: string | null | undefined): Strain {
+  if (!strain) return 'NONE';
+
+  const s = strain.toUpperCase().trim();
+
+  // Exact matches first
+  if (s === 'HYBRID') return 'HYBRID';
+  if (s === 'INDICA') return 'INDICA';
+  if (s === 'SATIVA') return 'SATIVA';
+  if (s === 'CBD') return 'CBD';
+  if (s === 'I/S') return 'I/S';
+  if (s === 'S/I') return 'S/I';
+
+  // Common Treez patterns:
+  if (s.includes('INDICA') && s.includes('SATIVA')) return 'I/S';
+  if (s.includes('SATIVA') && s.includes('INDICA')) return 'S/I';
+
+  if (s.includes('INDICA')) return 'INDICA';
+  if (s.includes('SATIVA')) return 'SATIVA';
+  if (s.includes('HYBRID')) return 'HYBRID';
+
+  // Fallback
+  return 'NONE';
+}
+
+
+private extractThcPercent(thc: string | null | undefined): number {
+  if (!thc) return 0;
+  const match = String(thc).match(/(\d+(\.\d+)?)/);
+  return match ? Number(match[1]) : 0;
+}
+
+
+  
+getProductFilterOptions(): Observable<ProductFilterOptions> {
+  return combineLatest([this.products$, this.currentCategory$]).pipe(
+    map(([products, currentCategory]) => {
+      const options = {
+        brands: new Set<string>(),
+        weights: new Set<string>(),
+        sizes: new Set<string>(),
+        effects: new Set<string>(),
+        flavors: new Set<string>(),
+        subtypes: new Set<string>(),
+        generals: new Set<string>()
+      };
+
+      products.forEach((product) => {
+        // Respect current category for options
+        if (
+          currentCategory !== 'All' &&
+          currentCategory !== 'Deals' &&
+          product.category !== currentCategory
+        ) {
+          return;
+        }
+
+        if (currentCategory === 'Deals' && !product.isDeal) {
+          return;
+        }
+
+        // BRAND
+        if (product.brand) {
+          options.brands.add(product.brand);
+        }
+
+        // WEIGHT
+        if (product.weight) {
+          options.weights.add(product.weight);
+        }
+
+        // SIZE (uom / unit)
+        const sizeValue =
+          (product as any).uom || product.unit || product.weight;
+        if (sizeValue) {
+          options.sizes.add(sizeValue);
+        }
+
+        // SUBTYPE
+        if ((product as any).subtype) {
+          options.subtypes.add((product as any).subtype);
+        }
+
+        // ATTRIBUTES
+        const attrs = (product as any).attributes || {};
+
+        // EFFECTS (attributes.effects OR product.effects)
+        [
+          ...(attrs.effects || []),
+          ...(product.effects || []),
+        ].forEach((e: string) => options.effects.add(e));
+
+        // FLAVORS (attributes.flavors OR product.flavors)
+        [
+          ...(attrs.flavors || []),
+          ...(product.flavors || []),
+        ].forEach((f: string) => options.flavors.add(f));
+
+        // GENERALS (attributes.general)
+        (attrs.general || []).forEach((g: string) =>
+          options.generals.add(g)
+        );
+      });
+
+      const toFilterOptions = (set: Set<string>) =>
+        Array.from(set).map((value) => ({
+          label: value,
+          value,
+        }));
+
+      return {
+        brands: toFilterOptions(options.brands),
+        weights: toFilterOptions(options.weights),
+        sizes: toFilterOptions(options.sizes),
+        effects: toFilterOptions(options.effects),
+        flavors: toFilterOptions(options.flavors),
+        subtypes: toFilterOptions(options.subtypes),
+        generals: toFilterOptions(options.generals),
+      };
+    })
+  );
+}
+
 
   updateCategory(category: ProductCategory) {
     this.currentCategory.next(category); 
@@ -269,44 +438,22 @@ export class ProductsService {
   }
 
   getCategories(): CategoryWithImage[] {
-    // return [
-    //   { category: 'Flower', imageUrl: 'assets/icons/flower.png' },
-    //   { category: 'Pre-Roll', imageUrl: 'assets/icons/prerolls.png' },
-    //   { category: 'Vapes', imageUrl: 'assets/icons/vaporizer.png' },
-    //   { category: 'Concentrates', imageUrl: 'assets/icons/concentrates.png' },
-    //   { category: 'Edibles', imageUrl: 'assets/icons/edibles.png' },
-    //   // { category: 'Beverages', imageUrl: 'assets/icons/beverages.png' },
-    //   { category: 'Tinctures', imageUrl: 'assets/icons/tinctures.png' },
-    //   { category: 'Topicals', imageUrl: 'assets/icons/topicals.png' },
-    //   { category: 'CBD', imageUrl: 'assets/icons/cbd.png' },
-    //   { category: 'Accessories', imageUrl: 'assets/icons/accessories.png' },
-    //   { category: 'Apparel', imageUrl: 'assets/icons/apparel.png' },
-    // ];
-
-    const categories: CategoryWithImage[] = [
+    return [
+      { category: 'All', imageUrl: 'assets/icons/all.png' },
+      { category: 'Deals', imageUrl: 'assets/icons/deals.png' },
       { category: 'Flower', imageUrl: 'assets/icons/flower.png' },
-      { category: 'Pre-Roll', imageUrl: 'assets/icons/prerolls.png' },
-      { category: 'Vapes', imageUrl: 'assets/icons/vaporizer.png' },
-      { category: 'Concentrates', imageUrl: 'assets/icons/concentrates.png' },
+      { category: 'Pre-Roll', imageUrl: 'assets/icons/rolls.png' },
+      { category: 'Vapes', imageUrl: 'assets/icons/vapes.png' },
+      { category: 'Concentrates', imageUrl: 'assets/icons/extract.png' },
       { category: 'Edibles', imageUrl: 'assets/icons/edibles.png' },
-      // { category: 'Beverages', imageUrl: 'assets/icons/beverages.png' },
+      { category: 'Beverages', imageUrl: 'assets/icons/drinks.png' },
       { category: 'Tinctures', imageUrl: 'assets/icons/tinctures.png' },
+      { category: 'Capsules', imageUrl: 'assets/icons/capsules.png' },
       { category: 'Topicals', imageUrl: 'assets/icons/topicals.png' },
-      { category: 'CBD', imageUrl: 'assets/icons/cbd.png' },
-      { category: 'Accessories', imageUrl: 'assets/icons/accessories.png' },
-      { category: 'Apparel', imageUrl: 'assets/icons/apparel.png' },
+      { category: 'Accessory', imageUrl: 'assets/icons/accessories.png' }
     ];
-
-    const hasVapeProducts = this.products.value.some(
-      (p) => p.category?.toLowerCase() === 'vapes'
-    );
-
-    console.log(hasVapeProducts)
-
-    return hasVapeProducts
-      ? categories
-      : categories.filter((c) => c.category !== 'Vapes');
   }
+
 
   getSimilarItems(): Observable<Product[]> {
     return combineLatest([this.currentProduct$, this.products$]).pipe(
@@ -326,13 +473,54 @@ export class ProductsService {
       })
     );
   }
+/** 
+ * SIMILAR ITEMS — same category + similar price 
+ */
+getSimilarItemsByCategoryAndPrice(): Observable<Product[]> {
+  return combineLatest([this.currentProduct$, this.products$]).pipe(
+    map(([current, products]) => {
+      if (!current) return [];
+
+      const price = Number(current.price);
+      const low = price * 0.8;
+      const high = price * 1.2;
+
+      return products
+        .filter(p =>
+          p.id !== current.id &&
+          p.category === current.category &&
+          p.brand !== current.brand &&          // 🚀 NEW: exclude same brand
+          Number(p.price) >= low &&
+          Number(p.price) <= high
+        )
+        .slice(0, 6);
+    })
+  );
+}
+
+
+
+getMoreFromBrand(excludedIds: string[] = []): Observable<Product[]> {
+  return combineLatest([this.currentProduct$, this.products$]).pipe(
+    map(([current, products]) => {
+      if (!current) return [];
+
+      return products
+        .filter(p =>
+          p.id !== current.id &&
+          p.brand === current.brand &&
+          !excludedIds.includes(p.id)  // 🔥 EXCLUDE DUPES
+        )
+        .slice(0, 6);
+    })
+  );
+}
+
 
 
   updateCurrentProduct(product: Product) {
     this.currentProduct.next(product);
-    this.updateCategory(
-      this.getEffectiveCategory(product.category ?? '', product.masterCategory ?? '') as ProductCategory
-    );
+    this.updateCategory(product.category as ProductCategory);
     console.log(product);
     this.route.navigateByUrl('/product-display');
   }
@@ -353,53 +541,7 @@ export class ProductsService {
       )
     );
   }
-
-  private normalizeCategory(category: string): string {
-    const aliasMap: { [key: string]: ProductCategory } = {
-      'RSO': 'Concentrates',
-      'Live Resin': 'Concentrates',
-      'Cartridges': 'Vapes',
-      'Disposables': 'Vapes',
-      'Shake': 'Flower',
-      'Bud': 'Flower',
-      'Capsules': 'Edibles',
-      // Add more aliases here
-    };
-
-    return aliasMap[category?.trim()] || category?.trim();
-  }
   
-
-  public getEffectiveCategory(category: string, masterCategory: string): ProductCategory {
-    const normalized = this.normalizeCategory(category);
-    const fallback = this.normalizeCategory(masterCategory);
-
-    if (this.validProductCategories.includes(normalized as ProductCategory)) {
-      return normalized as ProductCategory;
-    }
-
-    if (this.validProductCategories.includes(fallback as ProductCategory)) {
-      return fallback as ProductCategory;
-    }
-
-    // Final fallback if neither match — could return 'Flower', 'Uncategorized', etc.
-    return 'Flower';
-  }
-
-  private validProductCategories: ProductCategory[] = [
-    'Flower',
-    'Pre-Roll',
-    'Vape',
-    'Vapes',
-    'Concentrates',
-    'Edibles',
-    'Tinctures',
-    'Topicals',
-    'CBD',
-    'Accessories',
-    'Apparel',
-    'Beverages',
-  ];
 
 
 }

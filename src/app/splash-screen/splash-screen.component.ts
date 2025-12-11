@@ -30,89 +30,44 @@ import { ProductsService } from '../products.service';
   ],
 })
 export class SplashScreenComponent implements OnInit {
-  @Output() closeSplash = new EventEmitter<void>();
+   @Output() closeSplash = new EventEmitter<void>();
+
   logoState = 'initial';
-  showAgeVerification = false;
   splashVisibility = 'visible';
   logoSrc = 'assets/logo.png';
 
-  selectedAgeConfirmed: boolean = false;
-  locations: any[] = []; // Populate this with your fetched venue data
+  constructor(
+    private accessibilityService: AccessibilityService
+  ) {}
 
-
-  constructor(private accessibilityService: AccessibilityService, private settingsService: SettingsService, private productsService: ProductsService) {}
-  
   ngOnInit() {
     const isDarkMode = document.body.classList.contains('dark-mode');
     this.logoSrc = isDarkMode ? 'assets/logo-dark-mode.png' : 'assets/logo.png';
 
     setTimeout(() => {
       this.logoState = 'final';
-      this.accessibilityService.announce('Welcome to the app. Logo displayed.', 'polite');
+      this.accessibilityService.announce(
+        'Welcome to the shop.',
+        'polite'
+      );
     }, 200);
-
-    setTimeout(() => {
-      this.showAgeVerification = true;
-      this.accessibilityService.announce('Please confirm if you are 21 years old or older.', 'assertive');
-    }, 1000);
   }
 
-  onYesClick() {
-    this.selectedAgeConfirmed = true;
-    this.showAgeVerification = false;
-    setTimeout(() => {
-      this.closeSplash.emit();
-    }, 100);
-    // this.accessibilityService.announce('Thank you for confirming your age. Entering the app.', 'polite');
-    // setTimeout(() => {
-    //   this.closeSplash.emit();
-    // }, 100);
+  onEnterClick() {
+    this.accessibilityService.announce(
+      'Entering the shop.',
+      'polite'
+    );
+    this.closeSplash.emit();
   }
 
-  onNoClick() {
-    this.accessibilityService.announce('Access denied. You must be over 21 to enter.', 'assertive');
-    alert('Sorry, you must be over 21 to enter.');
+  onYes() {
+    this.accessibilityService.announce('Access granted.', 'polite');
+    this.closeSplash.emit(); // proceed into the app
   }
 
-  // loadLocations() {
-  //   this.settingsService.getAlpineVenues().then((data) => {
-  //     console.log(data)
-  //     this.locations = data;
-  //   }).catch((err) => {
-  //     console.error('Failed to load locations', err);
-  //   });
-  // }
-
-  // selectLocation(venue: any) {
-  //   this.settingsService.setSelectedVenueId(venue.id);
-  //   const location_key = this.settingsService.getSelectedVenueKey();
-  //   // Map venue key to flowhub location ID
-  //   let locationId = '';
-  //   switch (location_key) {
-  //     case 'ROCHESTER':
-  //       locationId = environment.flowhub_location_rochester;
-  //       console.log(locationId)
-  //       break;
-  //     case 'CANANDAIGUA':
-  //       locationId = environment.flowhub_location_canandaigua;
-  //       break;
-  //     default:
-  //       console.warn('Unknown venue selected, using default location ID.');
-  //   }
-  //    this.productsService.fetchProducts(locationId).subscribe({
-  //     next: () => {
-  //       console.log("Products fetched successfully.");
-  
-
-  //     },
-  //     error: (error) => {
-  //       console.error("Error fetching products:", error);
-  //     }
-  //   });
-  //   this.accessibilityService.announce('Thank you for confirming your age. Entering the app.', 'polite');
-  //   setTimeout(() => {
-  //     this.closeSplash.emit();
-  //   }, 100);
-  // }
+  onNo() {
+    this.accessibilityService.announce('Access denied.', 'assertive');
+  }
 
 }

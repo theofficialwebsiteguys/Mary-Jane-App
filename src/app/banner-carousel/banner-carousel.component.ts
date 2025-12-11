@@ -1,5 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { SettingsService } from '../settings.service';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
 @Component({
   selector: 'app-banner-carousel',
@@ -7,46 +6,101 @@ import { SettingsService } from '../settings.service';
   styleUrls: ['./banner-carousel.component.scss'],
 })
 export class BannerCarouselComponent implements OnInit, OnDestroy {
-  banners: { image: string; title: string; description: string }[] = [];
+  @ViewChild('dragArea') dragArea!: ElementRef;
+
+  banners = [
+    { image: 'assets/banner1.jpg', title: 'banner 1', description: '' },
+    { image: 'assets/banner2.jpg', title: 'banner 2', description: '' },
+    { image: 'assets/banner3.jpg', title: 'banner 3', description: '' },
+    { image: 'assets/banner4.jpg', title: 'banner 4', description: '' }
+  ];
+
   currentIndex = 0;
+
+  // drag state
+  isDragging = false;
+  startX = 0;
+  currentX = 0;
+  translateX = 0;
+  trackTransform = '';
+  trackTransition = 'transform 0.45s ease';
+
   interval: any;
 
-  constructor(private settingsService: SettingsService) {}
-
   ngOnInit(): void {
-    // this.loadCarouselImages();
-    this.banners = [{ image: 'assets/banner1.jpg' , title: 'banner 1', description: 'cottonmouth banner'},
-      { image: 'assets/banner2.jpg' , title: 'banner 2', description: 'cottonmouth banner'}
-    ]
-    this.startCarousel();
+    this.updateTransform();
+    // this.startAutoplay();
   }
 
-  loadCarouselImages() {
-    this.settingsService.getCarouselImages().subscribe(
-      response => {
-        console.log(response)
-        this.banners = response.images.map((imgUrl, index) => ({
-          image: `${imgUrl}?v=${new Date().getTime()}`,
-          title: `Carousel Image ${index + 1}`,
-          description: 'CottonMouth Dispensary',
-        }));
-        console.log(this.banners)
-      },
-      error => {
-        console.error('Error fetching carousel images:', error);
-      }
-    );
-  }
-
-  startCarousel() {
+  startAutoplay() {
     this.interval = setInterval(() => {
       this.currentIndex = (this.currentIndex + 1) % this.banners.length;
-    }, 6000);
+      this.updateTransform();
+    }, 3500);
+  }
+
+  stopAutoplay() {
+    clearInterval(this.interval);
+  }
+
+  onDragStart(event: any) {
+    this.stopAutoplay();
+    this.isDragging = true;
+    this.trackTransition = 'none';
+
+    this.startX = event.touches ? event.touches[0].clientX : event.clientX;
+    this.currentX = this.startX;
+  }
+
+  onDragMove(event: any) {
+    if (!this.isDragging) return;
+
+    this.currentX = event.touches ? event.touches[0].clientX : event.clientX;
+    this.translateX =
+      -this.currentIndex * window.innerWidth + (this.currentX - this.startX);
+
+    this.trackTransform = `translateX(${this.translateX}px)`;
+  }
+
+  onDragEnd() {
+    if (!this.isDragging) return;
+    this.isDragging = false;
+
+    const dragDistance = this.currentX - this.startX;
+
+    // swipe threshold
+    if (dragDistance > 50) {
+      this.prev();
+    } else if (dragDistance < -50) {
+      this.next();
+    } else {
+      this.snap();
+    }
+
+    this.startAutoplay();
+  }
+
+  next() {
+    this.currentIndex = (this.currentIndex + 1) % this.banners.length;
+    this.snap();
+  }
+
+  prev() {
+    this.currentIndex =
+      (this.currentIndex - 1 + this.banners.length) % this.banners.length;
+    this.snap();
+  }
+
+  snap() {
+    this.trackTransition = 'transform 0.45s ease';
+    this.updateTransform();
+  }
+
+  updateTransform() {
+    this.trackTransform = `translateX(-${this.currentIndex * 100}%)`;
   }
 
   ngOnDestroy(): void {
-    if (this.interval) {
-      clearInterval(this.interval);
-    }
+    clearInterval(this.interval);
   }
 }

@@ -8,48 +8,56 @@
     >
       <ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon>
     </div>
-    <h1>Cart</h1>
+    <h1>Your Order</h1>
   </div>
 
   <div class="section contact-info">
     <h2>Contact Information</h2>
     <form>
-      <div class="input-row">
-        <ion-item class="rounded-input half-width">
-          <ion-input
+      <div class="checkout-inputs">
+        <div class="two-cols">
+          <input
+            type="text"
             [(ngModel)]="checkoutInfo.user_info.fname"
             name="first"
-            placeholder="First Name"
-            aria-label="First Name"
-          ></ion-input>
-        </ion-item>
-        <ion-item class="rounded-input half-width">
-          <ion-input
+            placeholder="First name*"
+            class="form-input"
+          />
+
+          <input
+            type="text"
             [(ngModel)]="checkoutInfo.user_info.lname"
             name="last"
-            placeholder="Last Name"
-            aria-label="Last Name"
-          ></ion-input>
-        </ion-item>
-      </div>
-      <ion-item class="rounded-input">
-        <ion-input
+            placeholder="Last name*"
+            class="form-input"
+          />
+        </div>
+
+        <input
+          type="email"
           [(ngModel)]="checkoutInfo.user_info.email"
           name="email"
-          type="email"
           placeholder="Email"
-          aria-label="Email Address"
-        ></ion-input>
-      </ion-item>
-      <ion-item class="rounded-input">
-        <ion-input
+          class="form-input"
+        />
+
+        <input
+          type="tel"
           [(ngModel)]="checkoutInfo.user_info.phone"
           name="phone"
-          type="tel"
-          placeholder="Phone"
-          aria-label="Phone Number"
-        ></ion-input>
-      </ion-item>
+          placeholder="Phone Number*"
+          class="form-input"
+        />
+
+        <input
+          type="text"
+          [(ngModel)]="checkoutInfo.user_info.dob"
+          name="dob"
+          placeholder="Date of birth*"
+          class="form-input"
+        />
+      </div>
+
     </form>
   </div>
 
@@ -60,10 +68,10 @@
         <ion-radio slot="start" value="pickup" checked></ion-radio>
         <ion-label>Pickup</ion-label>
       </ion-item>
-      <!-- <ion-item lines="none" class="radio-item">
-        <ion-radio slot="start" value="delivery" [disabled]="!enableDelivery"></ion-radio>
+      <ion-item lines="none" class="radio-item">
+        <ion-radio slot="start" value="delivery" [disabled]="enableDelivery"></ion-radio>
         <ion-label>Delivery</ion-label>
-      </ion-item> -->
+      </ion-item>
     </ion-radio-group>
     
     <!-- Conditional message for Delivery -->
@@ -75,59 +83,53 @@
     </p> -->
     
   
-    <div *ngIf="selectedOrderType === 'delivery' && enableDelivery" class="delivery-address">
+    <div *ngIf="selectedOrderType === 'delivery' && !enableDelivery" class="delivery-address">
+
       <h3>Delivery Address</h3>
-      <ion-item class="rounded-input">
-        <ion-input
-          [(ngModel)]="deliveryAddress.street"
+
+      <input
+        type="text"
+        class="form-input"
+        [(ngModel)]="deliveryAddress.street"
+        (ngModelChange)="onAddressInputChange()"
+        placeholder="Street Address"
+      />
+
+      <input
+        type="text"
+        class="form-input"
+        [(ngModel)]="deliveryAddress.apt"
+        (ngModelChange)="onAddressInputChange()"
+        placeholder="Apartment / Suite (Optional)"
+      />
+
+      <div class="two-cols">
+        <input
+          type="text"
+          class="form-input"
+          [(ngModel)]="deliveryAddress.city"
           (ngModelChange)="onAddressInputChange()"
-          autocomplete="address-line1"
-          name="street"
-          placeholder="Street Address"
-          aria-label="Street Address"
-        ></ion-input>
-      </ion-item>
-    
-      <ion-item class="rounded-input">
-        <ion-input
-          [(ngModel)]="deliveryAddress.apt"
+          placeholder="City"
+        />
+
+        <input
+          type="text"
+          class="form-input"
+          [(ngModel)]="deliveryAddress.zip"
           (ngModelChange)="onAddressInputChange()"
-          autocomplete="address-line2"
-          name="apt"
-          placeholder="Apartment / Suite (Optional)"
-          aria-label="Apartment or Suite"
-        ></ion-input>
-      </ion-item>
-    
-      <div class="input-row">
-        <ion-item class="rounded-input half-width">
-          <ion-input
-            [(ngModel)]="deliveryAddress.city"
-            (ngModelChange)="onAddressInputChange()"
-            autocomplete="address-level2"
-            name="city"
-            placeholder="City"
-            aria-label="City"
-          ></ion-input>
-        </ion-item>
-        <ion-item class="rounded-input half-width">
-          <ion-input
-            [(ngModel)]="deliveryAddress.zip"
-            (ngModelChange)="onAddressInputChange()"
-            autocomplete="postal-code"
-            name="zip"
-            placeholder="ZIP Code"
-            aria-label="ZIP Code"
-          ></ion-input>
-        </ion-item>
+          placeholder="ZIP Code"
+        />
       </div>
-    
-      <ion-item class="rounded-input readonly-input">
-        <ion-label>State</ion-label>
-        <ion-text>{{ deliveryAddress.state }}</ion-text>
-      </ion-item>
-      <div class="date-time-container">
-        <ion-item class="rounded-input">
+
+      <input
+        type="text"
+        class="form-input readonly"
+        value="{{ deliveryAddress.state }}"
+        readonly
+      />
+
+      <div class="two-cols">
+        <div class="form-input date-input">
           <ion-datetime-button datetime="pickupDate"></ion-datetime-button>
           <ion-modal [keepContentsMounted]="true">
             <ng-template>
@@ -141,135 +143,157 @@
               ></ion-datetime>
             </ng-template>
           </ion-modal>
-        </ion-item>
-      
-        <ion-item class="rounded-input">
+        </div>
+
+        <div class="form-input">
           <ion-select [(ngModel)]="selectedDeliveryTime" placeholder="Select Time">
             <ion-select-option *ngFor="let time of timeOptions" [value]="time.value">
               {{ time.display }}
             </ion-select-option>
           </ion-select>
-        </ion-item>
+        </div>
       </div>
+
     </div>
+
     
     
   </div>
   
 
   <div class="section payment-method">
-    <h2>Payment Method</h2>
-    <ion-radio-group [(ngModel)]="selectedPaymentMethod" (ngModelChange)="onPaymentMethodChange($event)" aria-label="Select Payment Method">
+  <h2>Payment details</h2>
 
-      <ion-item lines="none" class="radio-item">
-        <ion-radio [disabled]="selectedOrderType === 'delivery'" slot="start" value="cash"></ion-radio>
-        <ion-label>In Store - Cash</ion-label>
-      </ion-item>
-      <ion-item lines="none" class="radio-item">
-        <ion-radio [disabled]="selectedOrderType === 'delivery'" slot="start" value="card"></ion-radio>
-        <ion-label>In Store - Debit</ion-label>
-      </ion-item>
-      <!-- <ion-item lines="none" class="radio-item">
-        <ion-radio slot="start" value="aeropay"></ion-radio>
-        <ion-label class="aeropay-label">
-          <img class="aeropay-image" src="assets/aeropay.png" alt="Powered by Aeropay">
+    <p class="payment-description pickup" *ngIf="selectedOrderType === 'pickup'">
+      Want a faster pickup? Bank payments are processed quicker and can reduce wait time.
+    </p>
 
-          <div *ngIf="isFetchingAeroPay" class="loading-container">
-            <ion-spinner name="crescent"></ion-spinner>
-            <p> Fetching AeroPay details...</p>
-          </div>
+    <p class="payment-description delivery" *ngIf="selectedOrderType === 'delivery'">
+      Delivery orders require payment with Aeropay before checkout.
+    </p>
 
-          <div *ngIf="verificationRequired" class="verification-container">
-            <p>Enter the verification code sent to your email:</p>
-            <ion-input [(ngModel)]="verificationCode" placeholder="Verification Code"></ion-input>
-            <ion-button (click)="verifyAeroPayUser()">Verify</ion-button>
-          </div>
-          <div *ngIf="showBankSelection" class="aeropay-banks">
-            <ion-list>
-              <ion-item 
-                *ngFor="let bank of userBankAccounts" 
-                (click)="selectBank(bank.bankAccountId)"
-                [class.selected-bank]="selectedBankId === bank.bankAccountId"
-              >
-                <ion-avatar slot="start">
-                  <ion-icon name="card-outline" size="large"></ion-icon>
-                </ion-avatar>
-                <ion-label>
-                  <h3>{{ bank.bankName }}</h3>
-                  <p>Checking - ****{{ bank.accountLast4 }}</p>
-                </ion-label>
-                <ion-icon *ngIf="selectedBankId === bank.bankAccountId" name="checkmark-circle" color="success" slot="end"></ion-icon>
-              </ion-item>
-            </ion-list>
-          
-            <ion-button (click)="retrieveAerosyncCredentials()" expand="full" color="primary">
-              <ion-spinner *ngIf="loadingAerosync" name="crescent"></ion-spinner>
-              <span *ngIf="!loadingAerosync">Connect Another Bank</span>
-            </ion-button>
-          </div>
-        </ion-label>
-      </ion-item> -->
-    </ion-radio-group>
-  </div>
 
-  <div class="section order-summary">
-    <h2>Order Summary</h2>
-    <div *ngIf="checkoutInfo.user_info.premium" class="premium-banner">
-      🎉 You're a Premium Member! Orders over $100 get an extra 10% off.
-    </div>    
-    <div class="summary" aria-live="polite">
-      <p>
-        Subtotal: <span>{{ finalSubtotal | currency }}</span>
-      </p>
-      <p>
-        Available Points: <span>{{ checkoutInfo.user_info.points }}</span>
-      </p>
-      <p>
-        Potential Savings:
-        <span>{{ checkoutInfo.user_info.points * pointValue | currency }}</span>
-      </p>
-      <p>
-        Points to Redeem: <span>{{ pointsToRedeem }}</span>
-      </p>
-      <ion-item lines="none" class="points-slider">
-        <ion-range
-          [(ngModel)]="pointsToRedeem"
-          [min]="0"
-          [max]="maxRedeemablePoints"
-          [step]="1"
-          (ionChange)="updateTotals()"
-          aria-label="Adjust points to redeem for discount"
-        >
-          <ion-label slot="start">0</ion-label>
-          <ion-label slot="end">{{ maxRedeemablePoints }}</ion-label>
-        </ion-range>
-      </ion-item>
-      <p>
-        Discount Applied:
-        <span>{{ pointsToRedeem * pointValue | currency }}</span>
-      </p>
-      <p *ngIf="premiumDiscountApplied">
-        Premium Member Discount (10%): 
-        <span>-{{ premiumDiscountAmount | currency }}</span>
-      </p>
-      <p *ngIf="employeeDiscountApplied">
-        Staff Discount:
-        <span>-{{ employeeDiscountAmount | currency }}</span>
-      </p>      
-      <p>
-        Cannabis Tax (2%): <span>{{ cannabisTaxAmount | currency:'USD':'symbol':'1.2-2' }}</span>
-      </p>
-      <p>
-        State Tax (6.625%): <span>{{ stateTaxAmount | currency:'USD':'symbol':'1.2-2' }}</span>
-      </p>
-      <p>
-        Total Tax: <span>{{ finalTax | currency:'USD':'symbol':'1.2-2' }}</span>
-      </p>
-      <p>
-        Total: <span>{{ finalTotal | currency }}</span>
-      </p>
+
+  <!-- <div class="payment-badges">
+      <div class="badge">
+        <ion-icon name="business-outline"></ion-icon>
+        <span>ACH</span>
+      </div>
+
+      <div class="badge">
+        <ion-icon name="wallet-outline"></ion-icon>
+        <span>Cash</span>
+      </div>
+    </div>
+  </div> -->
+
+  <!-- PAYMENT METHOD SELECTION -->
+  <div class="payment-method-select">
+    <div 
+      class="payment-option" 
+      [class.selected]="selectedPaymentMethod === 'aeropay'"
+      (click)="onPaymentMethodChange('aeropay')"
+    >
+      <ion-icon name="business-outline"></ion-icon>
+      <span>Pay with Bank (ACH)</span>
+    </div>
+
+    <div 
+      class="payment-option" 
+      [class.selected]="selectedPaymentMethod === 'cash'"
+      (click)="onPaymentMethodChange('cash')"
+    >
+      <ion-icon name="wallet-outline"></ion-icon>
+      <span>Cash</span>
     </div>
   </div>
+
+
+  <div *ngIf="selectedPaymentMethod === 'aeropay'">
+
+    <!-- Verification -->
+    <div *ngIf="verificationRequired" class="verify-box">
+      <input type="text"
+            [(ngModel)]="verificationCode"
+            placeholder="Verification Code"
+            class="form-input" />
+      <button (click)="verifyAeroPayUser()">Verify</button>
+    </div>
+
+    <!-- Select Bank -->
+    <div *ngIf="showBankSelection">
+      <h3>Select Bank Account</h3>
+      <ion-list>
+        <ion-item *ngFor="let bank of userBankAccounts"
+                  (click)="selectBank(bank.bankAccountId)"
+                  [class.selected]="bank.bankAccountId === selectedBankId">
+          {{ bank.bankName }} — {{ bank.accountType }}
+        </ion-item>
+      </ion-list>
+    </div>
+
+    <!-- AeroSync Widget Area -->
+    <div id="widget"></div>
+
+  </div>
+
+
+  <div class="coupon-section">
+    <div class="coupon-row">
+      <input
+        type="text"
+        [(ngModel)]="couponCode"
+        placeholder="Coupon code"
+        class="coupon-input"
+      />
+
+      <button
+        class="apply-btn"
+        (click)="applyCoupon()"
+        [disabled]="isApplyingCoupon"
+      >
+        {{ isApplyingCoupon ? '...' : 'APPLY' }}
+      </button>
+    </div>
+
+    <p class="coupon-message" *ngIf="couponMessage">
+      {{ couponMessage }}
+    </p>
+  </div>
+
+
+    <div class="section order-summary">
+      <h2>Order Summary</h2>
+
+      <div class="summary" aria-live="polite">
+
+        <div *ngIf="appliedDiscount" class="applied-discount">
+          <strong>{{ appliedDiscount.name }}</strong>
+          <button (click)="removeDiscount()">Remove</button>
+        </div>
+
+        <p>
+          Subtotal:
+          <span>{{ finalSubtotal | currency }}</span>
+        </p>
+
+        <p *ngIf="discountTotal" class="discount-line">
+          Discount:
+          <span>{{ discountTotal | currency }}</span>
+        </p>
+
+        <p>
+          Tax:
+          <span>{{ finalTax | currency }}</span>
+        </p>
+
+        <p class="total-line">
+          Total:
+          <span>{{ finalTotal | currency }}</span>
+        </p>
+
+      </div>
+    </div>
 
   <div class="section cart-items">
     <h2>Your Items</h2>

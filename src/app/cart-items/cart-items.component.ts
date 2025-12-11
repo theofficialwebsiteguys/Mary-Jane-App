@@ -62,4 +62,13 @@ export class CartItemsComponent implements OnInit {
     };
     return map[key] || map['default'];
   }
+
+  removeItem(item: CartItem): void {
+    this.cartService.removeFromCart(item.id);
+    this.accessibilityService.announce(
+      `${item.title} removed from your cart.`,
+      'polite'
+    );
+  }
+
 }

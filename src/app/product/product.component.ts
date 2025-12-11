@@ -31,6 +31,7 @@ export class ProductComponent implements OnInit {
       menuDisplay: undefined
     },
     thc: '',
+    thcMG: '',
     cbd: '',
     weight: '',
     unit: '',
@@ -77,8 +78,8 @@ export class ProductComponent implements OnInit {
   }
 
   getProductImage(product: any): string {
-    if (product.image) {
-      return product.image;
+    if (product.gallery) {
+      return product.gallery[0];
     }
     return this.placeholderFor(product.category);
   }
@@ -101,4 +102,5 @@ export class ProductComponent implements OnInit {
     };
     return map[key] || map['default'];
   }
+
 }
