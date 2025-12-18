@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { CartService } from '../cart.service';
+import { AppliedDiscount, CartService } from '../cart.service';
 import { LoadingController, ToastController } from '@ionic/angular';
 import { AccessibilityService } from '../accessibility.service';
 import { AuthService } from '../auth.service';
@@ -86,7 +86,10 @@ export class CheckoutComponent implements OnInit {
 
   showAeropay = true; // optional depending on business rules
 
-  appliedDiscount: any = null;
+  appliedDiscount: AppliedDiscount | null = null;
+  availableRewards: AppliedDiscount[] = [];
+
+  selectedRewardId: string | null = null;
 
   constructor(
     private cartService: CartService,
@@ -100,7 +103,21 @@ export class CheckoutComponent implements OnInit {
   ) {}
 
   async ngOnInit() {
-    console.log(this.checkoutInfo)
+    this.cartService.appliedDiscount$.subscribe(discount => {
+      this.appliedDiscount = discount;
+
+      if (discount) {
+        this.selectedRewardId = discount.id;
+      } else {
+        this.selectedRewardId = null;
+        this.loadAvailableDiscounts();
+      }
+
+
+      this.updateTotals();
+    });
+
+    await this.loadAvailableDiscounts();
     // ------------------------------
     // USE TREEZ PREVIEW TOTALS ONLY
     // ------------------------------
@@ -128,6 +145,46 @@ export class CheckoutComponent implements OnInit {
     });
   }
 
+   private async loadAvailableDiscounts() {
+    try {
+      const discounts = await this.settingsService.getDiscounts();
+      const userPoints = this.userPoints;
+
+      this.availableRewards = discounts
+        .filter(d =>
+          d.tierDiscount === true &&
+          d.pointsDeduction > 0 &&
+          (d.dollarValue > 0 || d.percentageValue > 0) &&
+          d.pointsDeduction <= userPoints
+        )
+        .map(d => ({
+          id: d.id,
+          name: d.name,
+          dollarValue: d.dollarValue || 0,
+          percentageValue: d.percentageValue || 0,
+          pointsDeduction: d.pointsDeduction,
+          reusable: d.reusable,
+          internalName: d.internalName
+        })).sort((a: any, b: any) => a.pointsDeduction - b.pointsDeduction);
+
+    } catch (err) {
+      console.error('Failed to load discounts', err);
+      this.availableRewards = [];
+    }
+  }
+
+
+  get userPoints(): number {
+    return this.checkoutInfo?.user_info?.points ?? 0;
+  }
+  getRewardPoints(reward: any): number {
+    return reward?.pointsDeduction ?? 0;
+  }
+
+  applyReward(reward: AppliedDiscount) {
+    this.selectedRewardId = reward.id;
+    this.cartService.setDiscount(reward);
+  }
   // --------------------------------------------------------------------------
   // DELIVERY SCHEDULE + VALIDATION
   // --------------------------------------------------------------------------
@@ -465,14 +522,16 @@ export class CheckoutComponent implements OnInit {
     }
   }
 
-
-  // --------------------------------------------------------------------------
-  // UTIL
-  // --------------------------------------------------------------------------
-
   async presentToast(message: string, color: string = 'danger') {
     const t = await this.toastController.create({
-      message, duration: 2500, color, position: 'bottom'
+      message, duration: 5000, color, position: 'bottom'
+    });
+    t.present();
+  }
+
+  async presentVerifyToast(message: string, color: string = 'danger') {
+    const t = await this.toastController.create({
+      message, duration: 15000, color, position: 'bottom'
     });
     t.present();
   }
@@ -535,7 +594,7 @@ export class CheckoutComponent implements OnInit {
         if (res?.data?.displayMessage) {
           this.verificationRequired = true;
           this.existingUserId = res.data.existingUser.userId;
-          this.presentToast(res.data.displayMessage, 'warning');
+          this.presentVerifyToast(res.data.displayMessage, 'warning');
           return;
         }
 
@@ -562,7 +621,7 @@ export class CheckoutComponent implements OnInit {
     .subscribe({
       next: () => {
         this.verificationRequired = false;
-        this.presentToast("Verification successful!");
+        this.presentToast("Verification successful!", "success");
         this.createAeroPayUser(); // resume onboarding
       },
       error: () => this.presentToast("Invalid verification code.")
@@ -604,7 +663,7 @@ export class CheckoutComponent implements OnInit {
       id: "widget",
       token: this.aerosyncToken,
       iframeTitle: "Connect",
-      environment: "production",
+      environment: "staging",
 
       onLoad: () => {
         console.log("AeroSync widget loaded");

@@ -489,3 +489,147 @@
   border-color: #444;
   background: #eaeaea;
 }
+
+.aeropay-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+  margin-top: 16px;
+
+  background: #fafafa;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+
+  ion-spinner {
+    width: 32px;
+    height: 32px;
+    color: #444;
+    margin-bottom: 12px;
+  }
+
+  p {
+    font-size: 0.95rem;
+    color: #555;
+    text-align: center;
+  }
+}
+
+.payment-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.aeropay-logo-right {
+  margin-left: auto;   // 👈 pushes logo to the right
+  height: 12px;        // subtle + professional
+  width: auto;
+  opacity: 0.9;
+}
+
+
+
+.loyalty-picker {
+  margin-top: 18px;
+
+  h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #2f3a2d;
+  }
+}
+
+.reward-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reward-card {
+  all: unset;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid #d7dfd0;
+  background: #fafcf8;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    border-color: var(--ion-color-primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
+
+.reward-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.reward-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #2e352b;
+}
+
+.reward-value {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ion-color-primary);
+}
+
+.reward-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.points {
+  font-size: 0.75rem;
+  color: #66705f;
+}
+
+.locked {
+  font-size: 0.7rem;
+  color: #a25b5b;
+}
+
+.price-original {
+  text-decoration: line-through;
+  opacity: 0.5;
+  font-size: 0.85rem;
+  margin-right: 6px;
+}
+
+.price-final {
+  font-weight: 600;
+}
+
+.discount-pill {
+  background: #1f8f4e;
+  color: white;
+  font-size: 0.7rem;
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+
+.reward-card.active {
+  border-color: #2f6f3a;
+  background: #f4fbf6;
+  box-shadow: 0 0 0 2px rgba(47, 111, 58, 0.15);
+}

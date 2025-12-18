@@ -189,17 +189,24 @@
 
   <!-- PAYMENT METHOD SELECTION -->
   <div class="payment-method-select">
-    <div 
-      class="payment-option" 
+   <div
+      class="payment-option"
       [class.selected]="selectedPaymentMethod === 'aeropay'"
       (click)="onPaymentMethodChange('aeropay')"
     >
       <ion-icon name="business-outline"></ion-icon>
       <span>Pay with Bank (ACH)</span>
+
+      <img
+        src="assets/aeropay.png"
+        alt="AeroPay"
+        class="aeropay-logo-right"
+      />
     </div>
 
-    <div 
-      class="payment-option" 
+
+    <div
+      class="payment-option"
       [class.selected]="selectedPaymentMethod === 'cash'"
       (click)="onPaymentMethodChange('cash')"
     >
@@ -208,74 +215,111 @@
     </div>
   </div>
 
+  <!-- AEROPAY SECTION -->
+  <div *ngIf="selectedPaymentMethod === 'aeropay'" class="aeropay-section">
 
-  <div *ngIf="selectedPaymentMethod === 'aeropay'">
+    <h3>Pay with Bank (ACH)</h3>
+    <p class="aeropay-subtext">
+      Secure bank transfer powered by AeroPay.
+    </p>
 
-    <!-- Verification -->
-    <div *ngIf="verificationRequired" class="verify-box">
-      <input type="text"
-            [(ngModel)]="verificationCode"
-            placeholder="Verification Code"
-            class="form-input" />
-      <button (click)="verifyAeroPayUser()">Verify</button>
+    <!-- LOADING STATE -->
+    <div *ngIf="isFetchingAeroPay" class="aeropay-loading">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Connecting securely to your bank…</p>
     </div>
 
-    <!-- Select Bank -->
-    <div *ngIf="showBankSelection">
-      <h3>Select Bank Account</h3>
+    <!-- VERIFICATION -->
+    <div *ngIf="!isFetchingAeroPay && verificationRequired" class="verify-box">
+      <input
+        type="text"
+        [(ngModel)]="verificationCode"
+        placeholder="Verification Code"
+        class="form-input"
+      />
+      <ion-button (click)="verifyAeroPayUser()">Verify</ion-button>
+    </div>
+
+    <!-- BANK SELECTION -->
+    <div *ngIf="!isFetchingAeroPay && showBankSelection">
+      <h4>Select Bank Account</h4>
+
       <ion-list>
-        <ion-item *ngFor="let bank of userBankAccounts"
-                  (click)="selectBank(bank.bankAccountId)"
-                  [class.selected]="bank.bankAccountId === selectedBankId">
-          {{ bank.bankName }} — {{ bank.accountType }}
+        <ion-item
+          *ngFor="let bank of userBankAccounts"
+          class="bank-option"
+          (click)="selectBank(bank.bankAccountId)"
+          [class.selected]="bank.bankAccountId === selectedBankId"
+        >
+          <ion-label>
+            <strong>{{ bank.bankName }}</strong>
+            <div class="bank-meta">{{ bank.accountType }}</div>
+          </ion-label>
+
+          <ion-icon
+            name="checkmark-circle"
+            *ngIf="bank.bankAccountId === selectedBankId"
+          ></ion-icon>
         </ion-item>
       </ion-list>
     </div>
 
-    <!-- AeroSync Widget Area -->
-    <div id="widget"></div>
+    <!-- AEROSYNC WIDGET -->
+    <div *ngIf="!isFetchingAeroPay && !showBankSelection && !verificationRequired">
+      <div id="widget"></div>
+    </div>
 
   </div>
+
 
 
   <div class="coupon-section">
-    <div class="coupon-row">
-      <input
-        type="text"
-        [(ngModel)]="couponCode"
-        placeholder="Coupon code"
-        class="coupon-input"
-      />
-
-      <button
-        class="apply-btn"
-        (click)="applyCoupon()"
-        [disabled]="isApplyingCoupon"
-      >
-        {{ isApplyingCoupon ? '...' : 'APPLY' }}
-      </button>
-    </div>
-
-    <p class="coupon-message" *ngIf="couponMessage">
-      {{ couponMessage }}
-    </p>
-  </div>
-
-
     <div class="section order-summary">
       <h2>Order Summary</h2>
 
       <div class="summary" aria-live="polite">
-
-        <div *ngIf="appliedDiscount" class="applied-discount">
-          <strong>{{ appliedDiscount.name }}</strong>
-          <button (click)="removeDiscount()">Remove</button>
-        </div>
-
         <p>
           Subtotal:
           <span>{{ finalSubtotal | currency }}</span>
         </p>
+
+
+      <div
+        class="loyalty-picker"
+        *ngIf="availableRewards.length"
+      >
+        <h3>Available Rewards</h3>
+
+        <div class="reward-cards">
+          <button
+            class="reward-card"
+            *ngFor="let reward of availableRewards"
+            (click)="applyReward(reward)"
+            [class.active]="selectedRewardId === reward.id"
+            [attr.aria-label]="'Apply ' + reward.name"
+          >
+            <div class="reward-main">
+              <div class="reward-title">{{ reward.name }}</div>
+
+              <div class="reward-value">
+                <span *ngIf="reward.dollarValue">
+                  ${{ reward.dollarValue }} OFF
+                </span>
+                <span *ngIf="reward.percentageValue">
+                  {{ reward.percentageValue }}% OFF
+                </span>
+              </div>
+            </div>
+
+            <div class="reward-meta">
+              <span class="points">
+                {{ reward.pointsDeduction }} pts
+              </span>
+            </div>
+          </button>
+        </div>
+      </div>
+
 
         <p *ngIf="discountTotal" class="discount-line">
           Discount:

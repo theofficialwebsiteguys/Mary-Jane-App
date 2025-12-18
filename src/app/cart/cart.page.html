@@ -19,6 +19,26 @@
     <span>Calculating taxes & discounts...</span>
   </div>
 
+  <ng-container *ngIf="appliedDiscount && rewardDiscountAmount > 0">
+    <div class="reward-line">
+      <div class="reward-info">
+        <span class="reward-name">{{ appliedDiscount.name }}<span class="reward-amount">
+          − {{ rewardDiscountAmount | currency }}
+        </span></span>
+        
+      </div>
+
+      <button
+        class="remove-reward"
+        (click)="removeReward()"
+        aria-label="Remove applied reward"
+      >
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+
+  </ng-container>
   <!-- Totals Display -->
   <div class="totals-blended fade" [class.visible]="!previewLoading && previewTotals">
 

@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { CartItem, CartService } from '../cart.service';
+import { AppliedDiscount, CartItem, CartService } from '../cart.service';
 import { IonContent, LoadingController, ToastController } from '@ionic/angular';
 import { AuthService } from '../auth.service';
 import { AccessibilityService } from '../accessibility.service';
@@ -27,6 +27,8 @@ export class CartPage {
   previewLoading = false;
   previewError: string | null = null;
 
+  appliedDiscount: AppliedDiscount | null = null;
+
   constructor(
     private readonly cartService: CartService,
     private toastController: ToastController,
@@ -37,10 +39,14 @@ export class CartPage {
   ) {}
 
   ngOnInit(): void {
-      this.cartService.cart$.subscribe((cart) => {
-        this.cartItems = cart;
-        this.updateCartPreview();
-      });
+    this.cartService.cart$.subscribe((cart) => {
+      this.cartItems = cart;
+      this.updateCartPreview();
+    });
+
+    this.cartService.appliedDiscount$.subscribe(discount => {
+      this.appliedDiscount = discount;
+    });
   }
 
   private async updateCartPreview() {
@@ -167,4 +173,33 @@ export class CartPage {
     }, 500); // Small delay ensures the navigation completes first
   }
 
+  removeReward(): void {
+    this.cartService.setDiscount(null);
+
+    this.accessibilityService.announce(
+      'Loyalty reward removed from your cart.',
+      'polite'
+    );
+  }
+
+  /** Cart-level reward amount */
+  get rewardDiscountAmount(): number {
+    if (!this.appliedDiscount) return 0;
+
+    if (this.appliedDiscount.dollarValue) {
+      return Math.min(
+        this.appliedDiscount.dollarValue,
+        this.previewTotals?.subTotal || 0
+      );
+    }
+
+    if (this.appliedDiscount.percentageValue) {
+      return (
+        this.previewTotals?.subTotal || 0 *
+        (this.appliedDiscount.percentageValue / 100)
+      );
+    }
+
+    return 0;
+  }
 }

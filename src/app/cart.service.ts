@@ -30,10 +30,17 @@ export interface CartItem {
 
 export interface AppliedDiscount {
   id: string;
-  posDiscountID: string;
+  name: string;
+
   dollarValue?: number;
   percentageValue?: number;
-  name: string;
+
+  pointsDeduction?: number;
+  tierDiscount?: boolean;
+  reusable?: boolean;
+
+  posDiscountID?: string;
+  internalName?: string;
 }
 
 @Injectable({
@@ -54,7 +61,14 @@ export class CartService {
   appliedDiscount$ = this.appliedDiscountSubject.asObservable();
   private inactivityTimer: any;
 
+  private discountKey = 'applied_discount';
+
   constructor(private http: HttpClient, private authService: AuthService) {
+    const saved = sessionStorage.getItem(this.discountKey);
+    if (saved) {
+      this.appliedDiscountSubject.next(JSON.parse(saved));
+    }
+
     if (!sessionStorage.getItem(this.cartKey)) {
       sessionStorage.setItem(this.cartKey, JSON.stringify([]));
     }
@@ -75,7 +89,14 @@ export class CartService {
 
   setDiscount(discount: AppliedDiscount | null) {
     this.appliedDiscountSubject.next(discount);
+
+    if (discount) {
+      sessionStorage.setItem(this.discountKey, JSON.stringify(discount));
+    } else {
+      sessionStorage.removeItem(this.discountKey);
+    }
   }
+
 
   getAppliedDiscount(): AppliedDiscount | null {
     return this.appliedDiscountSubject.value;
@@ -189,6 +210,7 @@ export class CartService {
   }
 
   clearCart() {
+    this.setDiscount(null);
     this.saveCart([]);
   }
 

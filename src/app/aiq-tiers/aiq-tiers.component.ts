@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { CartService } from '../cart.service';
 
 export interface Discount {
@@ -20,6 +20,7 @@ interface DisplayDiscount {
   unlockText: string;
   unlocked: boolean;
   redeemable: boolean;
+  redeemed?: boolean; 
 }
 
 @Component({
@@ -27,13 +28,22 @@ interface DisplayDiscount {
   templateUrl: './aiq-tiers.component.html',
   styleUrls: ['./aiq-tiers.component.scss'],
 })
-export class AiqTiersComponent implements OnChanges {
+export class AiqTiersComponent implements OnChanges, OnInit {
   @Input() userPoints = 0;
   @Input() discounts: Discount[] = [];
 
   displayDiscounts: DisplayDiscount[] = [];
 
+  activeDiscountId: string | null = null;
+
   constructor(private cartService: CartService) {}
+
+  ngOnInit(): void {
+    this.cartService.appliedDiscount$.subscribe(discount => {
+      this.activeDiscountId = discount?.id ?? null;
+      this.buildDiscounts();
+    });
+  }
 
 
   ngOnChanges(): void {
@@ -73,18 +83,22 @@ export class AiqTiersComponent implements OnChanges {
       ? this.userPoints >= d.pointsDeduction
       : d.available === true;
 
+    const redeemed = this.activeDiscountId === d.id;
+
     return {
       id: d.id,
       label: d.name,
       rewardText: this.getRewardText(d),
-      unlockText: isTier
-        ? `${d.pointsDeduction} pts`
-        : d.available
-          ? 'Available'
-          : 'Locked',
+      unlockText: isTier ? `${d.pointsDeduction} pts` : unlocked ? 'Available' : 'Locked',
       unlocked,
-      redeemable: unlocked
+      redeemable: unlocked && !redeemed,
+      redeemed
     };
+  }
+
+
+  removeDiscount() {
+    this.cartService.setDiscount(null);
   }
 
   private getRewardText(d: Discount): string {

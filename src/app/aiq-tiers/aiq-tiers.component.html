@@ -7,6 +7,7 @@
       *ngFor="let discount of displayDiscounts"
       class="tier"
       [class.active]="discount.unlocked"
+      [class.redeemed]="discount.redeemed"
     >
       <div class="tier-header">
         <div>
@@ -20,13 +21,26 @@
 
       <p class="perk">{{ discount.rewardText }}</p>
 
+     <div class="tier-actions">
+
+      <!-- Redeem button -->
       <button
+        *ngIf="!discount.redeemed"
         class="redeem-btn"
         [disabled]="!discount.redeemable"
         (click)="redeem(discount)"
       >
         Redeem
       </button>
+
+      <!-- Redeemed state -->
+      <div *ngIf="discount.redeemed" class="redeemed-pill">
+        <span>✓ Applied</span>
+        <button class="undo-btn" (click)="removeDiscount()">Undo</button>
+      </div>
+
+    </div>
+
     </div>
   </div>
 </div>
