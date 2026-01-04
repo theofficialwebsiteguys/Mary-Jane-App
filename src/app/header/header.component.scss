@@ -1,7 +1,7 @@
 /* ===== Toolbar Base ===== */
 ion-toolbar.heading-container {
   --min-height: 60px;
-  height: 60px;
+  height: auto;
   display: flex;
   align-items: center;
   --padding-top: env(safe-area-inset-top);
