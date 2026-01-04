@@ -89,6 +89,8 @@
   .action-button {
     text-transform: capitalize;
     width: 100%;
+    --background: var(--ion-color-secondary-contrast);
+    color: black;
   }
 }
 

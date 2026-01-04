@@ -85,7 +85,17 @@ export class AuthService {
           observer.complete();
           console.log(response)
         })
-        .catch((error) => observer.error(error));
+       .catch((error) => {
+        const normalizedError = {
+          status: error?.status || 500,
+          message:
+            error?.data?.error ||
+            error?.error ||
+            'Unknown error occurred'
+        };
+
+        observer.error(normalizedError);
+      });
     });
   }
 

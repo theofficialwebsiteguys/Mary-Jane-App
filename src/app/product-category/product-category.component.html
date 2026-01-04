@@ -9,6 +9,13 @@
   </div>
 
   <p class="label">
-    {{ category.category === 'Pre-Roll' ? 'Pre Rolls' : category.category.toLowerCase() }}
+    {{
+      category.category === 'Accessory'
+        ? 'MJ Collection'
+        : category.category === 'Pre-Roll'
+          ? 'Pre Rolls'
+          : category.category.toLowerCase()
+    }}
   </p>
+
 </button>

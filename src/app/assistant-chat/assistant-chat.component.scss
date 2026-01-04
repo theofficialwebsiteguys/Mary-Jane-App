@@ -1,7 +1,7 @@
 /* FAB BUTTON */
 .chat-fab {
-  --background: #222;
-  --color: #fff;
+  --background: var(--ion-color-secondary-contrast);
+  --color: var(--ion-color-primary);
   transform: scale(1);
   transition: transform .2s ease;
   &:active {
@@ -115,7 +115,6 @@ ion-fab {
 
 /* SEND BUTTON */
 .send-btn {
-  --background: #222;
   --border-radius: 12px;
   height: 48px;
   font-size: 1rem;

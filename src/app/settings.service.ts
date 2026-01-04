@@ -344,4 +344,44 @@ export class SettingsService {
       return [];
     }
   }
+
+
+  //2FA for Aeropay - Twilio
+  async sendVerify(phoneNumber: string): Promise<any[]> {
+    const options = {
+      url: `${environment.apiUrl}/twilio/send`,
+      method: 'POST',
+      headers: { 'x-auth-api-key': environment.db_api_key, 'Content-Type': 'application/json' },
+      data: { to: phoneNumber }
+    };
+
+    try {
+      const response = await CapacitorHttp.request(options);
+
+      console.log('Twilio verification sent:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error sending Twilio verification:', error);
+      return [];
+    }
+  }
+
+  async checkVerify(phoneNumber: string, code: string): Promise<{ verified: boolean; status?: string }> {
+    const options = {
+      url: `${environment.apiUrl}/twilio/check`,
+      method: 'POST',
+      headers: { 'x-auth-api-key': environment.db_api_key,  'Content-Type': 'application/json' },
+      data: { to: phoneNumber, code }
+    };
+
+    try {
+      const response = await CapacitorHttp.request(options);
+
+      console.log('Twilio verification checked:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error checking Twilio verification:', error);
+      return { verified: false };
+    }
+  }
 }

@@ -3,26 +3,31 @@ ion-tab-bar {
   left: 0;
   z-index: 10;
   box-shadow: -2px 5px rgba(0, 0, 0, 0.1);
-  background-color: var(--ion-color-primary);
+  background-color: var(--ion-color-secondary-contrast);
   border-top: none; /* Add this to remove the default border on the bar */
 }
 
 ion-tab-button {
-  background-color: var(--ion-color-primary);
+  background-color: var(--ion-color-secondary-contrast);
   border-top: none; /* Add this to remove the default border on the buttons */
-  color: #a9a9a9; /* Set a default color for unselected tabs */
+  color: #ffffff; /* Set a default color for unselected tabs */
 }
 
 .icon {
   font-size: 1.8em;
+  color: rgba(0, 0, 0, 0.473);
+}
+
+ion-label{
+  color: rgba(0, 0, 0, 0.473);
 }
 
 /* Updated styles for the selected tab */
 ion-tab-button.tab-selected {
-  border-top: 4px solid white; /* Your custom vibrant top border */
+  border-top: 4px solid var(--ion-color-primary); /* Your custom vibrant top border */
 }
 
 ion-tab-button.tab-selected .icon,
 ion-tab-button.tab-selected ion-label {
-  color: white; /* Your custom color for the icon and label */
+  color: var(--ion-color-primary); /* Your custom color for the icon and label */
 }

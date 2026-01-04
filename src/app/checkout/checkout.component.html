@@ -229,6 +229,42 @@
       <p>Connecting securely to your bank…</p>
     </div>
 
+    <div class="aiq-card" *ngIf="twilioVerificationStep !== 'idle' && twilioVerificationStep !== 'verified'">
+      <div class="card-header">
+        <h2>Verify your phone</h2>
+        <p class="muted">Enter the code we sent to {{ checkoutInfo.user_info.phone }}</p>
+      </div>
+
+      <div class="form-section">
+        <div class="field" *ngIf="twilioVerificationStep === 'sending'">
+          <p class="muted">Sending code…</p>
+        </div>
+
+        <div class="field" *ngIf="twilioVerificationStep === 'code' || twilioVerificationStep === 'verifying'">
+          <label>Code</label>
+          <div class="aiq-input">
+            <input
+              inputmode="numeric"
+              maxlength="6"
+              [(ngModel)]="twilioVerificationCode"
+              placeholder="6-digit code"
+            />
+          </div>
+
+          <button
+            class="primary-btn"
+            [disabled]="twilioVerificationCode.length < 4 || twilioVerificationStep === 'verifying'"
+            (click)="confirmVerification()"
+          >
+            {{ twilioVerificationStep === 'verifying' ? 'Verifying…' : 'Verify & Continue' }}
+          </button>
+
+          <p class="error" *ngIf="twilioVerificationError">{{ twilioVerificationError }}</p>
+        </div>
+      </div>
+    </div>
+
+
     <!-- VERIFICATION -->
     <div *ngIf="!isFetchingAeroPay && verificationRequired" class="verify-box">
       <input
@@ -262,6 +298,11 @@
           ></ion-icon>
         </ion-item>
       </ion-list>
+
+      <ion-button (click)="retrieveAerosyncCredentials()" expand="full" color="primary">
+        <ion-spinner *ngIf="loadingAerosync" name="crescent"></ion-spinner>
+        <span *ngIf="!loadingAerosync">Connect Another Bank</span>
+      </ion-button>
     </div>
 
     <!-- AEROSYNC WIDGET -->

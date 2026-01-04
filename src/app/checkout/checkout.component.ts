@@ -91,6 +91,13 @@ export class CheckoutComponent implements OnInit {
 
   selectedRewardId: string | null = null;
 
+  twilioVerificationStep: 'idle' | 'sending' | 'code' | 'verifying' | 'verified' = 'idle';
+  twilioVerificationCode = '';
+  twilioVerificationError = '';
+  twilioVerified = false;
+  pendingAeroPayUser: any = null;
+
+
   constructor(
     private cartService: CartService,
     private loadingController: LoadingController,
@@ -122,6 +129,7 @@ export class CheckoutComponent implements OnInit {
     // USE TREEZ PREVIEW TOTALS ONLY
     // ------------------------------
     const t = this.checkoutInfo.previewTotals;
+    console.log(this.checkoutInfo)
     this.originalTreezSubtotal = t.subTotal;
     this.originalTreezTax = t.taxTotal;
 
@@ -139,10 +147,10 @@ export class CheckoutComponent implements OnInit {
     tomorrow.setDate(tomorrow.getDate() + 1);
     this.minDate = tomorrow.toISOString().split('T')[0];
 
-     this.cartService.appliedDiscount$.subscribe(d => {
-      this.appliedDiscount = d;
-      this.updateTotals();
-    });
+    //  this.cartService.appliedDiscount$.subscribe(d => {
+    //   this.appliedDiscount = d;
+    //   this.updateTotals();
+    // });
   }
 
    private async loadAvailableDiscounts() {
@@ -173,10 +181,10 @@ export class CheckoutComponent implements OnInit {
     }
   }
 
-
   get userPoints(): number {
     return this.checkoutInfo?.user_info?.points ?? 0;
   }
+
   getRewardPoints(reward: any): number {
     return reward?.pointsDeduction ?? 0;
   }
@@ -426,7 +434,7 @@ export class CheckoutComponent implements OnInit {
         order_source: 'ECOMMERCE',
         order_status: 'AWAITING_PROCESSING',
         delivery_address: deliveryAddress,
-        customner_id: this.checkoutInfo.user.pos_customer_id,
+        customer_id: this.checkoutInfo.user_info.pos_customer_id,
 
         items: this.checkoutInfo.cart.map((i: any) => ({
           size_id: i.id,
@@ -465,53 +473,53 @@ export class CheckoutComponent implements OnInit {
       }
 
 
-      // ----------------------------------------------------
-      // 3️⃣ Submit to TREEZ
-      // ----------------------------------------------------
-      const treezRes = await this.cartService.submitTreezOrder(treezPayload);
-      console.log('TREEZ ORDER SUCCESS:', treezRes);
+      // // ----------------------------------------------------
+      // // 3️⃣ Submit to TREEZ
+      // // ----------------------------------------------------
+      // const treezRes = await this.cartService.submitTreezOrder(treezPayload);
+      // console.log('TREEZ ORDER SUCCESS:', treezRes);
 
-      pos_order_id = treezRes.order.data.order_number || 0;
-      points_add = this.finalSubtotal;
+      // pos_order_id = treezRes.order.data.order_number || 0;
+      // points_add = this.finalSubtotal;
 
-      // ----------------------------------------------------
-      // 4️⃣ Save to LOCAL DATABASE (THIS WAS MISSING)
-      // ----------------------------------------------------
-      await this.cartService.placeOrder(
-        {
-          user_id,
-          pos_order_id,
-          points_add: points_redeem ? 0 : points_add,
-          points_redeem,
-          amount: this.finalSubtotal,
-          cart: this.checkoutInfo.cart,
+      // // ----------------------------------------------------
+      // // 4️⃣ Save to LOCAL DATABASE (THIS WAS MISSING)
+      // // ----------------------------------------------------
+      // await this.cartService.placeOrder(
+      //   {
+      //     user_id,
+      //     pos_order_id,
+      //     points_add: points_redeem ? 0 : points_add,
+      //     points_redeem,
+      //     amount: this.finalSubtotal,
+      //     cart: this.checkoutInfo.cart,
 
-          // NEW ➜ customer fields
-          customer_name: `${this.checkoutInfo.user_info.fname} ${this.checkoutInfo.user_info.lname}`,
-          customer_email: this.checkoutInfo.user_info.email,
-          customer_phone: this.checkoutInfo.user_info.phone,
-          customer_dob: this.checkoutInfo.user_info.dob,
+      //     // NEW ➜ customer fields
+      //     customer_name: `${this.checkoutInfo.user_info.fname} ${this.checkoutInfo.user_info.lname}`,
+      //     customer_email: this.checkoutInfo.user_info.email,
+      //     customer_phone: this.checkoutInfo.user_info.phone,
+      //     customer_dob: this.checkoutInfo.user_info.dob,
 
-          // NEW ➜ order meta fields
-          order_type: this.selectedOrderType
-        }
-      );
+      //     // NEW ➜ order meta fields
+      //     order_type: this.selectedOrderType
+      //   }
+      // );
 
-      await this.authService.getUserOrders();
+      // await this.authService.getUserOrders();
 
-      const msg =
-        this.selectedOrderType === 'delivery'
-          ? 'Your delivery order has been placed!'
-          : 'Your pickup order has been placed!';
+      // const msg =
+      //   this.selectedOrderType === 'delivery'
+      //     ? 'Your delivery order has been placed!'
+      //     : 'Your pickup order has been placed!';
 
-      await this.fcmService.sendPushNotification(
-        user_id,
-        'Order Confirmed',
-        msg
-      );
+      // await this.fcmService.sendPushNotification(
+      //   user_id,
+      //   'Order Confirmed',
+      //   msg
+      // );
 
-      this.orderPlaced.emit();
-      this.accessibilityService.announce('Your order has been placed successfully.');
+      // this.orderPlaced.emit();
+      // this.accessibilityService.announce('Your order has been placed successfully.');
 
     } catch (err) {
       console.error('Order Error:', err);
@@ -559,6 +567,26 @@ export class CheckoutComponent implements OnInit {
 
   
   //Aeropay
+  // async startAeroPayProcess() {
+  //   this.isFetchingAeroPay = true;
+
+  //   this.aeropayService.fetchMerchantToken().subscribe({
+  //     next: (res: any) => {
+  //       if (!res?.data?.token) {
+  //         this.presentToast("AeroPay authentication failed.");
+  //         this.isFetchingAeroPay = false;
+  //         return;
+  //       }
+  //       this.createAeroPayUser();
+
+  //     },
+  //     error: () => {
+  //       this.presentToast("AeroPay auth error.");
+  //       this.isFetchingAeroPay = false;
+  //     }
+  //   });
+  // }
+
   async startAeroPayProcess() {
     this.isFetchingAeroPay = true;
 
@@ -569,6 +597,8 @@ export class CheckoutComponent implements OnInit {
           this.isFetchingAeroPay = false;
           return;
         }
+
+        // ✅ Always attempt Aeropay user creation first
         this.createAeroPayUser();
       },
       error: () => {
@@ -606,7 +636,13 @@ export class CheckoutComponent implements OnInit {
           this.showBankSelection = true;
           this.selectedBankId = this.userBankAccounts[0].bankAccountId;
         } else {
-          this.retrieveAerosyncCredentials();
+          // 🆕 NEW USER → require Twilio FIRST (only once)
+          if (!this.twilioVerified) {
+            this.pendingAeroPayUser = res.data.user; // stash response
+            this.startPhoneVerification();
+            return;
+          }
+          // this.retrieveAerosyncCredentials();
         }
       },
       error: () => {
@@ -615,6 +651,60 @@ export class CheckoutComponent implements OnInit {
       }
     });
   }
+
+  async startPhoneVerification() {
+    this.twilioVerificationError = '';
+    this.twilioVerificationStep = 'sending';
+
+    try {
+      await this.settingsService.sendVerify(this.checkoutInfo.user_info.phone);
+      this.twilioVerificationStep = 'code';
+    } catch (e) {
+      console.error(e);
+      this.twilioVerificationError = 'Unable to send code. Please try again.';
+      this.twilioVerificationStep = 'idle';
+      this.presentToast('Unable to send verification code.');
+    }
+  }
+
+  async confirmVerification() {
+    this.twilioVerificationError = '';
+    this.twilioVerificationStep = 'verifying';
+
+    try {
+      const result = await this.settingsService.checkVerify(
+        this.checkoutInfo.user_info.phone,
+        this.twilioVerificationCode // ✅ correct field
+      );
+
+      if (!result?.verified) {
+        this.twilioVerificationError = 'Invalid code. Try again.';
+        this.twilioVerificationStep = 'code';
+        return;
+      }
+
+      this.twilioVerified = true;
+      this.twilioVerificationStep = 'verified';
+
+      // ✅ Resume Aeropay onboarding using the saved user payload
+      this.aeropayUserId = this.pendingAeroPayUser?.userId || null;
+      this.userBankAccounts = this.pendingAeroPayUser?.bankAccounts || [];
+      this.pendingAeroPayUser = null;
+
+      if (this.userBankAccounts.length > 0) {
+        this.showBankSelection = true;
+        this.selectedBankId = this.userBankAccounts[0].bankAccountId;
+      } else {
+        this.retrieveAerosyncCredentials();
+      }
+
+    } catch (e) {
+      console.error(e);
+      this.twilioVerificationError = 'Verification failed. Try again.';
+      this.twilioVerificationStep = 'code';
+    }
+  }
+
 
   verifyAeroPayUser() {
     this.aeropayService.verifyUser(this.existingUserId, this.verificationCode)
@@ -663,7 +753,7 @@ export class CheckoutComponent implements OnInit {
       id: "widget",
       token: this.aerosyncToken,
       iframeTitle: "Connect",
-      environment: "staging",
+      environment: "sandbox",
 
       onLoad: () => {
         console.log("AeroSync widget loaded");

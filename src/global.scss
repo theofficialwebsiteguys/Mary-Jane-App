@@ -74,8 +74,13 @@
 body{
   --ion-background-color: var(--ion-background-primary);
 
+  ion-button{
+    --background: var(--ion-color-secondary-contrast);
+    color: black;
+  }
+
   p, h2{
-    font-family: 'Inter', sans-serif;
+    font-family: "Poppins", sans-serif;
     font-optical-sizing: auto;
     color: #333;
   }

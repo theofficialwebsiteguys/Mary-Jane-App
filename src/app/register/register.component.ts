@@ -146,6 +146,7 @@ export class RegisterComponent {
 
   onSubmit() {
     this.submitted = true;
+    this.error = '';
 
     if (this.registerForm.invalid) {
       this.accessibilityService.announce('Please correct the errors in the form.', 'assertive');
@@ -163,10 +164,6 @@ export class RegisterComponent {
     const day = this.registerForm.get('day')?.value;
     const year = this.registerForm.get('year')?.value;
 
-    console.log(month);
-    console.log(day);
-    console.log(year);
-
     if (!month || !day || !year) {
       this.dobEmptyError = true;
       this.loading = false;
@@ -179,9 +176,6 @@ export class RegisterComponent {
     const dobString = `${year}-${month}-${day}`;
     const dob = new Date(dobString);
 
-    console.log(dob);
-    console.log(isNaN(dob.getTime()))
-
     if (isNaN(dob.getTime())) {
       this.dobInvalidError = true;
       this.accessibilityService.announce('Invalid date of birth.', 'assertive');
@@ -192,7 +186,6 @@ export class RegisterComponent {
     }
 
     const age = this.calculateAge(dob);
-    console.log(age)
     if (age < 21) {
       this.underageError = true;
       this.accessibilityService.announce('You must be at least 21 years old to register.', 'assertive');
@@ -221,27 +214,29 @@ export class RegisterComponent {
     };
 
     this.authService.register(userData).subscribe({
-      next: () => {
+      next: (response) => {
+        console.log(response)
+        if (response.error) {
+           if (response.error.includes('SequelizeUniqueConstraintError')) {
+            this.error = 'This user already exists in the system.';
+          } else if (response.error.includes('SequelizeValidationError')) {
+            this.error = 'The provided phone or email is invalid.';
+          } else {
+            this.error = 'An unexpected error occurred. Please try again later.';
+          }
+        }else{
+          this.resetForm();
+        }
         this.loading = false;
-        this.resetForm();
       },
       error: (err) => {
         this.loading = false;
-    
-        const errorMessage = err.data.error; // Assuming `err.error` is the string you provided
-        this.error
-        // if (err.status === 500) {
-        //   if (errorMessage.includes('SequelizeUniqueConstraintError')) {
-        //     this.error = 'This user already exists in the system.';
-        //   } else if (errorMessage.includes('SequelizeValidationError')) {
-        //     this.error = 'The provided phone or email is invalid.';
-        //   } else {
-        //     this.error = 'An unexpected error occurred. Please try again later.';
-        //   }
-        // } else {
-        //   this.error = 'Unable to register a new user at this time. Please try again later.';
-        // }
-      },
+
+        const errorMessage = err.message || '';
+
+        console.log(err)
+       
+      }
     });
     
   }
