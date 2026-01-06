@@ -7,6 +7,7 @@ import { SettingsService } from '../settings.service';
 import { FcmService } from '../fcm.service';
 import { AeropayService } from '../aeropay.service';
 import { openWidget } from 'aerosync-web-sdk';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-checkout',
@@ -754,6 +755,7 @@ export class CheckoutComponent implements OnInit {
       token: this.aerosyncToken,
       iframeTitle: "Connect",
       environment: "sandbox",
+      consumerId: environment.aeropay_consumerId || '',
 
       onLoad: () => {
         console.log("AeroSync widget loaded");
