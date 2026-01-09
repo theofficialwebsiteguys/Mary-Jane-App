@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
@@ -17,6 +17,8 @@ import { ProductCategory } from '../product-category/product-category.model';
   styleUrls: ['./single-product.component.scss'],
 })
 export class SingleProductComponent implements OnInit {
+  @ViewChild('topOfPage') topOfPage!: ElementRef<HTMLElement>;
+  
   currentProduct: Product = {
     id: '',
     category: 'Flower' as ProductCategory,
@@ -79,8 +81,17 @@ export class SingleProductComponent implements OnInit {
     this.productService.currentProduct$.subscribe((product) => {
       if (product) {
         this.currentProduct = product;
-        this.quantity = 1; 
-        this.accessibilityService.announce(`Now viewing ${product.title} by ${product.brand}.`, 'polite');
+        this.quantity = 1;
+
+        this.topOfPage?.nativeElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+
+        this.accessibilityService.announce(
+          `Now viewing ${product.title} by ${product.brand}.`,
+          'polite'
+        );
       } else {
         this.router.navigateByUrl('/home');
       }
@@ -90,7 +101,7 @@ export class SingleProductComponent implements OnInit {
       this.isLoggedIn = status;
     });
   }
-
+  
   ngOnDestroy(){
     this.quantity = 1;
   }
@@ -189,26 +200,132 @@ export class SingleProductComponent implements OnInit {
     const key = (category || 'default').toLowerCase();
     // map to your assets; provide a default fallback
     const map: Record<string, string> = {
-      flower: 'assets/flower-general.png',
-      'pre-roll': 'assets/pre-roll-general.png',
-      prerolls: 'assets/pre-roll-general.png',
-      edibles: 'assets/edibles-general.png',
-      vapes: 'assets/vapes-general.png',
-      concentrates: 'assets/concentrates-general.png',
-      beverage: 'assets/beverage-general.png',
-      tinctures: 'assets/tincture-general.png',
-      topicals: 'assets/topicals-general.png',
-      accessories: 'assets/accessories-general.png',
-      default: 'assets/default.png'
+      flower: 'assets/stock/flower-general.png',
+      'pre-roll': 'assets/stock/pre-roll-general.png',
+      prerolls: 'assets/stock/pre-roll-general.png',
+      edibles: 'assets/stock/edibles-general.png',
+      vapes: 'assets/stock/vapes-general.png',
+      concentrates: 'assets/stock/concentrates-general.png',
+      beverage: 'assets/stock/beverage-general.png',
+      tinctures: 'assets/stock/tincture-general.png',
+      topicals: 'assets/stock/topicals-general.png',
+      accessories: 'assets/stock/accessories-general.png',
+      default: 'assets/stock/default.png'
     };
     return map[key] || map['default'];
   }
 
-  // shouldShowThc(product: any): boolean {
-  //   const thc = Number(product.thc || 0);
-  //   const thcMG = Number(product.thcMG || 0);
+  viewerOpen = false;
 
-  //   return thc > 0 || thcMG > 0;
-  // }
+  scale = 1;
+  minScale = 1;
+  maxScale = 4;
+
+  x = 0;
+  y = 0;
+
+  private pointers = new Map<number, { x: number; y: number }>();
+  private lastPan?: { x: number; y: number };
+  private startDist = 0;
+  private startScale = 1;
+
+  get transform() {
+    return `translate(${this.x}px, ${this.y}px) scale(${this.scale})`;
+  }
+
+  openViewer() {
+    this.viewerOpen = true;
+    this.resetZoom();
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeViewer() {
+    this.viewerOpen = false;
+    document.body.style.overflow = '';
+    this.pointers.clear();
+    this.lastPan = undefined;
+  }
+
+  resetZoom() {
+    this.scale = 1;
+    this.x = 0;
+    this.y = 0;
+  }
+
+  zoomIn() {
+    this.scale = Math.min(this.maxScale, +(this.scale + 0.25).toFixed(2));
+  }
+
+  zoomOut() {
+    this.scale = Math.max(this.minScale, +(this.scale - 0.25).toFixed(2));
+    if (this.scale === 1) this.resetZoom();
+  }
+
+  onWheel(e: WheelEvent) {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? -0.15 : 0.15;
+    const next = this.scale + delta;
+    this.scale = Math.min(this.maxScale, Math.max(this.minScale, next));
+    if (this.scale === 1) this.resetZoom();
+  }
+
+  onDoubleClick(e?: MouseEvent) {
+    e?.preventDefault();
+
+    if (this.scale === 1) {
+      this.scale = 2;
+    } else {
+      this.resetZoom();
+    }
+  }
+
+  onPointerDown(e: PointerEvent) {
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    this.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (this.pointers.size === 1) {
+      this.lastPan = { x: e.clientX, y: e.clientY };
+    }
+
+    if (this.pointers.size === 2) {
+      const pts = Array.from(this.pointers.values());
+      this.startDist = this.distance(pts[0], pts[1]);
+      this.startScale = this.scale;
+    }
+  }
+
+  onPointerMove(e: PointerEvent) {
+    if (!this.pointers.has(e.pointerId)) return;
+    this.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    // pinch zoom
+    if (this.pointers.size === 2) {
+      const pts = Array.from(this.pointers.values());
+      const dist = this.distance(pts[0], pts[1]);
+      const ratio = dist / this.startDist;
+      this.scale = Math.min(this.maxScale, Math.max(this.minScale, this.startScale * ratio));
+      return;
+    }
+
+    // pan
+    if (this.scale > 1 && this.lastPan) {
+      const dx = e.clientX - this.lastPan.x;
+      const dy = e.clientY - this.lastPan.y;
+      this.x += dx;
+      this.y += dy;
+      this.lastPan = { x: e.clientX, y: e.clientY };
+    }
+  }
+
+  onPointerUp(e: PointerEvent) {
+    this.pointers.delete(e.pointerId);
+    this.lastPan = undefined;
+    if (this.pointers.size < 2) this.startDist = 0;
+  }
+
+  private distance(a: any, b: any) {
+    return Math.hypot(a.x - b.x, a.y - b.y);
+  }
+
   
 }

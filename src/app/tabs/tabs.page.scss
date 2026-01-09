@@ -1,33 +1,50 @@
-ion-tab-bar {
-  bottom: 0;
-  left: 0;
-  z-index: 10;
-  box-shadow: -2px 5px rgba(0, 0, 0, 0.1);
-  background-color: var(--ion-color-secondary-contrast);
-  border-top: none; /* Add this to remove the default border on the bar */
-}
-
 ion-tab-button {
-  background-color: var(--ion-color-secondary-contrast);
-  border-top: none; /* Add this to remove the default border on the buttons */
-  color: #ffffff; /* Set a default color for unselected tabs */
+  background: var(--ion-color-secondary-contrast);
+  border-top: none;
+  color: rgba(0, 0, 0, 0.47);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
-.icon {
+.tab-icon {
+  height: 26px;        /* SAME height for all icons */
+  width: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.tab-icon i {
   font-size: 1.8em;
   color: rgba(0, 0, 0, 0.473);
 }
 
-ion-label{
-  color: rgba(0, 0, 0, 0.473);
+.tab-icon img {
+  height: 22px;       /* slightly smaller for optical match */
+  width: auto;
+  display: block;
 }
 
-/* Updated styles for the selected tab */
+ion-label {
+  font-size: 12px;
+  line-height: 1;
+  margin-top: 2px;
+  color: rgba(0, 0, 0, 0.47);
+}
+
+/* Selected state */
 ion-tab-button.tab-selected {
-  border-top: 4px solid var(--ion-color-primary); /* Your custom vibrant top border */
+  border-top: 4px solid var(--ion-color-primary);
 }
 
-ion-tab-button.tab-selected .icon,
+ion-tab-button.tab-selected i,
 ion-tab-button.tab-selected ion-label {
-  color: var(--ion-color-primary); /* Your custom color for the icon and label */
+  color: var(--ion-color-primary);
+}
+
+.tab-icon {
+
 }

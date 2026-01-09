@@ -63,16 +63,36 @@
 
   <div class="section order-type">
     <h2>Order Type</h2>
-    <ion-radio-group [(ngModel)]="selectedOrderType" (ionChange)="onOrderTypeChange($event)" aria-label="Select Order Type">
-      <ion-item lines="none" class="radio-item">
-        <ion-radio slot="start" value="pickup" checked></ion-radio>
-        <ion-label>Pickup</ion-label>
-      </ion-item>
-      <ion-item lines="none" class="radio-item">
-        <ion-radio slot="start" value="delivery" [disabled]="enableDelivery"></ion-radio>
-        <ion-label>Delivery</ion-label>
-      </ion-item>
-    </ion-radio-group>
+      <div class="order-toggle">
+        <button
+          class="toggle-option"
+          [class.active]="selectedOrderType === 'delivery'"
+          [class.disabled]="!enableDelivery || !meetsDeliveryMinimum"
+          (click)="enableDelivery && meetsDeliveryMinimum && onOrderTypeChange('delivery')"
+          aria-label="Delivery"
+        >
+          <ion-icon name="car-outline"></ion-icon>
+          <span>Delivery</span>
+        </button>
+
+
+        <button
+          class="toggle-option"
+          [class.active]="selectedOrderType === 'pickup'"
+          (click)="onOrderTypeChange('pickup')"
+          aria-label="Pickup"
+        >
+          <ion-icon name="storefront-outline"></ion-icon>
+          <span>Pickup</span>
+        </button>
+      </div>
+      <p
+        class="delivery-warning"
+        *ngIf="enableDelivery && deliveryMin && !meetsDeliveryMinimum"
+      >
+        Delivery orders require a minimum of {{ deliveryMin | currency }}.
+      </p>
+
     
     <!-- Conditional message for Delivery -->
     <!-- <p *ngIf="!enableDelivery" class="delivery-warning">
@@ -83,7 +103,7 @@
     </p> -->
     
   
-    <div *ngIf="selectedOrderType === 'delivery' && !enableDelivery" class="delivery-address">
+    <div *ngIf="selectedOrderType === 'delivery' && enableDelivery" class="delivery-address">
 
       <h3>Delivery Address</h3>
 
@@ -207,6 +227,7 @@
 
     <div
       class="payment-option"
+      *ngIf="selectedOrderType === 'pickup'"
       [class.selected]="selectedPaymentMethod === 'cash'"
       (click)="onPaymentMethodChange('cash')"
     >
@@ -385,7 +406,7 @@
     <ul>
     <li *ngFor="let item of checkoutInfo.cart" class="order-item">
       <img
-        [src]="item.image === '' ? placeholderFor(item.category) : item.image "
+        [src]="!item.image ? placeholderFor(item.category) : item.image "
         [alt]="'Image of ' + item.title"
         class="item-image"
       />

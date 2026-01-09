@@ -97,6 +97,7 @@ export class CheckoutComponent implements OnInit {
   twilioVerificationError = '';
   twilioVerified = false;
   pendingAeroPayUser: any = null;
+  deliveryMin: any;
 
 
   constructor(
@@ -203,6 +204,9 @@ export class CheckoutComponent implements OnInit {
       const res: any = await this.settingsService.getDeliveryZone();
       if (res.schedule) {
         this.deliverySchedule = res.schedule;
+        if (res.deliveryMin !== null && res.deliveryMin !== undefined) {
+          this.deliveryMin = res.deliveryMin;
+        }
 
         this.validDeliveryDates = this.getAvailableDeliveryDates(res.schedule);
 
@@ -282,6 +286,12 @@ export class CheckoutComponent implements OnInit {
     this.timeOptions = opts;
   }
 
+  get meetsDeliveryMinimum(): boolean {
+    if (!this.deliveryMin) return true;
+    return this.finalSubtotal >= this.deliveryMin;
+  }
+
+
   async onAddressInputChange() {
     const { street, city, zip } = this.deliveryAddress;
 
@@ -304,7 +314,8 @@ export class CheckoutComponent implements OnInit {
   }
 
   onOrderTypeChange(event: any) {
-    this.selectedOrderType = event.detail.value;
+    console.log(event)
+    this.selectedOrderType = event;
 
     if (this.selectedOrderType === 'delivery') {
       this.selectedPaymentMethod = 'aeropay';
@@ -474,53 +485,53 @@ export class CheckoutComponent implements OnInit {
       }
 
 
-      // // ----------------------------------------------------
-      // // 3️⃣ Submit to TREEZ
-      // // ----------------------------------------------------
-      // const treezRes = await this.cartService.submitTreezOrder(treezPayload);
-      // console.log('TREEZ ORDER SUCCESS:', treezRes);
+      // ----------------------------------------------------
+      // 3️⃣ Submit to TREEZ
+      // ----------------------------------------------------
+      const treezRes = await this.cartService.submitTreezOrder(treezPayload);
+      console.log('TREEZ ORDER SUCCESS:', treezRes);
 
-      // pos_order_id = treezRes.order.data.order_number || 0;
-      // points_add = this.finalSubtotal;
+      pos_order_id = treezRes.order.data.order_number || 0;
+      points_add = this.finalSubtotal;
 
-      // // ----------------------------------------------------
-      // // 4️⃣ Save to LOCAL DATABASE (THIS WAS MISSING)
-      // // ----------------------------------------------------
-      // await this.cartService.placeOrder(
-      //   {
-      //     user_id,
-      //     pos_order_id,
-      //     points_add: points_redeem ? 0 : points_add,
-      //     points_redeem,
-      //     amount: this.finalSubtotal,
-      //     cart: this.checkoutInfo.cart,
+      // ----------------------------------------------------
+      // 4️⃣ Save to LOCAL DATABASE (THIS WAS MISSING)
+      // ----------------------------------------------------
+      await this.cartService.placeOrder(
+        {
+          user_id,
+          pos_order_id,
+          points_add: points_redeem ? 0 : points_add,
+          points_redeem,
+          amount: this.finalSubtotal,
+          cart: this.checkoutInfo.cart,
 
-      //     // NEW ➜ customer fields
-      //     customer_name: `${this.checkoutInfo.user_info.fname} ${this.checkoutInfo.user_info.lname}`,
-      //     customer_email: this.checkoutInfo.user_info.email,
-      //     customer_phone: this.checkoutInfo.user_info.phone,
-      //     customer_dob: this.checkoutInfo.user_info.dob,
+          // NEW ➜ customer fields
+          customer_name: `${this.checkoutInfo.user_info.fname} ${this.checkoutInfo.user_info.lname}`,
+          customer_email: this.checkoutInfo.user_info.email,
+          customer_phone: this.checkoutInfo.user_info.phone,
+          customer_dob: this.checkoutInfo.user_info.dob,
 
-      //     // NEW ➜ order meta fields
-      //     order_type: this.selectedOrderType
-      //   }
-      // );
+          // NEW ➜ order meta fields
+          order_type: this.selectedOrderType
+        }
+      );
 
-      // await this.authService.getUserOrders();
+      await this.authService.getUserOrders();
 
-      // const msg =
-      //   this.selectedOrderType === 'delivery'
-      //     ? 'Your delivery order has been placed!'
-      //     : 'Your pickup order has been placed!';
+      const msg =
+        this.selectedOrderType === 'delivery'
+          ? 'Your delivery order has been placed!'
+          : 'Your pickup order has been placed!';
 
-      // await this.fcmService.sendPushNotification(
-      //   user_id,
-      //   'Order Confirmed',
-      //   msg
-      // );
+      await this.fcmService.sendPushNotification(
+        user_id,
+        'Order Confirmed',
+        msg
+      );
 
-      // this.orderPlaced.emit();
-      // this.accessibilityService.announce('Your order has been placed successfully.');
+      this.orderPlaced.emit();
+      this.accessibilityService.announce('Your order has been placed successfully.');
 
     } catch (err) {
       console.error('Order Error:', err);
@@ -551,17 +562,17 @@ export class CheckoutComponent implements OnInit {
 
   placeholderFor(category?: string | null): string {
     const map: Record<string, string> = {
-      flower: 'assets/flower-general.png',
-      'pre-roll': 'assets/pre-roll-general.png',
-      prerolls: 'assets/pre-roll-general.png',
-      edibles: 'assets/edibles-general.png',
-      vapes: 'assets/vapes-general.png',
-      concentrates: 'assets/concentrates-general.png',
-      beverage: 'assets/beverage-general.png',
-      tinctures: 'assets/tincture-general.png',
-      topicals: 'assets/topicals-general.png',
-      accessories: 'assets/accessories-general.png',
-      default: 'assets/default.png'
+      flower: 'assets/stock/flower-general.png',
+      'pre-roll': 'assets/stock/pre-roll-general.png',
+      prerolls: 'assets/stock/pre-roll-general.png',
+      edibles: 'assets/stock/edibles-general.png',
+      vapes: 'assets/stock/vapes-general.png',
+      concentrates: 'assets/stock/concentrates-general.png',
+      beverage: 'assets/stock/beverage-general.png',
+      tinctures: 'assets/stock/tincture-general.png',
+      topicals: 'assets/stock/topicals-general.png',
+      accessories: 'assets/stock/accessories-general.png',
+      default: 'assets/stock/default.png'
     };
     return map[(category || '').toLowerCase()] || map['default'];
   }

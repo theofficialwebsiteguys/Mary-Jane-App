@@ -1,4 +1,6 @@
+<div #topOfPage class="scroll-anchor"></div>
 <div class="product-detail">
+
   <div class="detail-header">
     <div
       class="back-button"
@@ -10,7 +12,6 @@
       (keydown.space)="goBack()"
     >
       <ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon>
-      <span>Product Details</span>
     </div>
 
     <p
@@ -23,7 +24,7 @@
 
   <div class="product-main">
     <div class="image-column">
-      <div class="image-container">
+     <div class="image-container" (click)="openViewer()">
         <img
           [src]="primaryImage"
           [alt]="currentProduct.title + ' image'"
@@ -33,6 +34,7 @@
           {{ (currentProduct.sale.discountValue * 100) | number:'1.0-0' }}% OFF
         </div>
       </div>
+
 
       <!-- GALLERY -->
       <div class="thumbnail-row" *ngIf="currentProduct.gallery?.length">
@@ -220,6 +222,45 @@
           </p>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<div
+  class="image-viewer-backdrop"
+  *ngIf="viewerOpen"
+  (click)="closeViewer()"
+>
+  <div class="image-viewer" (click)="$event.stopPropagation()">
+    <button
+      class="viewer-close"
+      aria-label="Close image viewer"
+      (click)="closeViewer()"
+    >
+      ✕
+    </button>
+
+    <div
+      class="viewer-viewport"
+      (wheel)="onWheel($event)"
+      (pointerdown)="onPointerDown($event)"
+      (pointermove)="onPointerMove($event)"
+      (pointerup)="onPointerUp($event)"
+      (pointercancel)="onPointerUp($event)"
+      (dblclick)="onDoubleClick($event)"
+    >
+      <img
+        class="viewer-img"
+        [src]="primaryImage"
+        [style.transform]="transform"
+        draggable="false"
+      />
+    </div>
+
+    <div class="viewer-controls">
+      <button (click)="zoomOut()">−</button>
+      <button (click)="resetZoom()">Reset</button>
+      <button (click)="zoomIn()">+</button>
     </div>
   </div>
 </div>

@@ -11,6 +11,7 @@ export interface Discount {
   tierDiscount: boolean;
   available: boolean;
   posDiscountID: string;
+  desc: string
 }
 
 interface DisplayDiscount {
@@ -21,6 +22,7 @@ interface DisplayDiscount {
   unlocked: boolean;
   redeemable: boolean;
   redeemed?: boolean; 
+  desc?: string;
 }
 
 @Component({
@@ -30,6 +32,8 @@ interface DisplayDiscount {
 })
 export class AiqTiersComponent implements OnChanges, OnInit {
   @Input() userPoints = 0;
+  @Input() userDob?: string | Date;
+
   @Input() discounts: Discount[] = [];
 
   displayDiscounts: DisplayDiscount[] = [];
@@ -78,10 +82,14 @@ export class AiqTiersComponent implements OnChanges, OnInit {
 
   private toDisplayDiscount(d: Discount): DisplayDiscount {
     const isTier = d.tierDiscount && d.pointsDeduction > 0;
+    const isBirthday = this.isBirthdayDiscount(d);
+    const isBirthdayToday = isBirthday && this.isBirthdayToday(this.userDob);
 
     const unlocked = isTier
       ? this.userPoints >= d.pointsDeduction
-      : d.available === true;
+      : isBirthday
+        ? isBirthdayToday
+        : d.available === true;
 
     const redeemed = this.activeDiscountId === d.id;
 
@@ -89,10 +97,19 @@ export class AiqTiersComponent implements OnChanges, OnInit {
       id: d.id,
       label: d.name,
       rewardText: this.getRewardText(d),
-      unlockText: isTier ? `${d.pointsDeduction} pts` : unlocked ? 'Available' : 'Locked',
+      unlockText: isTier
+        ? `${d.pointsDeduction} pts`
+        : isBirthday
+          ? isBirthdayToday
+            ? 'Birthday Reward 🎉'
+            : 'Available on your birthday'
+          : unlocked
+            ? 'Available'
+            : 'Locked',
       unlocked,
       redeemable: unlocked && !redeemed,
-      redeemed
+      redeemed,
+      desc: d.desc
     };
   }
 
@@ -121,4 +138,26 @@ export class AiqTiersComponent implements OnChanges, OnInit {
       name: original.name
     });
   }
+
+  private isBirthdayToday(dob?: string | Date): boolean {
+    if (!dob) return false;
+
+    const birthDate = new Date(dob);
+    const today = new Date();
+
+    return (
+      birthDate.getUTCMonth() === today.getUTCMonth() &&
+      birthDate.getUTCDate() === today.getUTCDate()
+    );
+  }
+
+
+  private isBirthdayDiscount(d: Discount): boolean {
+    return (
+      d.name?.toLowerCase() === 'birthday' ||
+      d.name?.toLowerCase().includes('birthday')
+    );
+  }
+
+
 }

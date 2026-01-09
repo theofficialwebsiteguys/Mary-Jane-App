@@ -106,17 +106,17 @@ getLimitedProducts(section: string) {
     const key = (category || 'default').toLowerCase();
     // map to your assets; provide a default fallback
     const map: Record<string, string> = {
-      flower: 'assets/flower-general.png',
-      'pre-roll': 'assets/pre-roll-general.png',
-      prerolls: 'assets/pre-roll-general.png',
-      edibles: 'assets/edibles-general.png',
-      vapes: 'assets/vapes-general.png',
-      concentrates: 'assets/concentrates-general.png',
-      beverage: 'assets/beverage-general.png',
-      tinctures: 'assets/tincture-general.png',
-      topicals: 'assets/topicals-general.png',
-      accessory: 'assets/accessories-general.png',
-      default: 'assets/default.png'
+      flower: 'assets/stock/flower-general.png',
+      'pre-roll': 'assets/stock/pre-roll-general.png',
+      prerolls: 'assets/stock/pre-roll-general.png',
+      edibles: 'assets/stock/edibles-general.png',
+      vapes: 'assets/stock/vapes-general.png',
+      concentrates: 'assets/stock/concentrates-general.png',
+      beverage: 'assets/stock/beverage-general.png',
+      tinctures: 'assets/stock/tincture-general.png',
+      topicals: 'assets/stock/topicals-general.png',
+      accessory: 'assets/stock/accessories-general.png',
+      default: 'assets/stock/default.png'
     };
     return map[key] || map['default'];
   }

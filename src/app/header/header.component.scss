@@ -72,3 +72,12 @@ ion-toolbar.heading-container {
   background: #222;
   color: #fff;
 }
+
+.heading-container {
+  position: sticky;
+  top: 0;
+  z-index: 1; /* Increase above carousel */
+  background: #fff;
+  padding: calc(5px + env(safe-area-inset-top)) 5px 5px 5px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}

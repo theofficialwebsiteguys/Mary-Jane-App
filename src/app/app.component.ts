@@ -13,11 +13,12 @@ import { ProductsService } from './products.service';
 import { AuthService } from './auth.service';
 import { SettingsService } from './settings.service';
 import { FcmService } from './fcm.service';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { GeolocationService } from './geolocation.service';
 import { ModalController } from '@ionic/angular';
 import { RestrictedComponent } from './restricted/restricted.component';
 import { environment } from 'src/environments/environment';
+import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -42,6 +43,8 @@ export class AppComponent {
   showSplashScreen: boolean = true;
 
   isLoggedIn: boolean = false;
+
+  hideAssistantChat = false;
 
   constructor(
     private productService: ProductsService,
@@ -69,6 +72,14 @@ export class AppComponent {
         });
       }
     });
+
+    this.router.events
+      .pipe(
+        filter((event): event is NavigationEnd => event instanceof NavigationEnd)
+      )
+      .subscribe(event => {
+        this.hideAssistantChat = event.urlAfterRedirects.startsWith('/cart');
+      });
   }
 
   ngOnInit() {

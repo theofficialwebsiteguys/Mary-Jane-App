@@ -1,33 +1,34 @@
 <ion-tabs>
-  <ion-tab-bar slot="bottom" aria-label="Main navigation">
-    <ion-tab-button tab="home" routerLink="/tabs/home" aria-label="Home">
-      <i class="fa-solid fa-house icon" aria-hidden="true"></i>
-      <ion-label>Home</ion-label>
+<ion-tab-bar slot="bottom">
+  <ion-tab-button tab="home" routerLink="/tabs/home">
+    <div class="tab-icon">
+      <i class="fa-solid fa-house"></i>
+    </div>
+    <ion-label>Home</ion-label>
+  </ion-tab-button>
+
+  <ion-tab-button tab="products" routerLink="/products">
+    <div class="tab-icon">
+      <i class="fa-solid fa-list"></i>
+    </div>
+    <ion-label>Products</ion-label>
+  </ion-tab-button>
+
+  <ng-container *ngIf="isLoggedIn$ | async">
+    <ion-tab-button tab="orders" routerLink="/orders">
+      <div class="tab-icon">
+        <i class="fa-solid fa-receipt"></i>
+      </div>
+      <ion-label>Orders</ion-label>
     </ion-tab-button>
+  </ng-container>
 
-    <ion-tab-button tab="products" routerLink="/products" aria-label="Products">
-      <i class="fa-solid fa-list icon" aria-hidden="true"></i>
-      <ion-label>Products</ion-label>
-    </ion-tab-button>
+  <ion-tab-button tab="rewards" routerLink="/rewards">
+    <div class="tab-icon">
+      <img src="assets/MaryJane-Icon-DarkGreen.png" alt="" />
+    </div>
+    <ion-label>Rewards</ion-label>
+  </ion-tab-button>
+</ion-tab-bar>
 
-    <ng-container *ngIf="isLoggedIn$ | async">
-      <ion-tab-button tab="orders" routerLink="/orders" aria-label="Orders">
-        <i class="fa-solid fa-receipt icon"></i>
-        <ion-label>Orders</ion-label>
-      </ion-tab-button>
-    </ng-container>
-
-    <ion-tab-button tab="rewards" routerLink="/rewards" aria-label="Rewards">
-      <img src="assets/MaryJane-Icon-White.png" alt="" class="aiq-icon" aria-hidden="true" width="20"/>
-      <ion-label>Rewards</ion-label>
-    </ion-tab-button>
-
-
-    <!-- <ng-container *ngIf="isLoggedIn$ | async">
-      <ion-tab-button tab="social" routerLink="/social" aria-label="Social">
-        <i class="fa-solid fa-comment icon" aria-hidden="true"></i>
-        <ion-label>Social</ion-label>
-      </ion-tab-button>
-    </ng-container> -->
-  </ion-tab-bar>
 </ion-tabs>

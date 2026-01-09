@@ -753,3 +753,54 @@
     font-weight: 600;
   }
 }
+
+.order-toggle {
+  display: flex;
+  background: #f1f1f1;
+  border-radius: 14px;
+  padding: 6px;
+  gap: 6px;
+}
+
+.toggle-option {
+  flex: 1;
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #9a9a9a;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  ion-icon {
+    font-size: 18px;
+  }
+
+  &.active {
+    background: #5e6558; // 👈 match screenshot olive/green
+    color: #ffffff;
+
+    ion-icon {
+      color: #ffffff;
+    }
+  }
+
+  &.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.delivery-warning{
+  color: rgb(131, 0, 0);
+}

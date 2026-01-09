@@ -20,6 +20,8 @@
       </div>
 
       <p class="perk">{{ discount.rewardText }}</p>
+      <p class="perk" *ngIf="discount.redeemed">{{ discount.desc }}</p>
+      
 
      <div class="tier-actions">
 
