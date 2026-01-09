@@ -765,7 +765,7 @@ export class CheckoutComponent implements OnInit {
       id: "widget",
       token: this.aerosyncToken,
       iframeTitle: "Connect",
-      environment: "sandbox",
+      environment: "production",
       consumerId: environment.aeropay_consumerId || '',
 
       onLoad: () => {
