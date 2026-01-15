@@ -15,11 +15,27 @@
       [style.transform]="trackTransform"
       [style.transition]="trackTransition"
     >
-      <div class="carousel-slide" *ngFor="let banner of banners">
-        <div class="banner-card">
-          <img [src]="banner.image" [alt]="banner.title" />
+     <div class="carousel-slide" *ngFor="let banner of banners">
+      <div
+        class="banner-card"
+        (click)="onBannerClick(banner)"
+        role="button"
+        tabindex="0"
+      >
+        <img [src]="banner.image" [alt]="banner.title" />
+
+        <div class="banner-overlay">
+          <h3 class="banner-title">{{ banner.title }}</h3>
+          <p class="banner-subtitle">{{ banner.subtitle }}</p>
+
+          <button class="banner-cta">
+            {{ banner.cta }}
+          </button>
         </div>
       </div>
+    </div>
+
+
     </div>
   </div>
 </div>

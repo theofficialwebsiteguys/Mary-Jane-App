@@ -154,11 +154,20 @@ export class ProductsService {
           sale,
         } = product;
 
+        // 🎯 DISCOUNT FILTER (from banner click)
+        if (filters.discountId) {
+          const hasDiscount = Array.isArray(product.discounts)
+            && product.discounts.some(
+              d => d.discount_id === filters.discountId
+            );
+
+          if (!hasDiscount) return false;
+        }
+
         // 🔍 SEARCH
-        // 🔍 SEARCH (always applies)
         const matchesSearch =
           !searchQuery.trim() ||
-          title.toLowerCase().includes(searchQuery.toLowerCase());
+          title.toLowerCase().includes(searchQuery.toLowerCase()) || brand.toLowerCase().includes(searchQuery.toLowerCase());
 
         if (!matchesSearch) return false;
 
@@ -429,9 +438,19 @@ getProductFilterOptions(): Observable<ProductFilterOptions> {
 
 
   updateCategory(category: ProductCategory) {
-    this.currentCategory.next(category); 
+    this.currentCategory.next(category);
+
+    // Reset discount filter unless still in Deals
+    if (category !== 'Deals') {
+      this.updateProductFilters({
+        ...this.currentProductFilters.value,
+        discountId: null,
+      });
+    }
+
     this.route.navigateByUrl('/products');
   }
+
 
   getCurrentCategory(): ProductCategory {
     return this.currentCategory.value;
@@ -542,6 +561,34 @@ getMoreFromBrand(excludedIds: string[] = []): Observable<Product[]> {
     );
   }
   
+  getDiscountBanners(): Observable<any[]> {
+    return this.products$.pipe(
+      map(products =>
+        products
+          .filter(p => Array.isArray(p.discounts) && p.discounts.length)
+          .flatMap(product =>
+            product.discounts?.map(discount => ({
+              image:
+                // discount.discount_image_url ||
+                'assets/default-discount-banner.png',
+
+              title: discount.discount_title,
+              subtitle:
+                discount.discount_method === 'TARGET_PRICE'
+                  ? 'Target Price'
+                  : discount.discount_method,
+
+              cta: 'Shop Now',
+              discountId: discount.discount_id,
+            }))
+          )
+          .filter(
+          (banner, index, arr) =>
+            arr.findIndex(b => b?.discountId === banner?.discountId) === index
+        )
+      )
+    );
+  }
 
 
 }

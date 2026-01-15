@@ -19,7 +19,6 @@ export class CardSliderComponent implements OnInit {
   loading: boolean = true; // Add loading state
 
   homeSections = [
-    { key: 'featured', label: 'Featured Products' },
     { key: 'newest', label: 'Newest Drops' },
     { key: 'deals', label: 'Deals' },
     { key: 'accessory', label: 'Accessory' },
@@ -53,8 +52,8 @@ getLimitedProducts(section: string) {
         p => p.category?.toLowerCase() === 'accessory'
       ).slice(0, 9);
 
-    case 'featured':
-      return this.products.slice(0, 9);
+    // case 'featured':
+    //   return this.products.slice(0, 9);
       // return this.products.filter(p => p.isFeatured).slice(0, 9);
 
     case 'all':
@@ -122,19 +121,14 @@ getLimitedProducts(section: string) {
   }
 
   goToSection(section: string) {
+    console.log(section)
   if (section === 'deals') {
     this.updateCategory('Deals'); // real category
     return;
   }
 
-  if (section === 'accessories') {
+  if (section === 'accessory') {
     this.updateCategory('Accessory'); // real category
-    return;
-  }
-
-  // Featured → go to /products?page=featured
-  if (section === 'featured') {
-    this.productService.updateCategory('All');
     this.productService.updateProductFilters({
       ...DEFAULT_PRODUCT_FILTERS,
       sortMethod: { criterion: 'recent', direction: 'DESC' }
@@ -143,8 +137,28 @@ getLimitedProducts(section: string) {
     return;
   }
 
+  // Featured → go to /products?page=featured
+  // if (section === 'featured') {
+  //   this.productService.updateCategory('All');
+  //   this.productService.updateProductFilters({
+  //     ...DEFAULT_PRODUCT_FILTERS,
+  //     sortMethod: { criterion: 'recent', direction: 'DESC' }
+  //   });
+  //   this.router.navigate(['/products'], { queryParams: { view: 'featured' } });
+  //   return;
+  // }
+
   // Newest → go to /products sorted newest
   if (section === 'newest') {
+    this.productService.updateCategory('All');
+    this.productService.updateProductFilters({
+      ...DEFAULT_PRODUCT_FILTERS,
+      sortMethod: { criterion: 'recent', direction: 'DESC' }
+    });
+    this.router.navigate(['/products'], { queryParams: { view: 'newest' } });
+  }
+
+  if(section === 'all') {
     this.productService.updateCategory('All');
     this.productService.updateProductFilters({
       ...DEFAULT_PRODUCT_FILTERS,

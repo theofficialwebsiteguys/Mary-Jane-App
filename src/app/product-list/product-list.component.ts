@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
-import { Observable, of, startWith, switchMap } from 'rxjs';
+import { filter, map, Observable, of, startWith, switchMap } from 'rxjs';
 
 import { ProductsService } from '../products.service';
 
@@ -56,8 +56,10 @@ export class ProductListComponent implements OnInit {
           switchMap(similarList => {
             const similarIds = similarList.map(p => p.id);
             return this.productService.getMoreFromBrand(similarIds);
-          })
+          }),
+          filter(items => items.length > 0)
         );
+
 
         return;
       }

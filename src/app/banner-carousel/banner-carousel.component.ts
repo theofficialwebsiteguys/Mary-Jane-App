@@ -1,4 +1,14 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ProductsService } from '../products.service';
+import { Router } from '@angular/router';
+
+interface DiscountBanner {
+  image: string;
+  title: string;
+  description?: string;
+  discountId: string;
+}
+
 
 @Component({
   selector: 'app-banner-carousel',
@@ -8,12 +18,7 @@ import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/co
 export class BannerCarouselComponent implements OnInit, OnDestroy {
   @ViewChild('dragArea') dragArea!: ElementRef;
 
-  banners = [
-    { image: 'assets/banner1.jpg', title: 'banner 1', description: '' },
-    { image: 'assets/banner2.jpg', title: 'banner 2', description: '' },
-    { image: 'assets/banner3.jpg', title: 'banner 3', description: '' },
-    { image: 'assets/banner4.jpg', title: 'banner 4', description: '' }
-  ];
+  banners: any[] = [];
 
   currentIndex = 0;
 
@@ -27,9 +32,20 @@ export class BannerCarouselComponent implements OnInit, OnDestroy {
 
   interval: any;
 
+  constructor(private productsService: ProductsService, private router: Router) {}
+
   ngOnInit(): void {
-    this.updateTransform();
+     
     // this.startAutoplay();
+  }
+
+  ngAfterViewInit(){
+    this.productsService.getDiscountBanners().subscribe(banners => {
+          this.banners = banners;
+          console.log(this.banners)
+          this.currentIndex = 0;
+          this.updateTransform();
+        });
   }
 
   startAutoplay() {
@@ -102,5 +118,19 @@ export class BannerCarouselComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     clearInterval(this.interval);
+  }
+
+  onBannerClick(banner: any) {
+    // 1️⃣ Set category to Deals
+    this.productsService.updateCategory('Deals');
+
+    // 2️⃣ Apply discount filter
+    this.productsService.updateProductFilters({
+      ...this.productsService['currentProductFilters'].value,
+      discountId: banner.discountId,
+    });
+
+    // 3️⃣ Navigate to products page
+    this.router.navigateByUrl('/products');
   }
 }

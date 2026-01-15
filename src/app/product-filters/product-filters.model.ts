@@ -84,6 +84,7 @@ export interface ProductFilters {
   price: RangeFilter;
   potency: PotencyRange;
   sortMethod: SortMethod;
+  discountId?: string | null;
 }
 
 //

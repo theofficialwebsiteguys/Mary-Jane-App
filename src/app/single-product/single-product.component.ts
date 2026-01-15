@@ -140,8 +140,8 @@ export class SingleProductComponent implements OnInit {
 
   formatDiscountAmount(d: any): string {
     if (!d) return '';
-    if (d.method === 'PERCENT') return `${d.amount}% off`;
-    if (d.method === 'DOLLAR') return `$${d.amount} off`;
+    if (d.discount_method === 'PERCENT') return `${d.discount_amount}% off`;
+    if (d.discount_method === 'DOLLAR') return `$${d.discount_amount} off`;
     return `${d.amount}`;
   }
 

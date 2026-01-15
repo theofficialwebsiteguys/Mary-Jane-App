@@ -6,6 +6,8 @@ import { Product } from './product.model';
 import { CartItem, CartService } from '../cart.service';
 import { AuthService } from '../auth.service';
 import { AccessibilityService } from '../accessibility.service';
+import { ToastController } from '@ionic/angular';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -14,7 +16,7 @@ import { AccessibilityService } from '../accessibility.service';
   styleUrls: ['./product.component.scss'],
 })
 export class ProductComponent implements OnInit {
-  constructor(private productService: ProductsService, private cartService: CartService, private authService: AuthService, private accessibilityService: AccessibilityService) {}
+  constructor(private productService: ProductsService, private cartService: CartService, private authService: AuthService, private accessibilityService: AccessibilityService, private toastCtrl: ToastController, private router: Router) {}
   @Input() index: number = 0;
 
   @Input() product: Product = {
@@ -68,7 +70,7 @@ export class ProductComponent implements OnInit {
     this.accessibilityService.announce(`Quantity ${change} to ${this.quantity} for ${this.product.title}.`, 'polite');
   }
 
-  addToCart(event?: Event) {
+  async addToCart(event?: Event) {
     if (event) {
       event.stopPropagation();
     }
@@ -76,6 +78,8 @@ export class ProductComponent implements OnInit {
     this.cartService.addToCart(cartItem);
     // alert('Item added to cart!');
     this.accessibilityService.announce(`${this.product.title} added to your cart.`, 'polite');
+
+    await this.showAddedToast(this.product.title);
   }
 
   getProductImage(product: any): string {
@@ -103,6 +107,28 @@ export class ProductComponent implements OnInit {
     };
     return map[key] || map['default'];
   }
+
+  private async showAddedToast(title: string) {
+    const toast = await this.toastCtrl.create({
+      message: `Added ${title} to cart`,
+      duration: 3000,
+      position: 'bottom',
+      color: 'dark',
+      buttons: [
+        {
+          text: 'View',
+          role: 'action',
+          handler: () => {
+            // optional: navigate to cart or open cart modal
+            this.router.navigate(['/cart']);
+          }
+        }
+      ],
+    });
+
+    await toast.present();
+  }
+
 
 }
 

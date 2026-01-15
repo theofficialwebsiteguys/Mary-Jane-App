@@ -6,7 +6,9 @@
   display: flex;
   gap: 16px;
   flex-wrap: nowrap;
-  padding: 10px 16px;
+  padding-left: 10px;
+  padding-top: 20px;
+  padding-right: 10px;
   overflow-x: auto;
   scrollbar-width: none;
 }

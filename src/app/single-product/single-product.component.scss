@@ -449,9 +449,9 @@ ion-button {
 
 .image-viewer {
   position: relative;
-  width: min(960px, 100%);
-  height: min(85vh, 720px);
-  background: #0f0f0f;
+  // width: min(960px, 100%);
+  // height: min(85vh, 720px);
+  background: #ffffff;
   border-radius: 18px;
   overflow: hidden;
 }
@@ -501,8 +501,8 @@ ion-button {
     border: none;
     padding: 8px 14px;
     border-radius: 999px;
-    background: rgba(255,255,255,0.15);
-    color: #fff;
+    background: rgb(255, 255, 255);
+    color: #000000;
     font-weight: 600;
     cursor: pointer;
   }

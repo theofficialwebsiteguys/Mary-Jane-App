@@ -23,8 +23,8 @@
 
   padding: 10px 14px;
 
-  background: var(--ion-color-primary);
-  color: var(--ion-color-primary-contrast);
+  background: #97A08A;
+  color: white;
 
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
   font-size: 16px;
@@ -71,11 +71,14 @@
 .text-item .title {
   font-weight: 600;
   font-size: 14px;
+  color: white;
 }
 
 .text-item .message {
   font-size: 14px;
   opacity: 0.9;
+  color: #4B4F47;
+  font-weight: bold;
 }
 
 .announcement-right {
