@@ -96,8 +96,6 @@ export class RecentOrdersComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loading = true;
-
     this.authService.orders.subscribe((orders: any[]) => {
       this.processOrders(orders || []);
       this.loading = false;
@@ -111,110 +109,106 @@ export class RecentOrdersComponent implements OnInit {
       return;
     }
 
-    const normalized = orders.map(order => {
-      const latestStatus = this.getLatestStatus(order).toLowerCase();
-      const complete =
-        typeof order.complete === 'boolean'
-          ? order.complete
-          : latestStatus.includes('complete');
+    const normalized = orders.map(o => ({
+      ...o,
+      complete: Boolean(o.complete),
+      items: Array.isArray(o.items) ? o.items : [],
+      status: o.status || 'Received'
+    }));
 
-      return { ...order, complete };
-    });
-
-    const sorted = [...normalized].sort((a, b) => b.id_order - a.id_order);
-
-    this.pendingOrders = sorted.filter(
-      o => !o.complete && o.items?.length > 0
+    const sorted = normalized.sort(
+      (a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime()
     );
 
-
+    this.pendingOrders = sorted.filter(o => !o.complete);
     this.pastOrders = sorted.filter(o => o.complete);
   }
 
+  /* ---------------- STATUS ---------------- */
+
   getLatestStatus(order: any): string {
-    if (!order?.status_list?.length) return 'Received';
-
-    const latest = order.status_list.reduce((a: any, b: any) =>
-      new Date(a.created_at) > new Date(b.created_at) ? a : b
-    );
-
-    return latest.customer_message || 'Received';
+    if (order.status) return order.status;
+    return 'Received';
   }
 
   getCurrentStepIndex(order: any): number {
-    const status = this.getLatestStatus(order).toLowerCase();
-
-    if (status.includes('prepar')) return 1;
-    if (status.includes('ready') || status.includes('complete')) return 2;
+    const s = this.getLatestStatus(order).toLowerCase();
+    if (s.includes('prepar')) return 1;
+    if (s.includes('ready') || s.includes('complete')) return 2;
     return 0;
   }
 
   getProgressWidth(order: any): string {
     const index = this.getCurrentStepIndex(order);
-    const percent = (index / (this.statusSteps.length - 1)) * 100;
-    return `${percent}%`;
+    return `${(index / (this.statusSteps.length - 1)) * 100}%`;
   }
 
-  toggleExpand(index: number, section: 'pending' | 'past'): void {
+  getStatusClass(order: any): string {
+    const s = this.getLatestStatus(order).toLowerCase();
+    if (s.includes('prepar')) return 'status-preparing';
+    if (s.includes('ready')) return 'status-ready';
+    if (s.includes('complete')) return 'status-complete';
+    return 'status-received';
+  }
+
+  /* ---------------- UI HELPERS ---------------- */
+
+  toggleExpand(index: number, section: 'pending' | 'past') {
     this.expandedOrderIndex[section] =
       this.expandedOrderIndex[section] === index ? null : index;
-
-    this.accessibilityService.announce(
-      `Order ${index + 1} ${
-        this.expandedOrderIndex[section] === null ? 'collapsed' : 'expanded'
-      }.`,
-      'polite'
-    );
   }
 
-  reorder(order: any): void {
-    order.items.forEach((item: any) => {
-      this.cartService.addToCart({ ...item });
-    });
+  async reorder(order: any) {
+    if (!order.items?.length) return;
+
+    for (const item of order.items) {
+      const cartItem = {
+        id: item.item_id,
+        title: item.title,
+        brand: item.brand || '',
+        category: item.category || 'Other',
+        desc: '', 
+        strainType: 'N/A', 
+        quantity: item.quantity || 1,
+        price: String(item.price),
+        image: 'assets/stock/default.png',
+        thc: '',
+        weight: '',
+        sale: undefined,
+      };
+
+      this.cartService.addToCart(cartItem);
+    }
 
     this.accessibilityService.announce(
-      `Items from order ${order.id_order} added to cart.`,
+      `Items from order ${order.orderId} added to cart.`,
       'assertive'
     );
   }
 
+
   getOrderDate(date: string): string {
-    if (!date) return '';
     return new Date(date).toLocaleDateString('en-US', {
-      year: 'numeric',
       month: 'long',
       day: 'numeric',
+      year: 'numeric',
       hour: 'numeric',
       minute: '2-digit'
     });
   }
 
-  getStatusClass(order: any): string {
-    const status = this.getLatestStatus(order).toLowerCase();
-
-    if (status.includes('prepar')) return 'status-preparing';
-    if (status.includes('ready')) return 'status-ready';
-    if (status.includes('complete')) return 'status-complete';
-    return 'status-received';
-  }
-
-  /* ✅ DERIVED STATE */
+  /* ---------------- DERIVED ---------------- */
 
   get hasOrders(): boolean {
     return this.pendingOrders.length > 0 || this.pastOrders.length > 0;
   }
 
-  get hasPending(): boolean {
-    return this.pendingOrders.length > 0;
-  }
-
   get currentOrder(): any | null {
-    return this.pendingOrders.length ? this.pendingOrders[0] : null;
+    return this.pendingOrders[0] || null;
   }
 
   get pendingList(): any[] {
     return this.pendingOrders;
   }
-
 
 }

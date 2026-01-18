@@ -4,6 +4,13 @@
 :root {
   --ion-background-primary: #f8f8f8;
 
+  --ion-color-blue: #B8CCC5;
+  --ion-color-blue-rgb: 184, 204, 197;
+  --ion-color-blue-contrast: #000000;
+  --ion-color-blue-contrast-rgb: 0, 0, 0;
+  --ion-color-blue-shade: #a3b8b2;
+  --ion-color-blue-tint: #c6d8d2;
+
   --ion-color-primary: #4B4F47;
   --ion-color-primary-rgb: 91, 96, 83;
   --ion-color-primary-contrast: #ffffff;
@@ -26,4 +33,13 @@
   --ion-color-danger-tint: #d74444;
 
   --brand-primary: red;
+}
+
+.ion-color-blue {
+  --ion-color-base: var(--ion-color-blue);
+  --ion-color-base-rgb: var(--ion-color-blue-rgb);
+  --ion-color-contrast: var(--ion-color-blue-contrast);
+  --ion-color-contrast-rgb: var(--ion-color-blue-contrast-rgb);
+  --ion-color-shade: var(--ion-color-blue-shade);
+  --ion-color-tint: var(--ion-color-blue-tint);
 }

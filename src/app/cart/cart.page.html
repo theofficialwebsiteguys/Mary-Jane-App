@@ -72,12 +72,18 @@
 
 
 
-      <!-- CHECKOUT BUTTON -->
-      <div class="checkout-container">
-        <ion-button class="checkout-button" (click)="checkout()" aria-label="Proceed to checkout">
-          Continue
-        </ion-button>
-      </div>
+    <!-- CHECKOUT BUTTON -->
+    <div class="checkout-container" *ngIf="isLoggedIn">
+      <ion-button class="checkout-button" (click)="checkout()" aria-label="Proceed to checkout">
+        Continue
+      </ion-button>
+    </div>
+
+    <div class="checkout-container" *ngIf="!isLoggedIn">
+      <ion-button routerLink="/auth" [queryParams]="{ mode: 'login' }" aria-label="Proceed to checkout">
+        Sign up or Login to Continue
+      </ion-button>
+    </div>
 
     </ng-container>
 

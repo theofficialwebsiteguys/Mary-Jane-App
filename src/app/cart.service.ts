@@ -357,12 +357,12 @@ export class CartService {
       ];
     }
 
-    const sessionData = localStorage.getItem('sessionData');
-    const token = sessionData ? JSON.parse(sessionData).token : null;
+    // const sessionData = localStorage.getItem('sessionData');
+    // const token = sessionData ? JSON.parse(sessionData).token : null;
 
-    if (!token) {
-      throw new Error("No user logged in");
-    }
+    // if (!token) {
+    //   throw new Error("No user logged in");
+    // }
 
     const headers = {
       'x-auth-api-key': environment.db_api_key,

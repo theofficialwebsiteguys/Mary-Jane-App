@@ -82,8 +82,11 @@
           [attr.aria-expanded]="expandedOrderIndex.pending === i"
         >
           <div class="order-info">
-            <h3>{{ getOrderDate(order.status_list?.[0]?.created_at) }}</h3>
-            <p>{{ order.items.length }} items</p>
+           <h3>{{ getOrderDate(order.orderDate) }}</h3>
+           <p>Order ID: {{ order.orderId }}</p>
+            <p *ngIf="order.items.length">
+              {{ order.items.length }} items
+            </p>
             <p
               class="status-badge"
               [ngClass]="getStatusClass(order)"
@@ -102,11 +105,11 @@
               *ngFor="let item of order.items"
               class="order-item"
             >
-              <img
+              <!-- <img
                 [src]="item.image || 'assets/default.png'"
                 [alt]="item.title"
                 class="item-image"
-              />
+              /> -->
               <span>{{ item.quantity }}x</span>
               <span>{{ item.title }}</span>
             </li>

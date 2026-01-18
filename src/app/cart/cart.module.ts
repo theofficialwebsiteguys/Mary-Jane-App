@@ -10,6 +10,7 @@ import { CartPage } from './cart.page';
 import { CartItemsComponent } from '../cart-items/cart-items.component';
 import { SharedModule } from '../shared/shared.module';
 import { CheckoutComponent } from '../checkout/checkout.component';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   imports: [
@@ -17,7 +18,8 @@ import { CheckoutComponent } from '../checkout/checkout.component';
     FormsModule,
     IonicModule,
     CartPageRoutingModule,
-    SharedModule
+    SharedModule,
+    RouterModule
   ],
   declarations: [CartPage, CartItemsComponent, CheckoutComponent]
 })

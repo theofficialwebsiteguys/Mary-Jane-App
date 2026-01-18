@@ -28,6 +28,7 @@ export class CartPage {
   previewError: string | null = null;
 
   appliedDiscount: AppliedDiscount | null = null;
+  isLoggedIn = false;
 
   constructor(
     private readonly cartService: CartService,
@@ -39,6 +40,10 @@ export class CartPage {
   ) {}
 
   ngOnInit(): void {
+    this.authService.isLoggedIn().subscribe(async (status) => {
+      this.isLoggedIn = status;
+    });
+
     this.cartService.cart$.subscribe((cart) => {
       this.cartItems = cart;
       this.updateCartPreview();
@@ -145,12 +150,12 @@ export class CartPage {
     }
   }
 
-  async presentToast(message: string, color: string = 'success') {
+  async presentToast(message: string) {
     const toast = await this.toastController.create({
       message: message,
       duration: 5000,
-      color: color,
-      position: 'bottom',
+      color: 'blue',
+      position: 'middle',
     });
     await toast.present();
   }

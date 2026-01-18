@@ -23,14 +23,14 @@
       </button>
     </div>
 
-    <form class="chat-body" (ngSubmit)="sendMessage()">
+    <form class="chat-body" (ngSubmit)="sendMessage()" #chatForm="ngForm">
       <ion-input class="chat-input" [(ngModel)]="formData.name" name="name" placeholder="Your Name" required></ion-input>
 
       <ion-input class="chat-input" [(ngModel)]="formData.email" name="email" type="email" placeholder="Email" required></ion-input>
 
       <ion-textarea class="chat-textarea" [(ngModel)]="formData.message" name="message" placeholder="How can we help?" auto-grow="true" required></ion-textarea>
 
-      <ion-button expand="block" type="submit" class="send-btn">
+      <ion-button expand="block" type="submit" class="send-btn" [disabled]="chatForm.invalid">
         Send Message
       </ion-button>
     </form>

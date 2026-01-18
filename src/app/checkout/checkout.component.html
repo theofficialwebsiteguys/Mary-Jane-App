@@ -93,6 +93,9 @@
         Delivery orders require a minimum of {{ deliveryMin | currency }}.
       </p>
 
+
+
+
     
     <!-- Conditional message for Delivery -->
     <!-- <p *ngIf="!enableDelivery" class="delivery-warning">
@@ -104,7 +107,12 @@
     
   
     <div *ngIf="selectedOrderType === 'delivery' && enableDelivery" class="delivery-address">
-
+      <p
+        class="delivery-availability"
+        *ngIf="deliveryAvailabilityText"
+      >
+        {{ deliveryAvailabilityText }}
+      </p>
       <h3>Delivery Address</h3>
 
       <input
@@ -113,6 +121,9 @@
         [(ngModel)]="deliveryAddress.street"
         (ngModelChange)="onAddressInputChange()"
         placeholder="Street Address"
+        #streetInput
+        autocomplete="street-address"
+        inputmode="text"
       />
 
       <input
@@ -439,7 +450,7 @@
   class="sticky-footer"
   (click)="placeOrder()"
   [disabled]="
-  (selectedOrderType === 'delivery' && !deliveryAddressValid)"
+  (selectedOrderType === 'delivery' && (!deliveryAddressValid || !selectedDeliveryTime))"
   aria-label="Place your order"
 >
   Submit Order

@@ -17,7 +17,7 @@ export interface ProductDiscount {
   discount_method: string;
   discount_id: any;
   discount_title: string;
-  amount: number;
+  discount_amount: number;
   method: 'PERCENT' | 'DOLLAR' | string;
   stackable: boolean;
   conditions?: ProductDiscountCondition[];

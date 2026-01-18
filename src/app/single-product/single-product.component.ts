@@ -74,7 +74,8 @@ export class SingleProductComponent implements OnInit {
     private location: Location,
     private router: Router,
     private toastController: ToastController,
-    private accessibilityService: AccessibilityService
+    private accessibilityService: AccessibilityService,
+    private toastCtrl: ToastController,
   ) {}
 
   ngOnInit() {
@@ -142,7 +143,7 @@ export class SingleProductComponent implements OnInit {
     if (!d) return '';
     if (d.discount_method === 'PERCENT') return `${d.discount_amount}% off`;
     if (d.discount_method === 'DOLLAR') return `$${d.discount_amount} off`;
-    return `${d.amount}`;
+    return `${d.discount_amount}`;
   }
 
   getDiscountConditionsSummary(d: any): string {
@@ -183,10 +184,10 @@ export class SingleProductComponent implements OnInit {
       ...this.currentProduct,
       quantity: this.quantity,
     };
-  
-   this.cartService.addToCart(cartItem); 
+
+    this.cartService.addToCart(cartItem); 
     this.accessibilityService.announce(`${this.currentProduct.title} added to cart. Quantity: ${this.quantity}.`, 'assertive');
-    // alert('Item added to cart!');
+    await this.showAddedToast(this.currentProduct.title);
   }
   
   getProductImage(product: any): string {
@@ -327,5 +328,26 @@ export class SingleProductComponent implements OnInit {
     return Math.hypot(a.x - b.x, a.y - b.y);
   }
 
+
+  private async showAddedToast(title: string) {
+    const toast = await this.toastCtrl.create({
+      message: `Added ${title} to cart`,
+      duration: 3000,
+      position: 'bottom',
+      color: 'blue',
+      buttons: [
+        {
+          text: 'View',
+          role: 'action',
+          handler: () => {
+            // optional: navigate to cart or open cart modal
+            this.router.navigate(['/cart']);
+          }
+        }
+      ],
+    });
+
+    await toast.present();
+  }
   
 }

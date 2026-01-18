@@ -113,7 +113,7 @@ export class ProductComponent implements OnInit {
       message: `Added ${title} to cart`,
       duration: 3000,
       position: 'bottom',
-      color: 'dark',
+      color: 'blue',
       buttons: [
         {
           text: 'View',

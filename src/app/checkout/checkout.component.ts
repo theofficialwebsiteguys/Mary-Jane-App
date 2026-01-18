@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, NgZone, OnInit, Output, ViewChild } from '@angular/core';
 import { AppliedDiscount, CartService } from '../cart.service';
 import { LoadingController, ToastController } from '@ionic/angular';
 import { AccessibilityService } from '../accessibility.service';
@@ -8,6 +8,7 @@ import { FcmService } from '../fcm.service';
 import { AeropayService } from '../aeropay.service';
 import { openWidget } from 'aerosync-web-sdk';
 import { environment } from 'src/environments/environment';
+import { take } from 'rxjs';
 
 @Component({
   selector: 'app-checkout',
@@ -19,6 +20,11 @@ export class CheckoutComponent implements OnInit {
 
   @Output() back = new EventEmitter<void>();
   @Output() orderPlaced = new EventEmitter<void>();
+
+  @ViewChild('streetInput') streetInput!: ElementRef<HTMLInputElement>;
+
+  private addressAutocomplete?: google.maps.places.Autocomplete;
+  private placesLoaded = false;
 
   // DELIVERY
   deliveryAddress = {
@@ -108,7 +114,8 @@ export class CheckoutComponent implements OnInit {
     private authService: AuthService,
     private settingsService: SettingsService,
     private fcmService: FcmService,
-    private aeropayService: AeropayService  
+    private aeropayService: AeropayService,
+    private ngZone: NgZone
   ) {}
 
   async ngOnInit() {
@@ -145,15 +152,84 @@ export class CheckoutComponent implements OnInit {
     this.loadDeliverySchedule();
 
     // Set next day as minimum date
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    this.minDate = tomorrow.toISOString().split('T')[0];
+    const today = new Date();
+    today.setDate(today.getDate());
+    this.minDate = today.toISOString().split('T')[0];
 
     //  this.cartService.appliedDiscount$.subscribe(d => {
     //   this.appliedDiscount = d;
     //   this.updateTotals();
     // });
   }
+
+ private initAddressAutocomplete() {
+    const googleMaps = (window as any).google?.maps?.places;
+    const inputEl = this.streetInput?.nativeElement;
+
+    if (!googleMaps || !inputEl) {
+      console.warn('Autocomplete not ready yet');
+      return;
+    }
+
+    // Prevent double-init
+    if (this.addressAutocomplete) return;
+
+    this.addressAutocomplete = new google.maps.places.Autocomplete(inputEl, {
+      types: ['address'],
+      componentRestrictions: { country: 'us' },
+      fields: ['address_components', 'formatted_address']
+    });
+
+    this.addressAutocomplete.addListener('place_changed', () => {
+      const place = this.addressAutocomplete!.getPlace();
+      if (!place.address_components) return;
+
+      const parts = this.parseAddressComponents(place.address_components);
+
+      this.ngZone.run(() => {
+        const street = [parts.streetNumber, parts.route]
+          .filter(Boolean)
+          .join(' ')
+          .trim();
+
+        this.deliveryAddress.street =
+          street || place.formatted_address || this.deliveryAddress.street;
+
+        this.deliveryAddress.city = parts.locality || this.deliveryAddress.city;
+        this.deliveryAddress.state = parts.stateShort || 'NY';
+        this.deliveryAddress.zip = parts.postalCode || this.deliveryAddress.zip;
+
+        this.onAddressInputChange();
+      });
+    });
+  }
+
+
+  private parseAddressComponents(components: google.maps.GeocoderAddressComponent[]) {
+    const out: any = {};
+
+    for (const c of components) {
+      const t = c.types;
+
+      if (t.includes('street_number')) out.streetNumber = c.long_name;
+      if (t.includes('route')) out.route = c.long_name;
+
+      // City can come from different fields depending on address
+      if (t.includes('locality')) out.locality = c.long_name;
+      if (!out.locality && t.includes('sublocality')) out.locality = c.long_name;
+      if (!out.locality && t.includes('postal_town')) out.locality = c.long_name;
+
+      if (t.includes('administrative_area_level_1')) {
+        out.stateLong = c.long_name;
+        out.stateShort = c.short_name;
+      }
+
+      if (t.includes('postal_code')) out.postalCode = c.long_name;
+    }
+
+    return out;
+  }
+
 
    private async loadAvailableDiscounts() {
     try {
@@ -314,14 +390,25 @@ export class CheckoutComponent implements OnInit {
   }
 
   onOrderTypeChange(event: any) {
-    console.log(event)
     this.selectedOrderType = event;
+
+    if (this.selectedOrderType === 'pickup') {
+      // 🧹 cleanup when DOM is destroyed
+      this.addressAutocomplete = undefined;
+      return;
+    }
 
     if (this.selectedOrderType === 'delivery') {
       this.selectedPaymentMethod = 'aeropay';
+
+      this.ngZone.onStable.pipe(take(1)).subscribe(() => {
+        this.initAddressAutocomplete();
+      });
+
       this.startAeroPayProcess();
     }
   }
+
   
   onPaymentMethodChange(method: string) {
     this.selectedPaymentMethod = method;
@@ -517,7 +604,8 @@ export class CheckoutComponent implements OnInit {
         }
       );
 
-      await this.authService.getUserOrders();
+      // await this.authService.getUserOrders();
+      await this.authService.validateSession();
 
       const msg =
         this.selectedOrderType === 'delivery'
@@ -822,5 +910,38 @@ export class CheckoutComponent implements OnInit {
   removeDiscount() {
     this.cartService.setDiscount(null);
   }
+
+  get deliveryAvailabilityText(): string | null {
+    if (!this.enableDelivery || !this.deliverySchedule?.length) return null;
+
+    // If a date is selected, show that day's hours
+    if (this.selectedDeliveryDate) {
+      const d = new Date(this.selectedDeliveryDate);
+      const dayName = d.toLocaleDateString('en-US', { weekday: 'long' });
+
+      const daySchedule = this.deliverySchedule.find(s => s.day === dayName);
+      if (!daySchedule) return null;
+
+      return `Delivery is available from ${this.formatTime(daySchedule.startTime)} – ${this.formatTime(daySchedule.endTime)}`;
+    }
+
+    // Otherwise show general availability range
+    const starts = this.deliverySchedule.map(s => s.startTime);
+    const ends = this.deliverySchedule.map(s => s.endTime);
+
+    const earliest = starts.sort()[0];
+    const latest = ends.sort().slice(-1)[0];
+
+    return `Delivery is available from ${this.formatTime(earliest)} – ${this.formatTime(latest)}`;
+  }
+
+  private formatTime(time: string): string {
+    const [h, m] = time.split(':').map(Number);
+    const hour12 = h % 12 === 0 ? 12 : h % 12;
+    const ampm = h < 12 ? 'AM' : 'PM';
+    return `${hour12}:${m.toString().padStart(2, '0')} ${ampm}`;
+  }
+
+
 
 }

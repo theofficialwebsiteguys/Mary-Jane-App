@@ -260,6 +260,7 @@ export class AuthService {
         if (response.status === 200) {
           this.authStatus.next(true);
           this.updateUserData();
+          console.log(response.data)
           this.handleRecentOrders(response.data.orders);
           this.setAuthTokensAlleaves(response.data.authTokens?.alleaves);
           this.fcmService.initPushNotifications(this.getCurrentUser().email);
@@ -353,6 +354,8 @@ export class AuthService {
       status_list: o.status_list || [], // future Treez statuses
       items: o.items || [], // for now empty until you map product items
     }));
+
+    console.log(normalized)
 
     this.enrichedOrders.next(normalized);
   }

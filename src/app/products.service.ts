@@ -164,22 +164,24 @@ export class ProductsService {
           if (!hasDiscount) return false;
         }
 
-        // 🔍 SEARCH
+        const q = searchQuery.trim().toLowerCase();
         const matchesSearch =
-          !searchQuery.trim() ||
-          title.toLowerCase().includes(searchQuery.toLowerCase()) || brand.toLowerCase().includes(searchQuery.toLowerCase());
+          !q ||
+          (title || '').toLowerCase().includes(q) ||
+          (brand || '').toLowerCase().includes(q);
 
         if (!matchesSearch) return false;
 
-        // DEALS = virtual category
-        if (currentCategory === 'Deals' && !isDeal) {
-          return false;
-        }
+        const isSearching = !!q;
 
-        // REAL CATEGORIES
-        if (currentCategory !== 'All' && currentCategory !== 'Deals') {
-          if (product.category !== currentCategory) {
-            return false;
+        // DEALS = virtual category
+        if (!isSearching) {
+          // DEALS = virtual category
+          if (currentCategory === 'Deals' && !isDeal) return false;
+
+          // REAL CATEGORIES
+          if (currentCategory !== 'All' && currentCategory !== 'Deals') {
+            if (product.category !== currentCategory) return false;
           }
         }
 
@@ -539,8 +541,7 @@ getMoreFromBrand(excludedIds: string[] = []): Observable<Product[]> {
 
   updateCurrentProduct(product: Product) {
     this.currentProduct.next(product);
-    this.updateCategory(product.category as ProductCategory);
-    console.log(product);
+    // this.updateCategory(product.category as ProductCategory);
     this.route.navigateByUrl('/product-display');
   }
 

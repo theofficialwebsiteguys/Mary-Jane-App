@@ -138,7 +138,7 @@
         </div>
       </ng-template>
 
-       <div class="actions-row" *ngIf="isLoggedIn">
+       <div class="actions-row">
         <div class="quantity-counter" aria-label="Select product quantity">
           <button (click)="decrementQuantity()" aria-label="Decrease quantity">
             −
@@ -157,7 +157,7 @@
           Add to Cart
         </ion-button>
       </div>
-
+<!-- 
       <ion-button
         expand="block"
         routerLink="/auth"
@@ -168,19 +168,8 @@
         "
       >
         Register to Add to Cart
-      </ion-button>
+      </ion-button> -->
 
-      <div class="variants-block">
-        <p class="variants-label">Available variants</p>
-        <div class="variant-card">
-          <span class="variant-weight">
-            {{ currentProduct.weight || '—' }}g
-          </span>
-          <span class="variant-price">
-            {{ (currentProduct.sale?.discountedPrice || currentProduct.price) | currency }}
-          </span>
-        </div>
-      </div>
 
       <p id="product-description" class="description" *ngIf="currentProduct.desc">
         {{ getDescription() }}
@@ -213,8 +202,8 @@
 
         <div class="discount-pill" *ngFor="let d of currentProduct.discounts">
           <div class="discount-main">
-            <span class="discount-title">{{ d.discount_title }} - </span>
-            <span class="discount-amount">{{ formatDiscountAmount(d) }}</span>
+            <span class="discount-title">{{ d.discount_title }}</span>
+            <span class="discount-amount" *ngIf="d.discount_amount"> - {{ formatDiscountAmount(d) }}</span>
           </div>
 
           <p class="discount-conditions" *ngIf="d.conditions?.length">
