@@ -4,15 +4,28 @@
   </div>
 
   <div class="card user-info" aria-labelledby="user-info-header">
-    <h2 id="user-info-header" class="sr-only">User Information</h2>
+    <div class="user-info-header">
+      <h2 id="user-info-header">User Information</h2>
+
+      <ion-button
+        size="small"
+        fill="clear"
+        (click)="openEditProfileModal()"
+        aria-label="Edit account information"
+      >
+        Edit
+      </ion-button>
+    </div>
+
     <div *ngFor="let item of userInfo" class="info-item">
       <ion-icon [name]="item.icon" aria-hidden="true"></ion-icon>
       <div>
-        <p class="label" tabindex="0">{{ item.label }}</p>
-        <p tabindex="0">{{ item.value }}</p>
+        <p class="label">{{ item.label }}</p>
+        <p>{{ item.value }}</p>
       </div>
     </div>
   </div>
+
 
   <div class="card settings" aria-labelledby="settings-header">
     <h2 id="settings-header">Settings</h2>

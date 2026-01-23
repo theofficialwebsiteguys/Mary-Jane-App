@@ -105,3 +105,20 @@
   clip: rect(0, 0, 0, 0);
   border: 0;
 }
+
+.info-item.clickable {
+  cursor: pointer;
+}
+
+.user-info-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+
+  h2 {
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin: 0;
+  }
+}

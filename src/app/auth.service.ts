@@ -4,7 +4,8 @@ import { Router } from '@angular/router';
 import {
   BehaviorSubject,
   filter,
-  Observable
+  Observable,
+  take
 } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { FcmService } from './fcm.service';
@@ -261,7 +262,21 @@ export class AuthService {
           this.authStatus.next(true);
           this.updateUserData();
           console.log(response.data)
-          this.handleRecentOrders(response.data.orders);
+          this.productsService.products$
+            .pipe(
+              filter(products => products.length > 0),
+              take(1) // 🔑 run ONCE when products are ready
+            )
+            .subscribe({
+              next: () => {
+                this.handleRecentOrders(response.data.orders);
+              },
+              error: () => {
+                // fallback: still show orders without images
+                this.handleRecentOrders(response.data.orders);
+              }
+            });
+
           this.setAuthTokensAlleaves(response.data.authTokens?.alleaves);
           this.fcmService.initPushNotifications(this.getCurrentUser().email);
         } else {
@@ -343,22 +358,73 @@ export class AuthService {
     return this.enrichedOrders.asObservable(); // ✅ Always emits, even if empty
   }
   
-  handleRecentOrders(orders: any[]) {
-    const normalized = orders.map(o => ({
-      orderId: o.pos_order_id,
-      orderDate: o.createdAt,
-      total: Number(o.total_amount) || 0,
-      complete: Boolean(o.complete),
-      orderType: o.order_type === "pickup" ? "Pickup" : "Delivery",
-      status: o.status || "Pending", // fallback
-      status_list: o.status_list || [], // future Treez statuses
-      items: o.items || [], // for now empty until you map product items
-    }));
-
-    console.log(normalized)
-
-    this.enrichedOrders.next(normalized);
+ private normalize(str: string | null | undefined): string {
+    return (str || '')
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .replace(/[^a-z0-9 ]/g, '')
+      .trim();
   }
+
+  handleRecentOrders(orders: any[]) {
+    const products = this.productsService.getCurrentProducts();
+    
+    console.log(products)
+    console.log(orders)
+
+    // 1️⃣ Build lookup maps
+    const byId = new Map<string, Product>();
+    const byText = new Map<string, Product>();
+
+    for (const p of products) {
+      if (p.id) {
+        byId.set(String(p.id), p);
+      }
+
+      const textKey = `${this.normalize(p.title)}|${this.normalize(p.brand)}`;
+      byText.set(textKey, p);
+    }
+
+    // 2️⃣ Enrich orders
+    const enriched = orders.map(o => {
+      const items = (o.items || []).map((item: any) => {
+        let product: Product | undefined;
+
+        // ✅ Primary: ID match
+        if (item.item_id && byId.has(String(item.item_id))) {
+          product = byId.get(String(item.item_id));
+          console.log(product)
+        }
+
+        // 🔁 Fallback: title + brand
+        if (!product) {
+          const textKey =
+            `${this.normalize(item.title)}|${this.normalize(item.brand)}`;
+          product = byText.get(textKey);
+        }
+
+        return {
+          ...item,
+          image: product?.image || null
+        };
+      });
+
+      return {
+        orderId: o.pos_order_id,
+        orderDate: o.createdAt,
+        total: Number(o.total_amount) || 0,
+        complete: Boolean(o.complete),
+        orderType: o.order_type === 'pickup' ? 'Pickup' : 'Delivery',
+        status: o.status || 'Pending',
+        status_list: o.status_list || [],
+        items
+      };
+    });
+
+    this.enrichedOrders.next(enriched);
+  }
+
+
 
   setAuthTokensAlleaves(alleaves: any): void {
     sessionStorage.removeItem('authTokensAlleaves');
@@ -425,5 +491,37 @@ export class AuthService {
     });
   }
   
+
+  editAiqContact(data: {
+    lookupEmail?: string;
+    lookupPhone?: string;
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    phone?: string;
+  }): Observable<any> {
+
+    const headers = this.getHeaders();
+
+    return new Observable((observer) => {
+      CapacitorHttp.post({
+        url: `${environment.apiUrl}/alpine/contact/edit`,
+        headers,
+        data,
+      })
+        .then((response) => {
+          // 🔄 optionally refresh local user after update
+          this.updateUserData();
+
+          observer.next(response.data);
+          observer.complete();
+        })
+        .catch((error) => {
+          console.error('Failed to edit AIQ contact:', error);
+          observer.error(error);
+        });
+    });
+  }
+
 
 }

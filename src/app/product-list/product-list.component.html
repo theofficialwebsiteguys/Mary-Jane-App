@@ -1,5 +1,10 @@
 <ion-col class="list" role="list">
 
+  <div class="loading-state" *ngIf="loading$ | async">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Loading products…</p>
+  </div>
+
   <!-- SIMILAR ITEMS SECTION -->
   <ng-container *ngIf="showSimilarItems && (similarItems$ | async)?.length">
     <h2 class="section-title">Similar Items</h2>
@@ -29,6 +34,14 @@
   <ng-container *ngIf="!showSimilarItems && (products$ | async) as products">
 
     <!-- <p>Showing {{products.length}}</p> -->
+
+     <!-- ❌ EMPTY RESULTS -->
+      <div
+        class="empty-state"
+        *ngIf="products.length <= 0"
+      >
+        <h3>No products found</h3>
+      </div>
      
     <ng-container *ngIf="products.length > 0">
       <div class="product-grid">

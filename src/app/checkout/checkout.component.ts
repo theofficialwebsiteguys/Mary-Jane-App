@@ -503,7 +503,9 @@ export class CheckoutComponent implements OnInit {
 
     try {
       const user_id = this.checkoutInfo.user_info.id;
-      const points_redeem = this.pointsToRedeem;
+      // const points_redeem = this.pointsToRedeem;
+      const rewardUsed = this.appliedDiscount; 
+      const points_redeem = rewardUsed?.pointsDeduction ?? 0;
       let points_add = 0;
       let pos_order_id = 0;
 
@@ -604,8 +606,7 @@ export class CheckoutComponent implements OnInit {
         }
       );
 
-      // await this.authService.getUserOrders();
-      await this.authService.validateSession();
+      this.authService.validateSession();
 
       const msg =
         this.selectedOrderType === 'delivery'

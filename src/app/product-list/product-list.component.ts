@@ -25,13 +25,18 @@ export class ProductListComponent implements OnInit {
   similarItems$: Observable<Product[]> = of([]);
   brandItems$: Observable<Product[]> = of([]);
 
+  loading$: Observable<boolean> = of(true);
 
   ngOnInit() {
     this.updateProducts();
 
-    this.productService.currentCategory$.subscribe((category) => {
-      console.log(category)
-      this.currentCategory = category; 
+    // 🔄 Loading = products not yet loaded
+    this.loading$ = this.productService.productsLoaded$.pipe(
+      map(loaded => !loaded)
+    );
+
+    this.productService.currentCategory$.subscribe(category => {
+      this.currentCategory = category;
       this.updateProducts();
       this.accessibilityService.announce(`Category updated to ${category}.`, 'polite');
     });
@@ -79,13 +84,13 @@ export class ProductListComponent implements OnInit {
 
   private updateProducts() {
     if (this.showSimilarItems) {
-      this.similarItems$ = this.productService.getSimilarItemsByCategoryAndPrice().pipe(startWith([]));
+      this.similarItems$ =
+        this.productService.getSimilarItemsByCategoryAndPrice();
       return;
     }
 
-    this.products$ = this.productService
-      .getFilteredProducts(this.searchQuery)
-      .pipe(startWith([]));
+    this.products$ =
+      this.productService.getFilteredProducts(this.searchQuery);
   }
 
 

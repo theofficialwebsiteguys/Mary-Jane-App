@@ -111,3 +111,20 @@
   </div>
 
 </ion-content>
+
+
+<!-- ORDER SUCCESS MODAL -->
+<ng-container *ngIf="showConfirmation">
+  <ion-modal [isOpen]="showConfirmation" cssClass="order-success-modal" [backdropDismiss]="false">
+    <ng-template>
+      <div class="order-success-card">
+        <img src="assets/wordmark-white.png" alt="Logo" class="success-logo" />
+
+        <h2>Order Placed</h2>
+        <p>Your order was submitted successfully.</p>
+        <p class="subtle">Redirecting to your orders…</p>
+      </div>
+    </ng-template>
+  </ion-modal>
+
+</ng-container>

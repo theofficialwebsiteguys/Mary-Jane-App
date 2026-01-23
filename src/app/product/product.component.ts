@@ -46,6 +46,7 @@ export class ProductComponent implements OnInit {
 
   quantity = 1;
   isLoggedIn: boolean = false;
+  showConfirmation: boolean = false;
 
   ngOnInit() {
     this.authService.isLoggedIn().subscribe(status => this.isLoggedIn = status);

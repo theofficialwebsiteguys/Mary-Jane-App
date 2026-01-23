@@ -34,7 +34,7 @@ export class SplashScreenComponent implements OnInit {
 
   logoState = 'initial';
   splashVisibility = 'visible';
-  logoSrc = 'assets/logo.png';
+  logoSrc = 'assets/logo-white.png';
 
   constructor(
     private accessibilityService: AccessibilityService
@@ -42,7 +42,7 @@ export class SplashScreenComponent implements OnInit {
 
   ngOnInit() {
     const isDarkMode = document.body.classList.contains('dark-mode');
-    this.logoSrc = isDarkMode ? 'assets/logo-dark-mode.png' : 'assets/logo.png';
+    this.logoSrc = isDarkMode ? 'assets/logo-dark-mode.png' : 'assets/logo-white.png';
 
     setTimeout(() => {
       this.logoState = 'final';

@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../auth.service';
 import { CartService } from '../cart.service';
 import { AccessibilityService } from '../accessibility.service';
+import { ProductsService } from '../products.service';
+import { ToastController } from '@ionic/angular';
+import { Router } from '@angular/router';
 
 
 const MOCK_ORDERS = [
@@ -92,10 +95,14 @@ export class RecentOrdersComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private cartService: CartService,
-    private accessibilityService: AccessibilityService
+    private accessibilityService: AccessibilityService,
+    private productsService: ProductsService,
+    private toastCtrl: ToastController,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
+    this.authService.validateSession();
     this.authService.orders.subscribe((orders: any[]) => {
       this.processOrders(orders || []);
       this.loading = false;
@@ -103,6 +110,7 @@ export class RecentOrdersComponent implements OnInit {
   }
 
   processOrders(orders: any[]): void {
+    console.log(orders)
     if (!orders.length) {
       this.pendingOrders = [];
       this.pastOrders = [];
@@ -120,8 +128,8 @@ export class RecentOrdersComponent implements OnInit {
       (a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime()
     );
 
-    this.pendingOrders = sorted.filter(o => !o.complete);
-    this.pastOrders = sorted.filter(o => o.complete);
+    this.pendingOrders = sorted.filter(o => (!o.complete && o.status !== 'Canceled'));
+    this.pastOrders = sorted.filter(o => (o.complete || o.status === 'Canceled'));
   }
 
   /* ---------------- STATUS ---------------- */
@@ -171,7 +179,7 @@ export class RecentOrdersComponent implements OnInit {
         strainType: 'N/A', 
         quantity: item.quantity || 1,
         price: String(item.price),
-        image: 'assets/stock/default.png',
+        image: item.image,
         thc: '',
         weight: '',
         sale: undefined,
@@ -184,6 +192,8 @@ export class RecentOrdersComponent implements OnInit {
       `Items from order ${order.orderId} added to cart.`,
       'assertive'
     );
+
+    await this.showAddedToast();
   }
 
 
@@ -209,6 +219,46 @@ export class RecentOrdersComponent implements OnInit {
 
   get pendingList(): any[] {
     return this.pendingOrders;
+  }
+
+  goToProduct(item: any) {
+    if (!item?.item_id) return;
+
+    const product = this.productsService
+      .getCurrentProducts()
+      ?.find(p => p.id === item.item_id);
+
+    if (!product) {
+      console.warn('Product not found for order item:', item);
+      return;
+    }
+
+    this.productsService.updateCurrentProduct(product);
+    this.accessibilityService.announce(
+      `Viewing details for ${product.title}.`,
+      'polite'
+    );
+  }
+
+  private async showAddedToast() {
+    const toast = await this.toastCtrl.create({
+      message: `Added order to cart`,
+      duration: 3000,
+      position: 'bottom',
+      color: 'blue',
+      buttons: [
+        {
+          text: 'View',
+          role: 'action',
+          handler: () => {
+            // optional: navigate to cart or open cart modal
+            this.router.navigate(['/cart']);
+          }
+        }
+      ],
+    });
+
+    await toast.present();
   }
 
 }

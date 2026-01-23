@@ -32,6 +32,34 @@ export class ProductsService {
   );
   currentProductFilters$ = this.currentProductFilters.asObservable();
 
+  productsLoaded$ = this.products$.pipe(
+    map(products => products.length > 0)
+  );
+
+  hasActiveFilters$ = this.currentProductFilters$.pipe(
+    map(filters => {
+      const defaults = DEFAULT_PRODUCT_FILTERS;
+
+      return !!(
+        filters.strains.length ||
+        filters.brands.length ||
+        filters.weights.length ||
+        filters.sizes.length ||
+        filters.effects.length ||
+        filters.flavors.length ||
+        filters.subtypes.length ||
+        filters.generals.length ||
+        filters.price.min !== defaults.price.min ||
+        filters.price.max !== defaults.price.max ||
+        filters.potency.lower !== defaults.potency.lower ||
+        filters.potency.upper !== defaults.potency.upper ||
+        filters.discountId
+      );
+    })
+  );
+
+
+
   private lastFetchedLocationId: string | null = null;
 
 
@@ -117,6 +145,11 @@ export class ProductsService {
       console.log(sorted)
       return sorted;
   }
+
+  clearAllFilters() {
+    this.currentProductFilters.next({ ...DEFAULT_PRODUCT_FILTERS });
+  }
+
 
  getFilteredProducts(searchQuery: string = ''): Observable<Product[]> {
   return combineLatest([
@@ -536,6 +569,10 @@ getMoreFromBrand(excludedIds: string[] = []): Observable<Product[]> {
     })
   );
 }
+
+  getCurrentProducts(): Product[] {
+    return this.products.value;
+  }
 
 
 

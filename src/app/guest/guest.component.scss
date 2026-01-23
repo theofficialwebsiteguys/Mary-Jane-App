@@ -4,7 +4,9 @@
 
 /* ion-content OWNS layout + background */
 ion-content {
-  --background: url('../../assets/background.png') no-repeat center / cover;
+  --background:
+    linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)),
+    url('../../assets/background.png') center / cover no-repeat;
 
   --padding-top: env(safe-area-inset-top);
   --padding-bottom: env(safe-area-inset-bottom);
@@ -13,6 +15,7 @@ ion-content {
 
   --overflow: hidden;
 }
+
 
 /* inner wrapper NO padding */
 .guest-page {
@@ -31,13 +34,13 @@ ion-content {
   h1 {
     font-size: 1.75rem;
     font-weight: 600;
-    color: #3e4638;
+    color: #ffffffee;
     margin-bottom: 6px;
   }
 
   p {
     font-size: 0.95rem;
-    color: #6b7362;
+    color: #ffffff;
     max-width: 320px;
     margin: 0 auto;
   }

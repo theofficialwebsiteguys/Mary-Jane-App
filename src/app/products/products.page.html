@@ -15,5 +15,20 @@
 
   <app-product-filters aria-label="Product filtering options"></app-product-filters>
 
+    <div
+    class="active-filters-bar"
+    *ngIf="(hasActiveFilters$ | async) || hasSearch"
+  >
+    <span class="filter-indicator">
+      Filters applied
+    </span>
+
+    <button class="clear-filters-btn" (click)="clearAll()">
+      Clear all
+    </button>
+  </div>
+
+
+
   <app-product-list [searchQuery]="searchQuery" aria-label="Product list section"></app-product-list>
 </ion-content>

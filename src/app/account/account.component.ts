@@ -17,6 +17,14 @@ export class AccountComponent implements OnInit {
   userInfo: any = [];
   settings: any = [];
 
+  editForm = {
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: ''
+  };
+
+
   @ViewChild('liveRegion') liveRegion!: ElementRef;
   
   constructor(private authService: AuthService, private settingsService: SettingsService, private accessibilityService: AccessibilityService, private alertController: AlertController) {}
@@ -24,9 +32,9 @@ export class AccountComponent implements OnInit {
   ngOnInit(): void {
     if (this.user) {
       this.userInfo = [
-        { icon: 'person-outline', label: 'Name', value: `${this.user.fname} ${this.user.lname}` },
-        { icon: 'mail-outline', label: 'Email', value: this.user.email },
-        { icon: 'call-outline', label: 'Phone', value: this.user.phone }
+        { key: 'name', icon: 'person-outline', label: 'Name', value: `${this.user.fname} ${this.user.lname}` },
+        { key: 'email', icon: 'mail-outline', label: 'Email', value: this.user.email },
+        { key: 'phone', icon: 'call-outline', label: 'Phone', value: this.user.phone }
       ];
       this.darkModeEnabled = this.settingsService.getDarkModeEnabled();
       // this.settings = [
@@ -66,4 +74,98 @@ export class AccountComponent implements OnInit {
 
     await alert.present();
   }
+
+  async openEditProfileModal(): Promise<void> {
+    // preload current values
+    this.editForm = {
+      firstName: this.user.fname,
+      lastName: this.user.lname,
+      email: this.user.email,
+      phone: this.user.phone,
+    };
+
+    const alert = await this.alertController.create({
+      header: 'Edit Account Details',
+      inputs: [
+        {
+          name: 'firstName',
+          type: 'text',
+          placeholder: 'First name',
+          value: this.editForm.firstName,
+        },
+        {
+          name: 'lastName',
+          type: 'text',
+          placeholder: 'Last name',
+          value: this.editForm.lastName,
+        },
+        {
+          name: 'email',
+          type: 'email',
+          placeholder: 'Email',
+          value: this.editForm.email,
+        },
+        {
+          name: 'phone',
+          type: 'tel',
+          placeholder: 'Phone',
+          value: this.editForm.phone,
+        },
+      ],
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+        },
+        {
+          text: 'Save',
+          handler: (data) => {
+            this.saveProfileChanges(data);
+          },
+        },
+      ],
+    });
+
+    await alert.present();
+  }
+
+  saveProfileChanges(data: any): void {
+    const payload: any = {
+      // ALWAYS send stable identifiers
+      lookupEmail: this.user.email,
+      lookupPhone: this.user.phone,
+    };
+
+    // Only send changed values
+    if (data.firstName !== this.user.fname) payload.firstName = data.firstName;
+    if (data.lastName !== this.user.lname) payload.lastName = data.lastName;
+    if (data.email !== this.user.email) payload.email = data.email;
+    if (data.phone !== this.user.phone) payload.phone = data.phone;
+
+    // Nothing changed (only lookup fields present)
+    if (Object.keys(payload).length === 2) {
+      this.accessibilityService.announce('No changes made');
+      return;
+    }
+
+    this.authService.editAiqContact(payload).subscribe({
+      next: () => {
+        this.user.fname = data.firstName;
+        this.user.lname = data.lastName;
+        this.user.email = data.email;
+        this.user.phone = data.phone;
+
+        this.ngOnInit();
+        this.accessibilityService.announce('Account details updated');
+      },
+      error: () => {
+        this.accessibilityService.announce('Failed to update account details');
+      },
+    });
+  }
+
+
+
+
+
 }

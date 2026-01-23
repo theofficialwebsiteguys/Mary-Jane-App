@@ -71,6 +71,35 @@
 }
 
 
+ion-toast.order-toast {
+  --min-height: 140px;
+  --max-width: 90%;
+  text-align: center;
+}
+
+ion-toast.order-toast .toast-wrapper {
+  padding-top: 56px; /* space for logo */
+  position: relative;
+}
+
+ion-toast.order-toast .toast-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 44px;
+  height: 44px;
+  background: url('/assets/logo.png') no-repeat center / contain;
+}
+
+ion-toast.order-toast .toast-message {
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+
+
 body{
   --ion-background-color: var(--ion-background-primary);
 

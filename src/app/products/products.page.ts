@@ -1,5 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { IonContent } from '@ionic/angular';
+import { Observable } from 'rxjs';
+import { ProductsService } from '../products.service';
 
 @Component({
   selector: 'app-products',
@@ -11,7 +13,11 @@ export class ProductsPage implements OnInit {
 
   searchQuery: string = '';
 
-  constructor() {}
+  hasActiveFilters$: Observable<boolean>;
+
+  constructor(private productsService: ProductsService) {
+    this.hasActiveFilters$ = this.productsService.hasActiveFilters$;
+  }
 
   ngOnInit() {}
 
@@ -30,5 +36,18 @@ export class ProductsPage implements OnInit {
   onSearch(event: Event) {
     const target = event.target as HTMLInputElement;
     this.searchQuery = target.value.trim().toLowerCase();
+  }
+
+  get hasSearch(): boolean {
+    return !!this.searchQuery?.length;
+  }
+
+  clearSearch() {
+    this.searchQuery = '';
+  }
+
+  clearAll() {
+    this.productsService.clearAllFilters();
+    this.clearSearch();
   }
 }

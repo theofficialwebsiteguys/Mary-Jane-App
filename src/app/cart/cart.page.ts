@@ -170,12 +170,20 @@ export class CartPage {
 
 
   private async redirectToOrder() {
-    await this.router.navigateByUrl('/orders');
+    // await this.router.navigateByUrl('/orders');
     
-    // Force a full page reload after navigation
+     // Show modal
+    this.showConfirmation = true;
+
+    // Auto dismiss + redirect
     setTimeout(async () => {
-      await this.presentToast('Your order has been placed successfully!');
-    }, 500); // Small delay ensures the navigation completes first
+      this.showConfirmation = false;
+
+      // Allow modal close animation to finish
+      setTimeout(async () => {
+        await this.router.navigateByUrl('/orders');
+      }, 300);
+    }, 2500);
   }
 
   removeReward(): void {

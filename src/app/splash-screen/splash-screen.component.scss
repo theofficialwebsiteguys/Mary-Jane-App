@@ -1,24 +1,37 @@
 .splash-container {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-
-  width: 100%;
-  height: 100%;
+  inset: 0;
 
   display: flex;
   justify-content: center;
-  align-items: center; /* ⬅️ PERFECT VERTICAL CENTER */
+  align-items: center;
 
   background-image: url('/assets/background.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 
-  padding-bottom: env(safe-area-inset-bottom); /* ⬅️ Accounts for tab bars & iOS home bar */
+  padding-bottom: env(safe-area-inset-bottom);
+
+  /* Needed for overlay layering */
+  overflow: hidden;
 }
+
+.splash-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.25); /* subtle dark overlay */
+  z-index: 0;
+}
+
+/* Ensure content sits above overlay */
+.splash-container > * {
+  position: relative;
+  z-index: 1;
+}
+
 
 /* ---------- CENTERED COLUMN ---------- */
 .splash-content {
@@ -36,7 +49,7 @@
 
 /* ---------- LOGO ---------- */
 .logo {
-  width: 65%;
+  width: 70%;
   max-width: 420px;
   height: auto;
 }
@@ -44,8 +57,7 @@
 /* ---------- AGE TITLE ---------- */
 .age-title {
   font-size: 1.4rem;
-  font-weight: 600;
-  color: var(--ion-color-primary);
+  color: white;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   margin: 0;
@@ -59,7 +71,7 @@
 }
 
 .yes-btn {
-  --background: #5b6053;
+  --background: var(--ion-color-blue);
   --background-activated: #3d4137;
   --background-focused: #3d4137;
   width: 130px;
@@ -67,7 +79,7 @@
   text-transform: uppercase;
   font-weight: 600;
   letter-spacing: 0.05em;
-  color: white;
+  color: rgb(0, 0, 0);
 }
 
 .no-btn {

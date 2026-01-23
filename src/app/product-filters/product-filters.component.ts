@@ -127,9 +127,15 @@ export class ProductFiltersComponent implements OnInit {
     this.filters = JSON.parse(JSON.stringify(DEFAULT_PRODUCT_FILTERS));
     this.brandSearchTerm = '';
     this.showAllBrands = false;
-    this.handleFilterUpdate();
-    this.accessibilityService.announce('All filters cleared.', 'polite');
+
+    this.productService.clearAllFilters();
+
+    this.accessibilityService.announce(
+      'All filters cleared.',
+      'polite'
+    );
   }
+
 
   isChecked(array: any[], value: string): boolean {
     return array.includes(value);
