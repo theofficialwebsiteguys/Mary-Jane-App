@@ -15,19 +15,29 @@ export class AssistantChatComponent {
   formData = { name: '', email: '', message: '' };
   isKeyboardOpen = false;
 
+  keyboardHeight = 0;
+
   constructor(private http: HttpClient, private platform: Platform, private settingsService: SettingsService) {}
 
   async ngOnInit() {
-    // ✅ Use the correct enum value for Keyboard Resize Mode
     await Keyboard.setResizeMode({ mode: KeyboardResize.None });
 
-    Keyboard.addListener('keyboardDidShow', () => {
-      this.isKeyboardOpen = true;
+    Keyboard.addListener('keyboardWillShow', (e) => {
+      this.keyboardHeight = e.keyboardHeight;
     });
 
-    Keyboard.addListener('keyboardDidHide', () => {
-      this.isKeyboardOpen = false;
+    Keyboard.addListener('keyboardWillHide', () => {
+      this.keyboardHeight = 0;
     });
+  }
+
+  get keyboardOffset(): number {
+    if (!this.keyboardHeight) return 0;
+
+    return Math.min(
+      this.keyboardHeight * 0.6,
+      window.innerHeight * 0.35
+    );
   }
 
   toggleChat() {

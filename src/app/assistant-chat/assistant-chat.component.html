@@ -8,8 +8,12 @@
   </ion-fab-button>
 
   <!-- FLOATING CHAT PANEL -->
-  <div 
-    *ngIf="chatOpen"
+<div
+  *ngIf="chatOpen"
+  class="chat-shift"
+  [style.transform]="keyboardOffset ? 'translateY(-' + keyboardOffset + 'px)' : 'translateY(0)'"
+>
+  <div
     class="chat-panel animated fadeInUp"
     id="chat-panel"
     role="dialog"
@@ -36,4 +40,5 @@
     </form>
 
   </div>
+</div>
 </ion-fab>

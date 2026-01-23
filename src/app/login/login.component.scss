@@ -21,23 +21,16 @@ ion-content {
    PAGE WRAPPER (FULL CENTERING)
 =============================== */
 .log-in-page {
-  min-height: 100vh;
+  min-height: 100%;
   width: 100%;
-  overflow-y: auto;   /* ⭐ FIX: enables scrolling */
-  -webkit-overflow-scrolling: touch;
+
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start; /* 🔥 NOT center */
 
-  padding: 24px;
-  position: relative;
-
-  /* Smooth background fade */
-  animation: fadeBackground 0.6s ease;
-
-  /* Ensures proper safe-area handling */
-  padding-top: calc(env(safe-area-inset-top, 20px) + 10px);
-  padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 115px);
+  padding: 32px 24px;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 
@@ -56,6 +49,8 @@ ion-content {
   box-shadow: 0 10px 30px rgba(0,0,0,0.15);
 
   animation: fadeUp 0.45s ease;
+  margin-top: var(--login-offset, 12vh);
+  transition: margin-top 0.28s ease;
 
   display: flex;
   flex-direction: column;

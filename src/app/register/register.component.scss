@@ -28,21 +28,18 @@ ion-content {
    PAGE WRAPPER (FULL CENTERING)
 =============================== */
 .log-in-page {
-  min-height: 100vh;
+  min-height: 100%;
   width: 100%;
+
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start; /* IMPORTANT */
 
-  padding: 24px;
-  position: relative;
+  padding: 32px 24px;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
 
-  /* Smooth background fade */
   animation: fadeBackground 0.6s ease;
-
-  /* Ensures proper safe-area handling */
-  padding-top: calc(env(safe-area-inset-top, 20px) + 10px);
-  padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 115px);
 }
 
 /* ============================
@@ -60,11 +57,24 @@ ion-content {
   box-shadow: 0 10px 30px rgba(0,0,0,0.15);
 
   animation: fadeUp 0.45s ease;
-  overflow-y: auto; /* This enables vertical scrolling for this container only */
-  max-height: calc(100vh - 120px); /* This sets a maximum height */
+    transition: transform 0.3s ease;
+  will-change: transform;
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  overflow-y: auto;
+  max-height: calc(100vh - env(safe-area-inset-top) - 24px);
+  -webkit-overflow-scrolling: touch;
+}
+
+.login-shift {
+  transition: transform 0.3s ease;
+  will-change: transform;
+}
+
+
+.login-container.keyboard-open {
+  max-height: calc(100vh - env(safe-area-inset-top) - 24px);
 }
 
 /* Dark Mode Support */

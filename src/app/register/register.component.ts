@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { SettingsService } from '../settings.service';
 import { AccessibilityService } from '../accessibility.service';
+import { Keyboard } from '@capacitor/keyboard';
 
 @Component({
   selector: 'app-register',
@@ -53,6 +54,8 @@ export class RegisterComponent {
   showConfirmPassword = false;
   confirmPasswordFieldType: 'password' | 'text' = 'password';
 
+  keyboardHeight = 0;
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -100,9 +103,30 @@ export class RegisterComponent {
     );
   }
 
+  get keyboardShift(): number {
+    // move up, but never more than 40% of screen height
+    return Math.min(this.keyboardHeight * 0.6, window.innerHeight * 0.4);
+  }
+
+  onFocus(event: Event) {
+    const el = event.target as HTMLElement;
+    setTimeout(() => {
+      el.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+    }, 100);
+  }
+
   ngOnInit() {
-    window.addEventListener('resize', this.handleKeyboard.bind(this));
-  
+      Keyboard.addListener('keyboardWillShow', (info) => {
+        this.keyboardHeight = info.keyboardHeight;
+      });
+
+      Keyboard.addListener('keyboardWillHide', () => {
+        this.keyboardHeight = 0;
+      });
+
     this.registerForm.valueChanges.subscribe(() => {
       this.isFormTouched = true;
     });
@@ -112,17 +136,11 @@ export class RegisterComponent {
   }
 
   ngOnDestroy() {
+    Keyboard.removeAllListeners();
     // Reset the form when navigating away
     this.resetForm();
-    window.removeEventListener('resize', this.handleKeyboard.bind(this));
   }
 
-  handleKeyboard() {
-    const activeElement = document.activeElement as HTMLElement;
-    if (activeElement && activeElement.tagName === 'INPUT') {
-      activeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-  }
 
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;

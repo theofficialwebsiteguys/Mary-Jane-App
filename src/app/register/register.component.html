@@ -1,5 +1,10 @@
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" scroll-y="true">
 <div class="log-in-page" role="main" aria-labelledby="login-heading">
+  
+  <div
+  class="login-shift"
+  [style.transform]="keyboardHeight ? 'translateY(-' + keyboardShift + 'px)' : 'translateY(0)'"
+>
   <div class="login-container">
     <div class="login-header">
       <div class="login-header-logo">
@@ -284,6 +289,7 @@
       Already have an account?
       <a routerLink="/auth" [queryParams]="{ mode: 'login' }" aria-label="Log in to your account">Login</a>
     </p>
+  </div>
   </div>
 </div>
 </ion-content>

@@ -1,3 +1,4 @@
+import { KeyboardResize } from '@capacitor/keyboard';
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
@@ -25,6 +26,10 @@ const config: CapacitorConfig = {
     DeepLinks: {
       schemes: ["maryjanecannabisco"],
       hosts: ["dispensary-api-ac9613fa4c11.herokuapp.com"]
+    },
+    Keyboard: {
+      resize: KeyboardResize.Native, // ✅ THIS IS THE FIX
+      resizeOnFullScreen: true
     }
   },
 };

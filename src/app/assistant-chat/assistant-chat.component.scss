@@ -37,6 +37,31 @@ ion-fab {
   z-index: 9999;
 }
 
+.chat-shift {
+  position: fixed;
+  right: 20px;
+  bottom: 85px;
+  width: 92vw;
+  max-width: 380px;
+  transition: transform 0.3s ease;
+  will-change: transform;
+  z-index: 9999;
+}
+
+.chat-panel {
+  max-height: min(70vh, 520px);
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
 /* SLIDE UP ANIMATION */
 @keyframes fadeInUp {
   from {

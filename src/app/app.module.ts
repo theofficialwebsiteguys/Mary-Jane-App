@@ -16,7 +16,11 @@ import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [AppComponent, SplashScreenComponent, RestrictedComponent, AssistantChatComponent],
-  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, BrowserAnimationsModule, FormsModule],
+  imports: [BrowserModule, AppRoutingModule, BrowserAnimationsModule, FormsModule, 
+    IonicModule.forRoot({
+      scrollAssist: true,
+      scrollPadding: true
+    }),],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }, provideHttpClient(), InAppBrowser],
   bootstrap: [AppComponent],
 })

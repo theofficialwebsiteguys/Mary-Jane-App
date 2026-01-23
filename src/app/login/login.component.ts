@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { SettingsService } from '../settings.service';
 import { AccessibilityService } from '../accessibility.service';
+import { Keyboard } from '@capacitor/keyboard';
 
 @Component({
   selector: 'app-login',
@@ -56,12 +57,21 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit() {
+    Keyboard.addListener('keyboardWillShow', () => {
+      document.documentElement.style.setProperty('--login-offset', '0vh');
+    });
+
+    Keyboard.addListener('keyboardWillHide', () => {
+      document.documentElement.style.setProperty('--login-offset', '12vh');
+    });
+    
     this.settingsService.isDarkModeEnabled$.subscribe(
       mode => (this.darkModeEnabled = mode)
     );
   }
 
   ngOnDestroy() {
+    Keyboard.removeAllListeners();
     this.resetForm();
   }
 
