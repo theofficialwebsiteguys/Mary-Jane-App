@@ -558,7 +558,7 @@ export class CheckoutComponent implements OnInit {
           ).toPromise();
 
           if (!tx?.data?.success) {
-            await this.presentToast("Payment failed.");
+            await this.presentToast("Payment failed -" + tx?.data?.error);
             this.isLoading = false;
             return;
           }
@@ -567,7 +567,7 @@ export class CheckoutComponent implements OnInit {
 
         } catch (err) {
           console.error(err);
-          await this.presentToast("Payment error.");
+          await this.presentToast("Payment error -" + err);
           this.isLoading = false;
           return;
         }
