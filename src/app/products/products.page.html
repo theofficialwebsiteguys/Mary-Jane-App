@@ -2,9 +2,11 @@
   <app-header aria-label="Website header with navigation"></app-header>
 
   <ion-searchbar
+    #searchbar
     [(ngModel)]="searchQuery"
     (ionInput)="onSearch($event)"
     placeholder="Search products..."
+    (keydown.enter)="dismissKeyboard()"
     debounce="300"
     showClearButton="always"
     animated

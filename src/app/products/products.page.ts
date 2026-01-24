@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { IonContent } from '@ionic/angular';
+import { IonContent, IonSearchbar } from '@ionic/angular';
 import { Observable } from 'rxjs';
 import { ProductsService } from '../products.service';
 
@@ -14,6 +14,7 @@ export class ProductsPage implements OnInit {
   searchQuery: string = '';
 
   hasActiveFilters$: Observable<boolean>;
+  @ViewChild(IonSearchbar) searchbar!: IonSearchbar;
 
   constructor(private productsService: ProductsService) {
     this.hasActiveFilters$ = this.productsService.hasActiveFilters$;
@@ -49,5 +50,11 @@ export class ProductsPage implements OnInit {
   clearAll() {
     this.productsService.clearAllFilters();
     this.clearSearch();
+  }
+
+  dismissKeyboard() {
+    this.searchbar.getInputElement().then((input: any) => {
+      input.blur();
+    });
   }
 }
