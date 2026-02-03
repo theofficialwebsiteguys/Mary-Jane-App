@@ -67,6 +67,7 @@ export class CheckoutComponent implements OnInit {
   finalSubtotal = 0;
   finalTax = 0;
   finalTotal = 0;
+  finalTotalWithoutTip = 0;
   originalTreezSubtotal = 0;
   originalTreezTax = 0;
 
@@ -105,6 +106,19 @@ export class CheckoutComponent implements OnInit {
   pendingAeroPayUser: any = null;
   deliveryMin: any;
 
+  tipPercentOptions = [
+    { label: '10%', value: 0.10 },
+    { label: '15%', value: 0.15 },
+    { label: '20%', value: 0.20 }
+  ];
+
+  // --- TIP ---
+  selectedTipPercent: number | null = null;
+
+  // custom dollar tip
+  isCustomTip = false;
+  customTipAmountInput = ''; // string for typing
+  customTipAmount = 0;       // number used for math
 
   constructor(
     private cartService: CartService,
@@ -119,6 +133,21 @@ export class CheckoutComponent implements OnInit {
   ) {}
 
   async ngOnInit() {
+    // 1) init from Treez first
+    const t = this.checkoutInfo?.previewTotals;
+    if (t) {
+      this.originalTreezSubtotal = Number(t.subTotal) || 0;
+      this.originalTreezTax = Number(t.taxTotal) || 0;
+
+      this.finalSubtotal = this.originalTreezSubtotal;
+      this.finalTax = this.originalTreezTax;
+      this.finalTotal = Number(t.total) || (this.finalSubtotal + this.finalTax);
+      this.discountTotal = Number(t.discountTotal) || 0;
+
+      this.updateTotals(); // ✅ now it has real base values
+    }
+
+    // 2) now subscribe
     this.cartService.appliedDiscount$.subscribe(discount => {
       this.appliedDiscount = discount;
 
@@ -129,38 +158,60 @@ export class CheckoutComponent implements OnInit {
         this.loadAvailableDiscounts();
       }
 
-
-      this.updateTotals();
+      this.updateTotals(); // ✅ safe now
     });
 
     await this.loadAvailableDiscounts();
-    // ------------------------------
-    // USE TREEZ PREVIEW TOTALS ONLY
-    // ------------------------------
-    const t = this.checkoutInfo.previewTotals;
-    console.log(this.checkoutInfo)
-    this.originalTreezSubtotal = t.subTotal;
-    this.originalTreezTax = t.taxTotal;
-
-    // Live values
-    this.finalSubtotal = t.subTotal;
-    this.finalTax = t.taxTotal;
-    this.finalTotal = t.total;
-    this.discountTotal = t.discountTotal;
-
-    // Compute available delivery schedule + dates
     this.loadDeliverySchedule();
 
-    // Set next day as minimum date
     const today = new Date();
-    today.setDate(today.getDate());
     this.minDate = today.toISOString().split('T')[0];
-
-    //  this.cartService.appliedDiscount$.subscribe(d => {
-    //   this.appliedDiscount = d;
-    //   this.updateTotals();
-    // });
   }
+
+
+  // async ngOnInit() {
+  //   this.cartService.appliedDiscount$.subscribe(discount => {
+  //     this.appliedDiscount = discount;
+
+  //     if (discount) {
+  //       this.selectedRewardId = discount.id;
+  //     } else {
+  //       this.selectedRewardId = null;
+  //       this.loadAvailableDiscounts();
+  //     }
+
+
+  //     this.updateTotals();
+  //   });
+
+  //   await this.loadAvailableDiscounts();
+  //   // ------------------------------
+  //   // USE TREEZ PREVIEW TOTALS ONLY
+  //   // ------------------------------
+  //   const t = this.checkoutInfo.previewTotals;
+  //   console.log(this.checkoutInfo)
+  //   this.originalTreezSubtotal = t.subTotal;
+  //   this.originalTreezTax = t.taxTotal;
+
+  //   // Live values
+  //   this.finalSubtotal = t.subTotal;
+  //   this.finalTax = t.taxTotal;
+  //   this.finalTotal = t.total;
+  //   this.discountTotal = t.discountTotal;
+
+  //   // Compute available delivery schedule + dates
+  //   this.loadDeliverySchedule();
+
+  //   // Set next day as minimum date
+  //   const today = new Date();
+  //   today.setDate(today.getDate());
+  //   this.minDate = today.toISOString().split('T')[0];
+
+  //   //  this.cartService.appliedDiscount$.subscribe(d => {
+  //   //   this.appliedDiscount = d;
+  //   //   this.updateTotals();
+  //   // });
+  // }
 
  private initAddressAutocomplete() {
     const googleMaps = (window as any).google?.maps?.places;
@@ -432,37 +483,30 @@ export class CheckoutComponent implements OnInit {
     );
   }
 
+  private get treezEffectiveTaxRate(): number {
+    if (!this.originalTreezSubtotal || this.originalTreezSubtotal <= 0) {
+      return 0;
+    }
+    return this.originalTreezTax / this.originalTreezSubtotal;
+  }
+
   updateTotals() {
-    // Start from Treez preview subtotal
     let subtotal = this.originalTreezSubtotal;
 
-    // Apply points
     const pointsDiscount = this.pointsToRedeem * this.pointValue;
-    subtotal -= pointsDiscount;
-    if (subtotal < 0) subtotal = 0;
+    subtotal = Math.max(0, subtotal - pointsDiscount);
 
-    // Premium discount
-    this.premiumDiscountApplied = false;
-    if (this.checkoutInfo.user_info.premium && subtotal > 100) {
-      this.premiumDiscountAmount = subtotal * this.premiumDiscountRate;
-      subtotal -= this.premiumDiscountAmount;
-      this.premiumDiscountApplied = true;
-    }
+    this.finalSubtotal = Math.max(0, subtotal);
 
-    // Staff discount
-    this.employeeDiscountApplied = false;
-    if (['employee', 'admin'].includes(this.checkoutInfo.user_info.role)) {
-      this.employeeDiscountAmount = subtotal * this.employeeDiscountRate;
-      subtotal -= this.employeeDiscountAmount;
-      this.employeeDiscountApplied = true;
-    }
+    const taxRate = this.treezEffectiveTaxRate;
+    this.finalTax = +(this.finalSubtotal * taxRate).toFixed(2);
 
-    // Reapply Treez tax proportional snapshot
-    const taxRatio = this.originalTreezTax / this.originalTreezSubtotal;
-    this.finalSubtotal = subtotal;
-    this.finalTax = subtotal * taxRatio;
-    this.finalTotal = this.finalSubtotal + this.finalTax;
+    this.finalTotalWithoutTip = +(this.finalSubtotal + this.finalTax).toFixed(2);
+
+    const tip = this.tipAmount || 0;
+    this.finalTotal = +(this.finalTotalWithoutTip + tip).toFixed(2);
   }
+
 
   applyCoupon() {
     if (!this.couponCode.trim()) {
@@ -508,6 +552,7 @@ export class CheckoutComponent implements OnInit {
       const points_redeem = rewardUsed?.pointsDeduction ?? 0;
       let points_add = 0;
       let pos_order_id = 0;
+      let aeropay_transaction_id: string | null = null;
 
       // ----------------------------------------------------
       // 1️⃣ Build delivery address for backend + Treez
@@ -530,6 +575,42 @@ export class CheckoutComponent implements OnInit {
       // ----------------------------------------------------
      const appliedDiscount = this.cartService.getAppliedDiscount();
 
+      // --- AEROPAY PAYMENT ---
+      if (this.selectedPaymentMethod === "aeropay" && this.selectedBankId) {
+        try {
+          await this.aeropayService.fetchUsedForMerchantToken(this.aeropayUserId).toPromise();
+          const tip = this.tipAmount;
+
+          console.log( this.finalTotalWithoutTip.toFixed(2))
+          const tx = await this.aeropayService.createTransaction(
+            this.finalTotalWithoutTip.toFixed(2),
+            this.selectedBankId,
+            tip
+          ).toPromise();
+
+          if (!tx?.data?.success) {
+            const msg =
+              tx?.data?.error ||
+              tx?.data?.message ||
+              'Payment failed. Please try again.';
+            await this.presentToast("Payment failed - " + msg);
+            this.isLoading = false;
+            return;
+          }
+
+          aeropay_transaction_id = tx.data.transaction.id;
+
+          this.presentToast("Payment successful!", "success");
+
+        } catch (err) {
+          console.error(err);
+           await this.presentToast("Payment error - " + this.getErrMsg(err));
+          this.isLoading = false;
+          return;
+        }
+      }
+
+
       const treezPayload = {
         type: this.selectedOrderType === 'pickup' ? 'PICKUP' : 'DELIVERY',
         order_source: 'ECOMMERCE',
@@ -545,33 +626,17 @@ export class CheckoutComponent implements OnInit {
 
         discounts: appliedDiscount
           ? [{ discountId: appliedDiscount.posDiscountID }]
+          : [],
+
+        payments: aeropay_transaction_id
+          ? [
+              {
+                type: 'AEROPAY',
+                reference_id: aeropay_transaction_id
+              }
+            ]
           : []
       };
-
-      // --- AEROPAY PAYMENT ---
-      if (this.selectedPaymentMethod === "aeropay" && this.selectedBankId) {
-        try {
-          await this.aeropayService.fetchUsedForMerchantToken(this.aeropayUserId).toPromise();
-          const tx = await this.aeropayService.createTransaction(
-            this.finalTotal.toFixed(2),
-            this.selectedBankId
-          ).toPromise();
-
-          if (!tx?.data?.success) {
-            await this.presentToast("Payment failed -" + tx?.data?.error);
-            this.isLoading = false;
-            return;
-          }
-
-          this.presentToast("Payment successful!", "success");
-
-        } catch (err) {
-          console.error(err);
-          await this.presentToast("Payment error -" + err);
-          this.isLoading = false;
-          return;
-        }
-      }
 
 
       // ----------------------------------------------------
@@ -606,8 +671,6 @@ export class CheckoutComponent implements OnInit {
         }
       );
 
-      this.authService.validateSession();
-
       const msg =
         this.selectedOrderType === 'delivery'
           ? 'Your delivery order has been placed!'
@@ -624,7 +687,7 @@ export class CheckoutComponent implements OnInit {
 
     } catch (err) {
       console.error('Order Error:', err);
-      this.presentToast('Error placing order.');
+      this.presentToast('Error placing order. ' + err);
     } finally {
       this.isLoading = false;
       loading.dismiss();
@@ -943,6 +1006,87 @@ export class CheckoutComponent implements OnInit {
     return `${hour12}:${m.toString().padStart(2, '0')} ${ampm}`;
   }
 
+
+  get tipAmount(): number {
+    if (this.isCustomTip) {
+      return this.customTipAmount;
+    }
+
+    const percent = this.selectedTipPercent ?? 0;
+    return +(this.finalSubtotal + this.finalTax) * percent;
+  }
+
+
+  selectTipPercent(percent: number) {
+    if(this.selectedTipPercent === percent) {
+      this.selectedTipPercent = null;
+      this.updateTotals();
+      return;
+    }
+    this.isCustomTip = false;
+    this.selectedTipPercent = percent;
+    this.customTipAmountInput = '';
+    this.customTipAmount = 0;
+    this.updateTotals();
+  }
+
+
+  enableCustomTipPercent() {
+    this.isCustomTip = true;
+    this.selectedTipPercent = null;
+    this.customTipAmountInput = '';
+    this.customTipAmount = 0;
+    this.updateTotals();
+  }
+
+
+  onCustomTipAmountChange(value: string) {
+    // allow empty while typing
+    if (value === '') {
+      this.customTipAmount = 0;
+      this.updateTotals();
+      return;
+    }
+
+    const numeric = Number(value);
+
+    if (isNaN(numeric) || numeric < 0) return;
+
+    // optional hard cap (example $100)
+    this.customTipAmount = Math.min(numeric, 100);
+    this.updateTotals();
+  }
+
+
+  private getErrMsg(err: any): string {
+    if (!err) return 'Unknown error';
+
+    // Standard Error
+    if (err instanceof Error) return err.message;
+
+    // Angular HttpErrorResponse shape
+    // err.error can be string or object
+    if (err?.error) {
+      if (typeof err.error === 'string') return err.error;
+      if (typeof err.error === 'object') {
+        return (
+          err.error.message ||
+          err.error.error ||
+          err.error.displayMessage ||
+          JSON.stringify(err.error)
+        );
+      }
+    }
+
+    // Common API shapes
+    return (
+      err?.message ||
+      err?.data?.error ||
+      err?.data?.message ||
+      err?.statusText ||
+      JSON.stringify(err)
+    );
+  }
 
 
 }

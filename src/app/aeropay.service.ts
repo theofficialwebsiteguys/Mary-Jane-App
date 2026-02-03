@@ -110,15 +110,30 @@ export class AeropayService {
     );
   }
 
-  createTransaction(amount: string, bankAccountId: string | null): Observable<any> {
+  createTransaction(amount: string, bankAccountId: string | null, tipAmount?: number): Observable<any> {
     const transactionUUID = uuidv4();
-    const payload = {
+    const payload: any = {
       amount: amount,
       merchantId: environment.aeropay_merchant_id,
       uuid: transactionUUID,
       bankAccountId: bankAccountId
     };
-    return from(this.httpPost(`${environment.aeropay_url}/transaction`, payload, this.getUsedForMerchantToken() || '')).pipe(
+
+    if (tipAmount && tipAmount > 0) {
+      payload.attributes = {
+        tip: {
+          selection: {
+            tipAmount: tipAmount.toFixed(2),
+            label: `$${tipAmount.toFixed(2)}`,
+            totalAmount: (
+              Number(amount) + Number(tipAmount)
+            ).toFixed(2)
+          }
+        }
+      };
+    }
+    
+    return from(this.httpPost(`${environment.aeropay_url}/preauthTransaction`, payload, this.getUsedForMerchantToken() || '')).pipe(
       tap(response => console.log(response))
     );
   }

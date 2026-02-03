@@ -205,17 +205,13 @@ export class ProductsService {
 
         if (!matchesSearch) return false;
 
-        const isSearching = !!q;
+        // 🧭 CATEGORY FILTER — ALWAYS APPLIES
+        if (currentCategory === 'Deals') {
+          if (!isDeal) return false;
+        }
 
-        // DEALS = virtual category
-        if (!isSearching) {
-          // DEALS = virtual category
-          if (currentCategory === 'Deals' && !isDeal) return false;
-
-          // REAL CATEGORIES
-          if (currentCategory !== 'All' && currentCategory !== 'Deals') {
-            if (product.category !== currentCategory) return false;
-          }
+        if (currentCategory !== 'All' && currentCategory !== 'Deals') {
+          if (product.category !== currentCategory) return false;
         }
 
 

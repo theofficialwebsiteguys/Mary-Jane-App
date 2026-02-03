@@ -114,11 +114,18 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+
 
   h2 {
     font-size: 1.4rem;
     font-weight: bold;
     margin: 0;
   }
+}
+
+.info-note {
+  margin-top: 4px;
+  font-size: 0.75rem;
+  color: #8c8c8c;
+    margin-bottom: 15px;
 }

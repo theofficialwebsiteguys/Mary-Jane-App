@@ -320,7 +320,7 @@
           [class.selected]="bank.bankAccountId === selectedBankId"
         >
           <ion-label>
-            <strong>{{ bank.bankName }}</strong>
+            <strong>{{ bank.name }}</strong>
             <div class="bank-meta">{{ bank.accountType }}</div>
           </ion-label>
 
@@ -343,6 +343,50 @@
     </div>
 
   </div>
+
+ <!-- TIP SECTION -->
+<div
+  class="section tip-section"
+  *ngIf="selectedPaymentMethod === 'aeropay'"
+>
+  <h2>Tip</h2>
+  
+  <div class="tip-options">
+    <button
+      *ngFor="let tip of tipPercentOptions"
+      class="tip-btn"
+      [class.active]="selectedTipPercent === tip.value && !isCustomTip"
+      (click)="selectTipPercent(tip.value)"
+    >
+      {{ tip.label }}
+    </button>
+
+    <button
+      class="tip-btn"
+      [class.active]="isCustomTip"
+      (click)="enableCustomTipPercent()"
+    >
+      Custom
+    </button>
+  </div>
+
+  <!-- Custom dollar input -->
+  <div
+    class="currency-input"
+    [hidden]="!isCustomTip"
+  >
+    <input
+      type="text"
+      inputmode="decimal"
+      class="form-input"
+      placeholder="Enter tip amount"
+      [(ngModel)]="customTipAmountInput"
+      (ngModelChange)="onCustomTipAmountChange($event)"
+    />
+    <span class="suffix">$</span>
+  </div>
+
+</div>
 
 
 
@@ -402,6 +446,11 @@
         <p>
           Tax:
           <span>{{ finalTax | currency }}</span>
+        </p>
+
+        <p *ngIf="tipAmount > 0" class="summary">
+          Tip:
+          <span>{{ tipAmount | currency }}</span>
         </p>
 
         <p class="total-line">

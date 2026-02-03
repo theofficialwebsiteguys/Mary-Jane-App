@@ -809,3 +809,60 @@
   color: var(--ion-color-medium);
   margin-top: 6px;
 }
+
+.tip-section {
+  margin-top: 24px;
+
+  .tip-subtext {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 12px;
+  }
+
+  .tip-options {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .tip-btn {
+    flex: 1;
+    height: 44px;
+    border-radius: 10px;
+    border: 1px solid #e5e5e5;
+    background: #f6f6f6;
+
+    font-weight: 600;
+    font-size: 1rem;
+    color: #444;
+
+    transition: 0.2s ease;
+    cursor: pointer;
+
+    &.active {
+      background: #5e6558;
+      color: white;
+      border-color: #5e6558;
+    }
+  }
+}
+
+.currency-input {
+  position: relative;
+  width: 100%;
+
+  .suffix {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 15px;
+    font-weight: 600;
+    color: #888;
+    pointer-events: none;
+  }
+
+  input {
+    padding-right: 32px; // space for $
+  }
+}

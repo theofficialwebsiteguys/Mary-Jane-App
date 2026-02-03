@@ -56,6 +56,18 @@ export class AppComponent {
     private modalController: ModalController,
     private productsService: ProductsService
   ) {
+    let lastValidation = 0;
+
+    App.addListener('appStateChange', ({ isActive }) => {
+      if (!isActive) return;
+
+      const now = Date.now();
+      if (now - lastValidation < 15_000) return; // throttle (important)
+
+      lastValidation = now;
+      console.log('[App] Resume detected → validating session');
+      this.authService.validateSession();
+    });
     // Listen for app URL open events
     App.addListener('appUrlOpen', (data: any) => {
       console.log('App opened with URL:', JSON.stringify(data));
@@ -94,12 +106,10 @@ export class AppComponent {
 
   
     // Only check login after products are fetched
-    // this.authService.isLoggedIn().subscribe((status) => {
-    //   this.isLoggedIn = status;
-    //   if (this.isLoggedIn) this.onCloseSplash();
-    // });
-
-
+    this.authService.isLoggedIn().subscribe((status) => {
+      this.isLoggedIn = status;
+      if (this.isLoggedIn) this.onCloseSplash();
+    });
             
     this.productsService.fetchProducts().subscribe({
       next: () => {
@@ -134,9 +144,9 @@ export class AppComponent {
 
   async checkGeoLocation() {
     try {
-      const isInNJ = await this.geoLocationService.isUserInNewJersey();
+      const isInNY = await this.geoLocationService.isUserInNewYork();
   
-      if (!isInNJ) {
+      if (!isInNY) {
         this.showRestrictedAccessModal(); // Show the modal if the user is outside NY
       } else {
         this.initializeApp(); // Proceed with app initialization if in NY
