@@ -60,6 +60,9 @@ export class ProductsService {
 
 
 
+  private vapeToggle = new BehaviorSubject<boolean>(true);
+  vapeToggle$ = this.vapeToggle.asObservable();
+
   private lastFetchedLocationId: string | null = null;
 
 
@@ -113,6 +116,13 @@ export class ProductsService {
           }));
 
           const sortedProducts = this.sortProducts(normalized);
+
+          // Read vapeToggle from response and reset category if needed
+          const vapeEnabled = response.data.vapeToggle !== false;
+          this.vapeToggle.next(vapeEnabled);
+          if (!vapeEnabled && this.currentCategory.value === 'Vapes') {
+            this.currentCategory.next('All');
+          }
 
           this.products.next(sortedProducts);
           this.saveProductsToSessionStorage(sortedProducts);
@@ -504,6 +514,14 @@ getProductFilterOptions(): Observable<ProductFilterOptions> {
     ];
   }
 
+
+  getCategories$(): Observable<CategoryWithImage[]> {
+    return this.vapeToggle$.pipe(
+      map(vapeEnabled =>
+        this.getCategories().filter(c => vapeEnabled || c.category !== 'Vapes')
+      )
+    );
+  }
 
   getSimilarItems(): Observable<Product[]> {
     return combineLatest([this.currentProduct$, this.products$]).pipe(
