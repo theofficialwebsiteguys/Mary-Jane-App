@@ -1,63 +1,61 @@
 .guest-container {
-  padding: 24px 16px 32px;
+  padding: 16px 16px 32px;
 }
 
-/* Pill-style banner card */
 .guest-card {
-  max-width: 1040px;
-  margin: 0 auto;
-  border-radius: 32px;
-  padding: 24px 20px;
+  border-radius: 20px;
+  overflow: hidden;
+  padding: 32px 20px 28px;
   text-align: center;
-
-  /* subtle textured background like your screenshot */
-  background:
-    url('../../assets/background2.png') center/cover no-repeat,
-    #dde6dd;
-
+  background: url('../../assets/rewards-bg2.png') center / cover no-repeat;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 0;
 }
 
-.guest-text h2 {
-  font-size: 1.8rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: #2f3a32;
-  margin: 0 0 6px;
-}
-
-.guest-text p {
+.join-the {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  color: #E5DBC7;
   margin: 0;
-  font-size: 0.95rem;
-  color: #4f5b52;
+  line-height: 1.2;
+  padding-right: 75px;
 }
 
-/* CTA button in the middle */
+.prive-title {
+  font-family: 'Rafaella', serif;
+  font-weight: 700;
+  font-size: clamp(2.8rem, 13vw, 4rem);
+  color: #E5DBC7;
+  margin: 0 0 12px 0;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.guest-subtitle {
+  font-family: 'Bicyclette', sans-serif;
+  font-size: 0.95rem;
+  color: #E5DBC7;
+  max-width: 280px;
+  margin: 0 auto 24px;
+  line-height: 1.5;
+}
+
 .guest-cta {
   --border-radius: 999px;
-  --padding-start: 24px;
-  --padding-end: 24px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  margin-top: 8px;
-}
-
-/* Make it feel more like the wide banner on desktop */
-@media (min-width: 768px) {
-  .guest-card {
-    padding: 28px 64px;
-  }
-
-  .guest-text h2 {
-    font-size: 2.1rem;
-  }
-
-  .guest-text p {
-    font-size: 1rem;
-  }
+  --border-color: var(--ion-color-primary-shade);
+  --border-width: 2px;
+  --color: #1a1a1a;
+  --background: var(--ion-color-primary);
+  --background-activated: var(--ion-color-primary-shade);
+  height: 48px;
+  font-family: 'Bicyclette', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  min-width: 180px;
 }
 
 /* Keep your notification popout */

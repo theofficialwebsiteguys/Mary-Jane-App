@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find d:/Backup_Jared_folder/Jared/TheWebsiteGuys/Repos/Mary-Jane-App -name poppins* -o -name Poppins*)",
+      "Bash(mkdir -p \"d:/Backup_Jared_folder/Jared/TheWebsiteGuys/Repos/Mary-Jane-App/src/assets/fonts\")",
+      "Bash(cp /c/Users/Jared/Downloads/Poppins/*.ttf \"d:/Backup_Jared_folder/Jared/TheWebsiteGuys/Repos/Mary-Jane-App/src/assets/fonts/\")",
+      "Bash(xargs grep:*)"
+    ]
+  }
+}

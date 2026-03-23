@@ -45,15 +45,16 @@ ion-toolbar.heading-container {
 /* ===== Icons ===== */
 .icon-btn i {
   font-size: 21px;
-  color: var(--ion-color-secondary-contrast);
+  color: var(--ion-color-primary);
   line-height: 1;
 }
 
 /* ===== Text Button ===== */
 .text-btn {
-  font-size: 14px;
-  font-weight: 600;
+  font-family: 'Bicyclette', sans-serif;
+  font-size: 18px;
   padding: 0 8px;
+  --color: black;
 }
 
 /* ===== Badges ===== */

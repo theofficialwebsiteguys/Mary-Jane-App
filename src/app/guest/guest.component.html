@@ -1,49 +1,43 @@
 <ion-content [fullscreen]="true">
   <div class="guest-page">
 
-    <!-- Brand / Header -->
+    <!-- Header -->
     <div class="guest-header">
-      <h1>Join the MJ Privé List</h1>
-      <p>
-        Get exclusive updates about in-store events, promotions, and more.
+      <p class="join-the">Join the</p>
+      <h1 class="prive-title">Privé List</h1>
+      <p class="guest-subtitle">
+        Get exclusive updates about in-store events, promotions, &amp; more!
       </p>
     </div>
 
-    <!-- Main Card -->
-    <div class="guest-card">
-
-      <div class="perk-list">
-        <div class="perk">
-          <span>✔</span>
-          <p>Earn points with every purchase</p>
-        </div>
-
-        <div class="perk">
-          <span>✔</span>
-          <p>Redeem rewards whenever you’d like</p>
-        </div>
-
-        <div class="perk">
-          <span>✔</span>
-          <p>Access member-only drops, events, and offers</p>
-        </div>
+    <!-- Feature Cards -->
+    <div class="feature-list">
+      <div class="feature-card">
+        <p>EARN POINTS WITH EVERY PURCHASE</p>
       </div>
-
-      <ion-button
-        expand="block"
-        class="primary-cta"
-        routerLink="/auth"
-        [queryParams]="{ mode: 'register' }"
-      >
-        Join the List
-      </ion-button>
-
-      <p class="secondary-link">
-        Already a member?
-        <a routerLink="/auth" [queryParams]="{ mode: 'login' }">Log in</a>
-      </p>
-
+      <div class="feature-card">
+        <p>REDEEM REWARDS ANY TIME</p>
+      </div>
+      <div class="feature-card">
+        <p>ACCESS MEMBERS-ONLY DROPS, EVENTS, AND OFFERS</p>
+      </div>
     </div>
+
+    <!-- CTA -->
+    <ion-button
+      expand="block"
+      fill="outline"
+      class="join-btn"
+      routerLink="/auth"
+      [queryParams]="{ mode: 'register' }"
+    >
+      JOIN NOW
+    </ion-button>
+
+    <p class="secondary-link">
+      Already a member?
+      <a routerLink="/auth" [queryParams]="{ mode: 'login' }">Log in</a>
+    </p>
 
   </div>
 </ion-content>

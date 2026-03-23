@@ -131,7 +131,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: #2f2f2f;
+  background: var(--ion-color-secondary);
   color: #fff;
   border: none;
   font-size: 20px;
@@ -268,7 +268,7 @@
   height: 32px;
   border-radius: 50%;
   border: none;
-  background: var(--ion-color-primary);
+  background: var(--ion-color-secondary);
   color: #fff;
   font-size: 20px;
   display: flex;
@@ -279,7 +279,7 @@
   transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
 
   &:hover {
-    background: var(--ion-color-primary);
+    background: var(--ion-color-secondary);
     transform: translateY(-1px);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
   }
@@ -505,8 +505,8 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: var(--ion-color-secondary-contrast);
-  color: #000000;
+  background: var(--ion-color-secondary);
+  color: #fff;
   border: none;
   font-size: 20px;
   display: flex;

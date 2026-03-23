@@ -12,16 +12,16 @@
 
       <!-- ICON stays fixed -->
       <div class="announcement-left">
-        <span class="icon">
-          <ion-icon name="megaphone-outline"></ion-icon>
-        </span>
+        <div class="logo-badge">
+          <img src="assets/MaryJane-Icon-White.png" alt="MJ Logo" class="logo-img" />
+        </div>
 
         <!-- TEXT SLIDER (only thing that moves) -->
         <div class="text-slider">
          <div
             class="text-slide"
             [style.--count]="announcements.length"
-            [style.transform]="'translateY(-' + currentIndex * 32 + 'px)'"
+            [style.transform]="'translateY(-' + currentIndex * 38 + 'px)'"
           >
 
             <div class="text-item" *ngFor="let ann of announcements">

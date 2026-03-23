@@ -604,7 +604,7 @@ getMoreFromBrand(excludedIds: string[] = []): Observable<Product[]> {
             product.discounts?.map(discount => ({
               image:
                 // discount.discount_image_url ||
-                'assets/default-discount-banner.png',
+                'assets/banner-bg.png',
 
               title: discount.discount_title,
               subtitle:
@@ -612,7 +612,7 @@ getMoreFromBrand(excludedIds: string[] = []): Observable<Product[]> {
                   ? 'Target Price'
                   : discount.discount_method,
 
-              cta: 'Shop Now',
+              cta: 'SHOP NOW',
               discountId: discount.discount_id,
             }))
           )

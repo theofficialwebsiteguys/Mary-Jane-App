@@ -2,11 +2,9 @@
   --background: transparent;
 }
 
-/* ion-content OWNS layout + background */
 ion-content {
   --background:
-    linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)),
-    url('../../assets/background.png') center / cover no-repeat;
+    url('../../assets/rewards-bg2.png') center / cover no-repeat;
 
   --padding-top: env(safe-area-inset-top);
   --padding-bottom: env(safe-area-inset-bottom);
@@ -16,86 +14,111 @@ ion-content {
   --overflow: hidden;
 }
 
-
-/* inner wrapper NO padding */
+/* PAGE LAYOUT */
 .guest-page {
   min-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding-bottom: 48px;
 }
 
 /* HEADER */
 .guest-header {
-  margin-top: 48px;
-  margin-bottom: 28px;
+  margin-top: 40px;
+  margin-bottom: 32px;
   text-align: center;
-
-  h1 {
-    font-size: 1.75rem;
-    font-weight: 600;
-    color: #ffffffee;
-    margin-bottom: 6px;
-  }
-
-  p {
-    font-size: 0.95rem;
-    color: #ffffff;
-    max-width: 320px;
-    margin: 0 auto;
-  }
-}
-
-/* CARD */
-.guest-card {
   width: 100%;
-  max-width: 420px;
-  background: #ffffff;
-  padding: 28px 24px;
-  border-radius: 14px;
-  border: 1px solid #dde3d4;
-  box-sizing: border-box;
 }
 
-/* PERKS */
-.perk-list {
+.join-the {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: #E5DBC7;
+  margin: 0;
+  line-height: 1.2;
+  display: block;
+  padding-right: 75px;
+}
+
+.prive-title {
+  font-family: 'Rafaella', serif;
+  font-weight: 700;
+  font-size: clamp(3rem, 14vw, 4.5rem);
+  color: #E5DBC7;
+  margin: 0 0 28px 0;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.guest-subtitle {
+  font-family: 'Bicyclette', sans-serif;
+  font-size: 1.2rem;
+  color: #E5DBC7;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+/* FEATURE CARDS */
+.feature-list {
+  width: 100%;
+  max-width: 400px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  margin-bottom: 26px;
+  gap: 16px;
+  margin-bottom: 36px;
+  align-items: center;
 }
 
-.perk {
-  display: flex;
-  gap: 10px;
-
-  span {
-    color: #6b734e;
-  }
+.feature-card {
+  background: #E5DBC7;
+  border-radius: 14px;
+  padding: 22px 24px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  max-width: 80%;
 
   p {
+    font-family: 'Bicyclette', sans-serif;
+    font-weight: 700;
+    font-size: 1.25rem;
+    letter-spacing: 0.05em;
+    color: #1a1a1a;
     margin: 0;
-    font-size: 0.95rem;
-    color: #444d3d;
+    line-height: 1.35;
   }
 }
 
-/* CTA */
-.primary-cta {
-  --border-radius: 12px;
-  height: 48px;
+/* JOIN NOW BUTTON */
+.join-btn {
+  width: 100%;
+  max-width: 240px;
+  --border-radius: 999px;
+  --border-color: var(--ion-color-primary-shade);
+  --border-width: 2px;
+  --color: #1a1a1a;
+  --background: var(--ion-color-primary);
+  --background-activated: var(--ion-color-primary-shade);
+  height: 52px;
+  font-family: 'Bicyclette', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  margin-bottom: 24px;
 }
 
 /* FOOTER LINK */
 .secondary-link {
-  margin-top: 18px;
   text-align: center;
-  font-size: 0.85rem;
-  color: #6b7362;
+  font-size: 1.05rem;
+  color: #E5DBC7;
+  margin: 0;
 
   a {
-    color: #5c6450;
-    font-weight: 500;
+    color: #E5DBC7;
+    font-weight: 700;
     text-decoration: none;
   }
 }

@@ -23,7 +23,7 @@
 
   padding: 10px 14px;
 
-  background: #97A08A;
+  background: var(--ion-color-primary);
   color: white;
 
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
@@ -33,33 +33,47 @@
 .announcement-left {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
 }
 
-.icon {
-  font-size: 18px;
+.logo-badge {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.15);
   display: flex;
   align-items: center;
+  justify-content: center;
+}
+
+.logo-img {
+  width: 26px;
+  height: auto;
 }
 
 /* Only the TEXT moves (vertical slide) */
 .text-slider {
-  height: 32px;
+  height: 38px;
   overflow: hidden;
   position: relative;
+  flex: 1;
+  min-width: 0;
 }
 
 .text-slide {
   display: flex;
   flex-direction: column;
   transition: transform 0.45s ease;
-  height: calc(32px * var(--count));
+  height: calc(38px * var(--count));
 }
 
 
 .text-item {
-  height: 32px;
-  min-height: 32px;
+  height: 38px;
+  min-height: 38px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -69,16 +83,17 @@
 }
 
 .text-item .title {
-  font-weight: 600;
-  font-size: 14px;
+  font-weight: 700;
+  font-size: 18px;
   color: white;
+  line-height: 1.2;
 }
 
 .text-item .message {
-  font-size: 14px;
-  opacity: 0.9;
-  color: #4B4F47;
-  font-weight: bold;
+  font-size: 12px;
+  color: #2e2e2e;
+  font-weight: 500;
+  line-height: 1.2;
 }
 
 .announcement-right {

@@ -6,89 +6,102 @@
   justify-content: center;
   align-items: center;
 
-  background-image: url('/assets/background.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  background-color: #e7decb;
 
   padding-bottom: env(safe-area-inset-bottom);
-
-  /* Needed for overlay layering */
   overflow: hidden;
 }
 
-.splash-container::before {
-  content: '';
+/* ---------- WATERMARK ---------- */
+.watermark-img {
   position: absolute;
-  inset: 0;
+  left: 0;
+  top: 100%;
+  /* width = screen height → after -90deg rotation, visual height fills the screen */
+  width: 100svh;
+  height: auto;
+  transform-origin: top left;
+  transform: rotate(-90deg);
 
-  background: rgba(0, 0, 0, 0.25); /* subtle dark overlay */
+  opacity: 0.08;
+  pointer-events: none;
+  user-select: none;
   z-index: 0;
+  max-width: none;
 }
-
-/* Ensure content sits above overlay */
-.splash-container > * {
-  position: relative;
-  z-index: 1;
-}
-
 
 /* ---------- CENTERED COLUMN ---------- */
 .splash-content {
+  position: relative;
+  z-index: 1;
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;   /* ⬅️ Keeps everything centered */
+  justify-content: center;
   text-align: center;
 
-  gap: 50px;                 /* Adjust spacing between logo & text/buttons */
+  gap: 20px;
   width: 100%;
-  padding: 0 20px;           /* Safe margins */
-  margin-bottom: 100px;
+  padding: 0 40px;
 }
 
 /* ---------- LOGO ---------- */
+.logo-container {
+  display: flex;
+  justify-content: center;
+}
+
 .logo {
-  width: 70%;
-  max-width: 420px;
+  width: 100px;
   height: auto;
 }
 
 /* ---------- AGE TITLE ---------- */
 .age-title {
-  font-size: 1.4rem;
-  color: white;
-  letter-spacing: 0.05em;
+  font-family: 'Bicyclette', sans-serif;
+  font-size: 2.4rem;
+  font-weight: 400;
+  color: #1a1a1a;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
   margin: 0;
+  line-height: 1.15;
 }
 
 /* ---------- YES / NO BUTTONS ---------- */
 .age-buttons {
   display: flex;
-  justify-content: center;
-  gap: 30px;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
 }
 
-.yes-btn {
-  --background: var(--ion-color-blue);
-  --background-activated: #3d4137;
-  --background-focused: #3d4137;
-  width: 130px;
-  height: 48px;
-  text-transform: uppercase;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  color: rgb(0, 0, 0);
-}
-
+.yes-btn,
 .no-btn {
-  --background: #ffffff;
-  --background-activated: #dddddd;
-  --background-focused: #cccccc;
-  width: 130px;
-  height: 48px;
+  --background: #1a1a1a;
+  --background-activated: #333333;
+  --background-focused: #333333;
+  --color: #ffffff;
+  color: #e7decb;
+  --border-radius: 15px;
+  margin: 0;
+  width: 65%;
+  height: 58px;
+  font-size: 1rem; /* keep at 1rem so Ionic's em-based internal padding stays small */
+}
+
+.yes-btn::part(native),
+.no-btn::part(native) {
+  padding-top: 0;
+  padding-bottom: 0;
+  height: 58px;
+  min-height: unset;
+  font-family: 'Bicyclette', sans-serif;
+  font-size: 2.4rem;
+  font-weight: 700;
   text-transform: uppercase;
-  font-weight: 600;
-  color: black;
+  letter-spacing: 0.04em;
+  line-height: 58px;
 }
