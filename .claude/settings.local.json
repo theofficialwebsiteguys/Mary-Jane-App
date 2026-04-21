@@ -4,7 +4,10 @@
       "Bash(find d:/Backup_Jared_folder/Jared/TheWebsiteGuys/Repos/Mary-Jane-App -name poppins* -o -name Poppins*)",
       "Bash(mkdir -p \"d:/Backup_Jared_folder/Jared/TheWebsiteGuys/Repos/Mary-Jane-App/src/assets/fonts\")",
       "Bash(cp /c/Users/Jared/Downloads/Poppins/*.ttf \"d:/Backup_Jared_folder/Jared/TheWebsiteGuys/Repos/Mary-Jane-App/src/assets/fonts/\")",
-      "Bash(xargs grep:*)"
+      "Bash(xargs grep:*)",
+      "Read(//d/Backup_Jared_folder/Jared/TheWebsiteGuys/Repos/Dispensary-API/routes/**)",
+      "Read(//d/Backup_Jared_folder/Jared/TheWebsiteGuys/Repos/Dispensary-API/controllers/**)",
+      "Read(//d/Backup_Jared_folder/Jared/TheWebsiteGuys/Repos/Dispensary-API/models/**)"
     ]
   }
 }

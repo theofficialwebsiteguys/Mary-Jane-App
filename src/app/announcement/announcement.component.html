@@ -8,7 +8,13 @@
   <!-- ANNOUNCEMENT BAR -->
   <ng-container *ngIf="!isLoading && !hasError && announcements.length">
 
-    <div class="announcement-bar" role="status" aria-live="polite">
+    <div
+      class="announcement-bar"
+      [class.is-clickable]="isClickable"
+      role="button"
+      [attr.aria-label]="isClickable ? (currentAnnouncement?.ctaText || 'View announcement') : null"
+      (click)="handleTap()"
+    >
 
       <!-- ICON stays fixed -->
       <div class="announcement-left">
@@ -18,18 +24,23 @@
 
         <!-- TEXT SLIDER (only thing that moves) -->
         <div class="text-slider">
-         <div
+          <div
             class="text-slide"
             [style.--count]="announcements.length"
             [style.transform]="'translateY(-' + currentIndex * 38 + 'px)'"
           >
-
             <div class="text-item" *ngFor="let ann of announcements">
               <span class="title" *ngIf="ann.title">{{ ann.title }}</span>
               <span class="message">{{ ann.message }}</span>
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- CTA ARROW — always shown; label only appears when a custom ctaText is set -->
+      <div class="announcement-cta" aria-hidden="true">
+        <span class="cta-text" *ngIf="currentAnnouncement?.ctaText">{{ currentAnnouncement?.ctaText }}</span>
+        <ion-icon name="chevron-forward-outline"></ion-icon>
       </div>
 
     </div>

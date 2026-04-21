@@ -78,7 +78,7 @@ ion-content {
   padding: 22px 24px;
   text-align: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  max-width: 80%;
+  width: 100%;
 
   p {
     font-family: 'Bicyclette', sans-serif;
@@ -88,6 +88,7 @@ ion-content {
     color: #1a1a1a;
     margin: 0;
     line-height: 1.35;
+    text-wrap: balance;
   }
 }
 

@@ -4,6 +4,8 @@ import {
   OnInit,
   OnDestroy,
 } from '@angular/core';
+import { Router } from '@angular/router';
+import { Browser } from '@capacitor/browser';
 import { Announcement, SettingsService } from '../settings.service';
 
 @Component({
@@ -21,7 +23,10 @@ export class AnnouncementComponent implements OnInit, OnDestroy {
 
   private rotateInterval: any;
 
-  constructor(private settingsService: SettingsService) {}
+  constructor(
+    private settingsService: SettingsService,
+    private router: Router,
+  ) {}
 
   async ngOnInit() {
     try {
@@ -38,6 +43,33 @@ export class AnnouncementComponent implements OnInit, OnDestroy {
     } catch (err) {
       this.hasError = true;
       this.isLoading = false;
+    }
+  }
+
+  get currentAnnouncement(): Announcement | null {
+    return this.announcements[this.currentIndex] ?? null;
+  }
+
+  /** Always clickable — defaults to /rewards when no ctaUrl is set */
+  get isClickable(): boolean {
+    return true;
+  }
+
+  handleTap() {
+    const url = this.currentAnnouncement?.ctaUrl;
+
+    if (!url) {
+      // No link set — fall back to rewards page
+      this.router.navigate(['/rewards']);
+      return;
+    }
+
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      // External URL — open in device browser
+      Browser.open({ url });
+    } else {
+      // Internal route (e.g. "/products" or "/rewards")
+      this.router.navigateByUrl(url);
     }
   }
 
