@@ -1,4 +1,3 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
@@ -12,17 +11,18 @@ import { AccessibilityService } from '../accessibility.service';
   templateUrl: './forgot-password.component.html',
   styleUrls: ['./forgot-password.component.scss'],
 })
-export class ForgotPasswordComponent {
+export class ForgotPasswordComponent implements OnInit {
   forgotPasswordForm: FormGroup;
-  emailSent = false; // Flag to toggle between form and success message
-  errorMessage = ''; // Store error message to display
+  emailSent = false;
+  errorMessage = '';
+  loading = false;
   darkModeEnabled: boolean = false;
 
   constructor(
     private readonly fb: FormBuilder,
     private readonly authService: AuthService,
     private readonly settingsService: SettingsService,
-    private location: Location,
+    private readonly location: Location,
     private readonly accessibilityService: AccessibilityService
   ) {
     this.forgotPasswordForm = this.fb.group({
@@ -44,15 +44,17 @@ export class ForgotPasswordComponent {
     }
 
     const email = this.forgotPasswordForm.value.email;
-    this.errorMessage = ''; 
+    this.errorMessage = '';
+    this.loading = true;
 
     this.authService.sendPasswordReset(email).subscribe({
       next: () => {
+        this.loading = false;
         this.emailSent = true;
-        this.errorMessage = '';
         this.accessibilityService.announce('Password reset email sent. Please check your inbox.', 'polite');
       },
       error: (err) => {
+        this.loading = false;
         this.errorMessage = this.getErrorMessage(err);
         this.accessibilityService.announce(this.errorMessage, 'assertive');
       },

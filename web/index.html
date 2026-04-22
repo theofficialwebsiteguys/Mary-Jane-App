@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reset Your Password – Mary Jane Cannabis Co.</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green:   #ADBC9B;
+      --green-dark: #8fa87b;
+      --pink:    #FFABB3;
+      --danger:  #d32f2f;
+      --text:    #333;
+      --subtle:  #555;
+      --radius:  14px;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 48px 20px 40px;
+      background:
+        linear-gradient(135deg, rgba(173,188,155,0.35) 0%, rgba(255,171,179,0.25) 100%),
+        #f4f4f0;
+      color: var(--text);
+    }
+
+    .card {
+      width: 100%;
+      max-width: 420px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      padding: 36px 32px;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.12);
+      animation: fadeUp 0.4s ease;
+    }
+
+    .logo-wrap {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    /* Drop your logo file at web/logo.png and this will display it.
+       Falls back to a text wordmark if the image fails to load. */
+    .logo-img {
+      width: 160px;
+      height: auto;
+    }
+
+    .wordmark {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--green-dark);
+      letter-spacing: 0.02em;
+    }
+
+    h1 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: var(--green-dark);
+      text-align: center;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: 0.875rem;
+      color: var(--subtle);
+      text-align: center;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    /* ---- States ---- */
+    .state { display: none; }
+    .state.active { display: block; }
+
+    /* ---- Form ---- */
+    .field { margin-bottom: 18px; }
+
+    label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    input[type="password"] {
+      width: 100%;
+      padding: 13px 14px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      background: #f7f7f7;
+      border: 2px solid #e2e2e2;
+      border-radius: 10px;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      color: var(--text);
+    }
+
+    input[type="password"]:focus {
+      outline: none;
+      border-color: var(--green);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(173,188,155,0.2);
+    }
+
+    .field-error {
+      display: none;
+      font-size: 0.78rem;
+      color: var(--danger);
+      margin-top: 5px;
+    }
+
+    .field-error.visible { display: block; }
+
+    /* ---- Alert ---- */
+    .alert {
+      display: none;
+      padding: 12px 14px;
+      border-radius: 9px;
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+      line-height: 1.45;
+    }
+
+    .alert.error {
+      background: rgba(211,47,47,0.1);
+      border-left: 4px solid var(--danger);
+      color: #b71c1c;
+    }
+
+    .alert.visible { display: block; }
+
+    /* ---- Button ---- */
+    button {
+      width: 100%;
+      height: 50px;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      background: var(--green);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.2s, opacity 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    button:hover:not(:disabled) { background: var(--green-dark); }
+    button:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .spinner {
+      display: none;
+      width: 18px;
+      height: 18px;
+      border: 2.5px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    button.loading .spinner { display: block; }
+    button.loading .btn-text { opacity: 0.7; }
+
+    /* ---- Success state ---- */
+    .success-icon {
+      font-size: 3rem;
+      display: block;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+
+    .open-app-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      height: 50px;
+      background: var(--green);
+      color: #fff;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 12px;
+      text-decoration: none;
+      transition: background 0.2s;
+      margin-top: 20px;
+    }
+
+    .open-app-btn:hover { background: var(--green-dark); }
+
+    .open-app-note {
+      font-size: 0.78rem;
+      color: var(--subtle);
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    /* ---- Expired / invalid state ---- */
+    .expired-icon {
+      font-size: 2.8rem;
+      display: block;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+<div class="card">
+
+  <div class="logo-wrap">
+    <img
+      class="logo-img"
+      src="logo.png"
+      alt="Mary Jane Cannabis Co."
+      onerror="this.style.display='none'; document.getElementById('wordmark').style.display='block';"
+    />
+    <p class="wordmark" id="wordmark" style="display:none;">Mary Jane Cannabis Co.</p>
+  </div>
+
+  <!-- LOADING: validating token -->
+  <div id="state-loading" class="state active">
+    <p class="subtitle">Verifying your reset link…</p>
+  </div>
+
+  <!-- FORM: valid token -->
+  <div id="state-form" class="state">
+    <h1>Reset Password</h1>
+    <p class="subtitle">Choose a new password for your account.</p>
+
+    <div id="form-alert" class="alert error"></div>
+
+    <form id="reset-form" novalidate>
+      <div class="field">
+        <label for="password">New Password</label>
+        <input
+          type="password"
+          id="password"
+          placeholder="At least 8 characters"
+          autocomplete="new-password"
+        />
+        <p class="field-error" id="err-password"></p>
+      </div>
+
+      <div class="field">
+        <label for="confirm">Confirm Password</label>
+        <input
+          type="password"
+          id="confirm"
+          placeholder="Repeat your password"
+          autocomplete="new-password"
+        />
+        <p class="field-error" id="err-confirm"></p>
+      </div>
+
+      <button type="submit" id="submit-btn">
+        <span class="spinner"></span>
+        <span class="btn-text">Reset Password</span>
+      </button>
+    </form>
+  </div>
+
+  <!-- SUCCESS -->
+  <div id="state-success" class="state">
+    <span class="success-icon">✅</span>
+    <h1>Password Reset!</h1>
+    <p class="subtitle">Your password has been updated. Open the app and log in with your new password.</p>
+
+    <a class="open-app-btn" href="maryjanecannabisco://auth?mode=login">
+      Open Mary Jane App
+    </a>
+    <p class="open-app-note">
+      Already have the app? Tap the button above. If it doesn't open,
+      launch the app manually and log in.
+    </p>
+  </div>
+
+  <!-- EXPIRED / INVALID -->
+  <div id="state-expired" class="state">
+    <h1>Link Expired</h1>
+    <p class="subtitle">
+      This password reset link is invalid or has expired.<br />
+      Open the Mary Jane app and request a new reset link from the login screen.
+    </p>
+  </div>
+
+</div>
+
+<script>
+  const API = 'https://dispensary-api-ac9613fa4c11.herokuapp.com/api';
+
+  // ---- helpers ----
+  function show(id) {
+    document.querySelectorAll('.state').forEach(el => el.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function getToken() {
+    return new URLSearchParams(window.location.search).get('token');
+  }
+
+  // ---- validate token on load ----
+  (async function init() {
+    const token = getToken();
+    if (!token) { show('state-expired'); return; }
+
+    try {
+      const res = await fetch(`${API}/users/validate-reset-token?token=${encodeURIComponent(token)}`);
+      if (!res.ok) throw new Error('invalid');
+      show('state-form');
+    } catch {
+      show('state-expired');
+    }
+  })();
+
+  // ---- form submission ----
+  document.getElementById('reset-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const password = document.getElementById('password').value;
+    const confirm  = document.getElementById('confirm').value;
+    const alert    = document.getElementById('form-alert');
+    const errPw    = document.getElementById('err-password');
+    const errCf    = document.getElementById('err-confirm');
+    const btn      = document.getElementById('submit-btn');
+
+    // clear previous errors
+    [errPw, errCf].forEach(el => el.classList.remove('visible'));
+    alert.classList.remove('visible');
+
+    let valid = true;
+
+    if (password.length < 8) {
+      errPw.textContent = 'Password must be at least 8 characters.';
+      errPw.classList.add('visible');
+      valid = false;
+    }
+
+    if (password !== confirm) {
+      errCf.textContent = 'Passwords do not match.';
+      errCf.classList.add('visible');
+      valid = false;
+    }
+
+    if (!valid) return;
+
+    const token = getToken();
+    btn.classList.add('loading');
+    btn.disabled = true;
+
+    try {
+      const res = await fetch(`${API}/users/reset-password?token=${encodeURIComponent(token)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data?.message || 'Something went wrong. Please try again.');
+      }
+
+      show('state-success');
+    } catch (err) {
+      alert.textContent = err.message;
+      alert.classList.add('visible');
+    } finally {
+      btn.classList.remove('loading');
+      btn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>

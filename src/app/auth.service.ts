@@ -215,8 +215,8 @@ export class AuthService {
     return new Observable((observer) => {
       CapacitorHttp.post({
         url: `${this.apiUrl}/forgot-password`,
-        headers: { 'Content-Type': 'application/json' },
-        data: { email, business_id: 1 },
+        headers: { 'Content-Type': 'application/json', 'x-auth-api-key': environment.db_api_key },
+        data: { email },
       })
         .then(() => {
           observer.next();
