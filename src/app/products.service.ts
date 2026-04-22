@@ -499,18 +499,18 @@ getProductFilterOptions(): Observable<ProductFilterOptions> {
 
   getCategories(): CategoryWithImage[] {
     return [
-      { category: 'All', imageUrl: 'assets/icons/all.png' },
-      { category: 'Deals', imageUrl: 'assets/icons/deals.png' },
-      { category: 'Flower', imageUrl: 'assets/icons/flower.png' },
-      { category: 'Pre-Roll', imageUrl: 'assets/icons/rolls.png' },
-      { category: 'Vapes', imageUrl: 'assets/icons/vapes.png' },
-      { category: 'Concentrates', imageUrl: 'assets/icons/extract.png' },
-      { category: 'Edibles', imageUrl: 'assets/icons/edibles.png' },
-      { category: 'Beverages', imageUrl: 'assets/icons/drinks.png' },
-      { category: 'Tinctures', imageUrl: 'assets/icons/tinctures.png' },
-      { category: 'Capsules', imageUrl: 'assets/icons/capsules.png' },
-      { category: 'Topicals', imageUrl: 'assets/icons/topicals.png' },
-      { category: 'Accessory', imageUrl: 'assets/icons/accessories.png' }
+      { category: 'All', imageUrl: 'assets/icons-images/All.jpg' },
+      { category: 'Deals', imageUrl: 'assets/icons-images/Deals.jpg' },
+      { category: 'Flower', imageUrl: 'assets/icons-images/Flower.jpeg' },
+      { category: 'Pre-Roll', imageUrl: 'assets/icons-images/Prerolls.jpg' },
+      { category: 'Vapes', imageUrl: 'assets/icons-images/Vapes.jpg' },
+      { category: 'Concentrates', imageUrl: 'assets/icons-images/Concentrates.jpg' },
+      { category: 'Edibles', imageUrl: 'assets/icons-images/Edibles.jpg' },
+      { category: 'Beverages', imageUrl: 'assets/icons-images/Drinks.jpg' },
+      { category: 'Tinctures', imageUrl: 'assets/icons-images/Tinctures.jpg' },
+      { category: 'Capsules', imageUrl: 'assets/icons-images/Capsules.jpg' },
+      { category: 'Topicals', imageUrl: 'assets/icons-images/Topicals.jpg' },
+      { category: 'Accessory', imageUrl: 'assets/icons-images/Accessories.jpg' }
     ];
   }
 

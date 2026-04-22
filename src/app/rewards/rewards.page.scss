@@ -69,6 +69,11 @@
 }
 
 
+ion-content::part(scroll) {
+  display: flex;
+  flex-direction: column;
+}
+
 .rewards-page {
   padding: 24px 16px 40px;
   display: flex;

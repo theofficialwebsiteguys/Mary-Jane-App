@@ -1,43 +1,41 @@
-<ion-content [fullscreen]="true">
-  <div class="guest-page">
+<div class="guest-page">
 
-    <!-- Header -->
-    <div class="guest-header">
-      <p class="join-the">Join the</p>
-      <h1 class="prive-title">Privé List</h1>
-      <p class="guest-subtitle">
-        Get exclusive updates about in-store events, promotions, &amp; more!
-      </p>
-    </div>
-
-    <!-- Feature Cards -->
-    <div class="feature-list">
-      <div class="feature-card">
-        <p>EARN POINTS WITH EVERY PURCHASE</p>
-      </div>
-      <div class="feature-card">
-        <p>REDEEM REWARDS ANY TIME</p>
-      </div>
-      <div class="feature-card">
-        <p>ACCESS MEMBERS-ONLY DROPS, EVENTS, AND OFFERS</p>
-      </div>
-    </div>
-
-    <!-- CTA -->
-    <ion-button
-      expand="block"
-      fill="outline"
-      class="join-btn"
-      routerLink="/auth"
-      [queryParams]="{ mode: 'register' }"
-    >
-      JOIN NOW
-    </ion-button>
-
-    <p class="secondary-link">
-      Already a member?
-      <a routerLink="/auth" [queryParams]="{ mode: 'login' }">Log in</a>
+  <!-- Header -->
+  <div class="guest-header">
+    <p class="join-the">Join the</p>
+    <h1 class="prive-title">Privé List</h1>
+    <p class="guest-subtitle">
+      Get exclusive updates about in-store events, promotions, &amp; more!
     </p>
-
   </div>
-</ion-content>
+
+  <!-- Feature Cards -->
+  <div class="feature-list">
+    <div class="feature-card">
+      <p>EARN POINTS WITH EVERY PURCHASE</p>
+    </div>
+    <div class="feature-card">
+      <p>REDEEM REWARDS ANY TIME</p>
+    </div>
+    <div class="feature-card">
+      <p>ACCESS MEMBERS-ONLY DROPS, EVENTS, AND OFFERS</p>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <ion-button
+    expand="block"
+    fill="outline"
+    class="join-btn"
+    routerLink="/auth"
+    [queryParams]="{ mode: 'register' }"
+  >
+    JOIN NOW
+  </ion-button>
+
+  <p class="secondary-link">
+    Already a member?
+    <a routerLink="/auth" [queryParams]="{ mode: 'login' }">Log in</a>
+  </p>
+
+</div>

@@ -1,32 +1,25 @@
 :host {
-  --background: transparent;
-}
-
-ion-content {
-  --background:
-    url('../../assets/rewards-bg2.png') center / cover no-repeat;
-
-  --padding-top: env(safe-area-inset-top);
-  --padding-bottom: env(safe-area-inset-bottom);
-  --padding-start: 20px;
-  --padding-end: 20px;
-
-  --overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
 }
 
 /* PAGE LAYOUT */
 .guest-page {
-  min-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-bottom: 48px;
+  justify-content: center;
+  padding: 16px 20px;
+  background: url('../../assets/rewards-bg2.png') center / cover no-repeat;
 }
 
 /* HEADER */
 .guest-header {
-  margin-top: 40px;
-  margin-bottom: 32px;
+  margin-top: 0;
+  margin-bottom: 20px;
   text-align: center;
   width: 100%;
 }
@@ -47,7 +40,7 @@ ion-content {
   font-weight: 700;
   font-size: clamp(3rem, 14vw, 4.5rem);
   color: #E5DBC7;
-  margin: 0 0 28px 0;
+  margin: 0 0 14px 0;
   line-height: 1;
   letter-spacing: 0.01em;
   white-space: nowrap;
@@ -67,15 +60,15 @@ ion-content {
   max-width: 400px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-bottom: 36px;
+  gap: 12px;
+  margin-bottom: 24px;
   align-items: center;
 }
 
 .feature-card {
   background: #E5DBC7;
   border-radius: 14px;
-  padding: 22px 24px;
+  padding: 16px 20px;
   text-align: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   width: 100%;
@@ -107,7 +100,7 @@ ion-content {
   font-size: 1.25rem;
   font-weight: 700;
   letter-spacing: 0.1em;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 /* FOOTER LINK */
