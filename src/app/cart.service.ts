@@ -223,6 +223,7 @@ export class CartService {
     const headers = {
       'Content-Type': 'application/json',
       'x-auth-api-key': environment.db_api_key,
+      'Authorization': token,
     };
 
     const options = {
