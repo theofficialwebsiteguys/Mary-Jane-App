@@ -100,10 +100,10 @@ export class ProductComponent implements OnInit {
       edibles: 'assets/stock/edibles-general.png',
       vapes: 'assets/stock/vapes-general.png',
       concentrates: 'assets/stock/concentrates-general.png',
-      beverage: 'assets/stock/beverage-general.png',
+      beverages: 'assets/stock/beverage-general.png',
       tinctures: 'assets/stock/tincture-general.png',
       topicals: 'assets/stock/topicals-general.png',
-      accessories: 'assets/stock/accessories-general.png',
+      accessory: 'assets/stock/accessories-general.png',
       default: 'assets/stock/default.png'
     };
     return map[key] || map['default'];

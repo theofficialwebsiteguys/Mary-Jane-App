@@ -234,7 +234,13 @@ export class CartService {
     };
 
     return CapacitorHttp.request(options)
-      .then(res => res.data)
+      .then(res => {
+        if (res.status >= 400) {
+          const msg = res.data?.details || res.data?.error || `Server error ${res.status}`;
+          throw new Error(msg);
+        }
+        return res.data;
+      })
       .catch(err => {
         console.error("Treez order submit error:", err);
         throw err;

@@ -26,7 +26,7 @@
     <p class="brand">{{ product.brand }}</p>
 
     <div class="strain-pill" [ngClass]="product.strainType">
-      {{ product.strainType || '-' | uppercase }}
+      {{ product.strainType || product.subtype || '-' | uppercase }}
     </div>
 
     <h2 class="title">

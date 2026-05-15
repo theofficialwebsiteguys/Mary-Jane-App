@@ -10,39 +10,46 @@
       [class.redeemed]="discount.redeemed"
     >
       <div class="tier-header">
-        <div>
+        <div class="tier-title-wrap">
           <span class="name">{{ discount.label }}</span>
+          <p class="perk">{{ discount.rewardText }}</p>
         </div>
 
         <span class="badge">
+          <ion-icon
+            name="lock-closed-outline"
+            class="lock-icon"
+            *ngIf="!discount.unlocked"
+          ></ion-icon>
           {{ discount.unlockText }}
         </span>
       </div>
 
-      <p class="perk">{{ discount.rewardText }}</p>
-      <p class="perk" *ngIf="discount.redeemed">{{ discount.desc }}</p>
-      
+      <p class="perk desc" *ngIf="discount.redeemed">{{ discount.desc }}</p>
 
-     <div class="tier-actions">
+      <div class="tier-actions">
 
-      <!-- Redeem button -->
-      <button
-        *ngIf="!discount.redeemed"
-        class="redeem-btn"
-        [disabled]="!discount.redeemable"
-        (click)="redeem(discount)"
-      >
-        Redeem
-      </button>
+        <!-- Redeem button -->
+        <button
+          *ngIf="!discount.redeemed"
+          class="redeem-btn"
+          [disabled]="!discount.redeemable"
+          (click)="redeem(discount)"
+        >
+          <ion-icon
+            name="lock-closed-outline"
+            *ngIf="!discount.redeemable"
+          ></ion-icon>
+          {{ discount.redeemable ? 'Redeem' : '' }}
+        </button>
 
-      <!-- Redeemed state -->
-      <div *ngIf="discount.redeemed" class="redeemed-pill">
-        <span>✓ Applied</span>
-        <button class="undo-btn" (click)="removeDiscount()">Undo</button>
+        <!-- Redeemed state -->
+        <div *ngIf="discount.redeemed" class="redeemed-pill">
+          <span>✓ Applied</span>
+          <button class="undo-btn" (click)="removeDiscount()">Undo</button>
+        </div>
+
       </div>
-
-    </div>
-
     </div>
   </div>
 </div>

@@ -645,7 +645,7 @@ export class CheckoutComponent implements OnInit {
       const treezRes = await this.cartService.submitTreezOrder(treezPayload);
       console.log('TREEZ ORDER SUCCESS:', treezRes);
 
-      pos_order_id = treezRes.order.data.order_number || 0;
+      pos_order_id = treezRes.order?.order_number || 0;
       points_add = this.finalSubtotal;
 
       // ----------------------------------------------------

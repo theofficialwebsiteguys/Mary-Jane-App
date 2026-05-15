@@ -1,11 +1,13 @@
 .carousel-wrapper {
   display: flex;
   justify-content: center;
+  overflow-x: clip;
+  padding-bottom: 15px;
+  padding-top: 15px;
 }
 
 .carousel-container {
   width: 100%;
-  overflow: hidden;
   position: relative;
   touch-action: pan-y;
 }
@@ -28,7 +30,7 @@
   height: 100%;
   border-radius: 14px;
   overflow: hidden;
-  // box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
   background: #fff;
    position: relative;
 }
@@ -61,7 +63,6 @@
   font-size: 14px;
   letter-spacing: 1px;
   opacity: 0.7;
-  margin-bottom: 14px;
   margin: 0;
 }
 
