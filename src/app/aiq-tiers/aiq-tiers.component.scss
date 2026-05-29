@@ -1,5 +1,7 @@
 // Design tokens matching tabs & splash screen language
 $dark-green: #2A3020;
+$light-green: #aebc9f;
+$light-green-border: #97a888;
 $cream: #e5dbc7;
 $cream-muted: #c8c0ad;
 $locked-bg: #ededea;
@@ -105,23 +107,23 @@ $locked-text-dim: #aaa89f;
 
 /* ── ACTIVE TIER (unlocked / available) ──────────────────── */
 .tier.active {
-  background: $dark-green;
-  border-color: #3d4a2e;
-  box-shadow: 0 8px 24px rgba(42, 48, 32, 0.28);
+  background: $light-green;
+  border-color: $light-green-border;
+  box-shadow: 0 8px 24px rgba(42, 48, 32, 0.2);
   opacity: 1;
 
   .name {
-    color: $cream;
+    color: $dark-green;
   }
 
   .perk {
-    color: $cream-muted;
+    color: #3a4530;
   }
 
   .badge {
-    background: rgba(229, 219, 199, 0.14);
-    border: 1px solid rgba(229, 219, 199, 0.28);
-    color: $cream;
+    background: rgba(42, 48, 32, 0.12);
+    border: 1px solid rgba(42, 48, 32, 0.22);
+    color: $dark-green;
   }
 }
 
@@ -173,12 +175,12 @@ $locked-text-dim: #aaa89f;
   transition: all 0.2s ease;
 
   // Enabled (active tier)
-  background: $cream;
-  color: $dark-green;
+  background: $dark-green;
+  color: $cream;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
 
   &:hover:not(:disabled) {
-    background: #f0e8d5;
+    background: lighten($dark-green, 8%);
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
     transform: translateY(-1px);
   }

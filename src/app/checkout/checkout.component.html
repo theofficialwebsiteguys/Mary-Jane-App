@@ -400,10 +400,20 @@
           <span>{{ finalSubtotal | currency }}</span>
         </p>
 
+        <div class="reward-line" *ngIf="appliedDiscount">
+          <div class="reward-info">
+            <span class="reward-name">{{ appliedDiscount.name }}
+              <span class="reward-amount">− {{ appliedRewardAmount | currency }}</span>
+            </span>
+          </div>
+          <button class="remove-reward" (click)="removeDiscount()" aria-label="Remove applied reward">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
 
       <div
         class="loyalty-picker"
-        *ngIf="availableRewards.length"
+        *ngIf="availableRewards.length && !appliedDiscount"
       >
         <h3>Available Rewards</h3>
 

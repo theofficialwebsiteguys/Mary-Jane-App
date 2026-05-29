@@ -14,7 +14,7 @@
 <div class="totals-container soft" [class.hidden]="cartItems.length === 0">
 
   <!-- Loading State -->
-  <div class="totals-loading fade" [class.visible]="previewLoading">
+  <div class="totals-loading" *ngIf="previewLoading">
     <ion-spinner name="crescent"></ion-spinner>
     <span>Calculating taxes & discounts...</span>
   </div>
@@ -44,7 +44,7 @@
 
     <div class="row">
       <span>Subtotal</span>
-      <span>{{ previewTotals?.subTotal | currency }}</span>
+      <span>{{ adjustedSubtotal | currency }}</span>
     </div>
 
     <div class="row">
@@ -59,7 +59,7 @@
 
     <div class="row total">
       <span>Total</span>
-      <span>{{ previewTotals?.total | currency }}</span>
+      <span>{{ adjustedTotal | currency }}</span>
     </div>
 
   </div>

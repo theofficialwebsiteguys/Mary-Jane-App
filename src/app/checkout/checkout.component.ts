@@ -496,6 +496,16 @@ export class CheckoutComponent implements OnInit {
     const pointsDiscount = this.pointsToRedeem * this.pointValue;
     subtotal = Math.max(0, subtotal - pointsDiscount);
 
+    if (this.appliedDiscount?.dollarValue) {
+      this.discountTotal = this.appliedDiscount.dollarValue;
+      subtotal = Math.max(0, subtotal - this.appliedDiscount.dollarValue);
+    } else if (this.appliedDiscount?.percentageValue) {
+      this.discountTotal = subtotal * (this.appliedDiscount.percentageValue / 100);
+      subtotal = Math.max(0, subtotal * (1 - this.appliedDiscount.percentageValue / 100));
+    } else {
+      this.discountTotal = Number(this.checkoutInfo?.previewTotals?.discountTotal) || 0;
+    }
+
     this.finalSubtotal = Math.max(0, subtotal);
 
     const taxRate = this.treezEffectiveTaxRate;
@@ -973,6 +983,15 @@ export class CheckoutComponent implements OnInit {
 
   removeDiscount() {
     this.cartService.setDiscount(null);
+  }
+
+  get appliedRewardAmount(): number {
+    if (!this.appliedDiscount) return 0;
+    if (this.appliedDiscount.dollarValue) return this.appliedDiscount.dollarValue;
+    if (this.appliedDiscount.percentageValue) {
+      return this.originalTreezSubtotal * (this.appliedDiscount.percentageValue / 100);
+    }
+    return 0;
   }
 
   get deliveryAvailabilityText(): string | null {

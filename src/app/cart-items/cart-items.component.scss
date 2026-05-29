@@ -1,5 +1,5 @@
 .cart-container {
-  padding: 16px;
+  padding: 16px 16px 0;
 
   .cart-item {
     display: flex;
@@ -70,7 +70,7 @@
   .add-more-button {
     width: 100%;
     cursor: pointer;
-    margin-bottom: 16px;
+    margin-bottom: 0;
     text-transform: capitalize;
   }
 

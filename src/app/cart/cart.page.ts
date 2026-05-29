@@ -51,6 +51,7 @@ export class CartPage {
 
     this.cartService.appliedDiscount$.subscribe(discount => {
       this.appliedDiscount = discount;
+      this.updateCartPreview();
     });
   }
 
@@ -200,19 +201,23 @@ export class CartPage {
     if (!this.appliedDiscount) return 0;
 
     if (this.appliedDiscount.dollarValue) {
-      return Math.min(
-        this.appliedDiscount.dollarValue,
-        this.previewTotals?.subTotal || 0
-      );
+      return this.appliedDiscount.dollarValue;
     }
 
     if (this.appliedDiscount.percentageValue) {
-      return (
-        this.previewTotals?.subTotal || 0 *
-        (this.appliedDiscount.percentageValue / 100)
-      );
+      return (this.previewTotals?.subTotal || 0) * (this.appliedDiscount.percentageValue / 100);
     }
 
     return 0;
+  }
+
+  get adjustedSubtotal(): number {
+    if (!this.previewTotals) return 0;
+    return Math.max(0, this.previewTotals.subTotal - this.rewardDiscountAmount);
+  }
+
+  get adjustedTotal(): number {
+    if (!this.previewTotals) return 0;
+    return Math.max(0, this.adjustedSubtotal + this.previewTotals.taxTotal);
   }
 }
