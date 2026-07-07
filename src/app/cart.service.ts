@@ -336,6 +336,10 @@ export class CartService {
   
     return CapacitorHttp.request(options)
       .then((response) => {
+        if (response.status >= 400) {
+          const msg = response.data?.error || response.data?.details || `Server error ${response.status}`;
+          throw new Error(msg);
+        }
         return response.data;
       })
       .catch((error) => {
@@ -343,8 +347,8 @@ export class CartService {
         throw error;
       });
   }
-  
-  
+
+
   async checkCartPrice(cartItems: any[], isDelivery: boolean) {
     const appliedDiscount = this.getAppliedDiscount();
 

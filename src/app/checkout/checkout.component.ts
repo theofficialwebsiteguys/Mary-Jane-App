@@ -557,9 +557,6 @@ export class CheckoutComponent implements OnInit {
 
     try {
       const user_id = this.checkoutInfo.user_info.id;
-      // const points_redeem = this.pointsToRedeem;
-      const rewardUsed = this.appliedDiscount; 
-      const points_redeem = rewardUsed?.pointsDeduction ?? 0;
       let points_add = 0;
       let pos_order_id = 0;
       let aeropay_transaction_id: string | null = null;
@@ -655,31 +652,41 @@ export class CheckoutComponent implements OnInit {
       const treezRes = await this.cartService.submitTreezOrder(treezPayload);
       console.log('TREEZ ORDER SUCCESS:', treezRes);
 
-      pos_order_id = treezRes.order?.order_number || 0;
+      pos_order_id = treezRes.order_number || 0;
       points_add = this.finalSubtotal;
+
+      // AlpineIQ + Treez are natively synced: AIQ performs the actual point
+      // deduction when this discount posts to Treez, and auto-awards points
+      // when an AIQ loyalty customer purchases. submitTreezOrder only verified
+      // eligibility against AIQ's live balance before attaching the discount —
+      // this app never adjusts the points balance itself. redeemed_points here
+      // is just the confirmed amount to record in the local order history.
+      const confirmedPointsRedeemed = treezRes.redeemed_points ?? 0;
 
       // ----------------------------------------------------
       // 4️⃣ Save to LOCAL DATABASE (THIS WAS MISSING)
       // ----------------------------------------------------
-      await this.cartService.placeOrder(
-        {
-          user_id,
-          pos_order_id,
-          points_add: points_redeem ? 0 : points_add,
-          points_redeem,
-          amount: this.finalSubtotal,
-          cart: this.checkoutInfo.cart,
+      // The Treez sale has already gone through at this point — a failure here
+      // means the local order-history record is at risk, not the sale itself,
+      // so retry transient failures rather than let a dropped connection leave
+      // a real sale with no local record.
+      await this.placeOrderWithRetry({
+        user_id,
+        pos_order_id,
+        points_add: confirmedPointsRedeemed ? 0 : points_add,
+        points_redeem: confirmedPointsRedeemed,
+        amount: this.finalSubtotal,
+        cart: this.checkoutInfo.cart,
 
-          // NEW ➜ customer fields
-          customer_name: `${this.checkoutInfo.user_info.fname} ${this.checkoutInfo.user_info.lname}`,
-          customer_email: this.checkoutInfo.user_info.email,
-          customer_phone: this.checkoutInfo.user_info.phone,
-          customer_dob: this.checkoutInfo.user_info.dob,
+        // NEW ➜ customer fields
+        customer_name: `${this.checkoutInfo.user_info.fname} ${this.checkoutInfo.user_info.lname}`,
+        customer_email: this.checkoutInfo.user_info.email,
+        customer_phone: this.checkoutInfo.user_info.phone,
+        customer_dob: this.checkoutInfo.user_info.dob,
 
-          // NEW ➜ order meta fields
-          order_type: this.selectedOrderType
-        }
-      );
+        // NEW ➜ order meta fields
+        order_type: this.selectedOrderType
+      });
 
       const msg =
         this.selectedOrderType === 'delivery'
@@ -692,6 +699,11 @@ export class CheckoutComponent implements OnInit {
         msg
       );
 
+      // Refresh the cached points balance immediately — otherwise the UI
+      // keeps showing the pre-redemption balance until the next login/session
+      // validation, letting a user attempt to "redeem" again in the same session.
+      this.authService.updateUserData();
+
       this.orderPlaced.emit();
       this.accessibilityService.announce('Your order has been placed successfully.');
 
@@ -701,6 +713,29 @@ export class CheckoutComponent implements OnInit {
     } finally {
       this.isLoading = false;
       loading.dismiss();
+    }
+  }
+
+  // Called only after the Treez sale has already succeeded — a failure here
+  // puts the local order-history record at risk, not the sale itself, so this
+  // retries transient failures and never reports an "order failed" message
+  // (the customer was already charged/served by the time this runs).
+  private async placeOrderWithRetry(payload: any, attempts = 3): Promise<void> {
+    for (let i = 0; i < attempts; i++) {
+      try {
+        await this.cartService.placeOrder(payload);
+        return;
+      } catch (err) {
+        console.error(`placeOrder attempt ${i + 1}/${attempts} failed:`, err);
+        if (i === attempts - 1) {
+          this.presentToast(
+            'Your order was placed! It may take a moment to appear in your order history.',
+            'warning'
+          );
+          return;
+        }
+        await new Promise(r => setTimeout(r, 1000 * Math.pow(2, i)));
+      }
     }
   }
 
