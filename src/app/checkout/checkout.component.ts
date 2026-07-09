@@ -284,15 +284,16 @@ export class CheckoutComponent implements OnInit {
 
    private async loadAvailableDiscounts() {
     try {
-      const discounts = await this.settingsService.getDiscounts();
-      const userPoints = this.userPoints;
+      // Live AIQ wallet — already filtered to only rewards this specific
+      // customer can redeem right now (real points, no stale local cache),
+      // matching what the backend re-checks at redemption time.
+      const { rewards } = await this.settingsService.getWalletRewards();
 
-      this.availableRewards = discounts
+      this.availableRewards = (rewards || [])
         .filter(d =>
           d.tierDiscount === true &&
           d.pointsDeduction > 0 &&
-          (d.dollarValue > 0 || d.percentageValue > 0) &&
-          d.pointsDeduction <= userPoints
+          (d.dollarValue > 0 || d.percentageValue > 0)
         )
         .map(d => ({
           id: d.id,
@@ -301,17 +302,13 @@ export class CheckoutComponent implements OnInit {
           percentageValue: d.percentageValue || 0,
           pointsDeduction: d.pointsDeduction,
           reusable: d.reusable,
-          internalName: d.internalName
+          posDiscountID: d.posDiscountID
         })).sort((a: any, b: any) => a.pointsDeduction - b.pointsDeduction);
 
     } catch (err) {
       console.error('Failed to load discounts', err);
       this.availableRewards = [];
     }
-  }
-
-  get userPoints(): number {
-    return this.checkoutInfo?.user_info?.points ?? 0;
   }
 
   getRewardPoints(reward: any): number {
@@ -701,7 +698,12 @@ export class CheckoutComponent implements OnInit {
 
       // Refresh the cached points balance immediately — otherwise the UI
       // keeps showing the pre-redemption balance until the next login/session
-      // validation, letting a user attempt to "redeem" again in the same session.
+      // validation, letting a user attempt to "redeem" again in the same
+      // session. A plain re-read is correct here (not validateSession(), which
+      // would log the user out on a transient network error right after a
+      // successful order) because submitTreezOrder now decrements User.points
+      // atomically as part of the redemption itself, so the local row is
+      // already up to date by the time this fires.
       this.authService.updateUserData();
 
       this.orderPlaced.emit();

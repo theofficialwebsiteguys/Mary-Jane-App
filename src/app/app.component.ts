@@ -8,6 +8,7 @@ import {
 } from '@angular/animations';
 import { Component } from '@angular/core';
 import { App } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
 
 import { ProductsService } from './products.service';
 import { AuthService } from './auth.service';
@@ -17,6 +18,7 @@ import { NavigationEnd, Router } from '@angular/router';
 import { GeolocationService } from './geolocation.service';
 import { ModalController } from '@ionic/angular';
 import { RestrictedComponent } from './restricted/restricted.component';
+import { ForceUpdateComponent } from './force-update/force-update.component';
 import { environment } from 'src/environments/environment';
 import { filter } from 'rxjs';
 
@@ -96,7 +98,58 @@ export class AppComponent {
 
   ngOnInit() {
     //this.checkGeoLocation();
+    this.checkAppVersion();
     this.initializeApp();
+  }
+
+  // Blocks the app behind a non-dismissible "Update Required" modal if the
+  // installed version is below the backend-configured minimum. Runs
+  // independently of the rest of init — the modal itself is what blocks
+  // interaction, so this shouldn't delay product/session loading for users
+  // who are already up to date.
+  async checkAppVersion() {
+    if (Capacitor.getPlatform() === 'web') return; // no app store on web
+
+    try {
+      const [info, config] = await Promise.all([
+        App.getInfo(),
+        this.settingsService.getVersionConfig(),
+      ]);
+
+      if (!config) return; // fail open — never block on a network hiccup
+
+      if (this.isVersionLower(info.version, config.minVersion)) {
+        const storeUrl = Capacitor.getPlatform() === 'ios' ? config.iosStoreUrl : config.androidStoreUrl;
+        await this.showForceUpdateModal(storeUrl);
+      }
+    } catch (err) {
+      console.error('Version check failed:', err);
+    }
+  }
+
+  private isVersionLower(current: string, min: string): boolean {
+    const c = current.split('.').map((n) => parseInt(n, 10) || 0);
+    const m = min.split('.').map((n) => parseInt(n, 10) || 0);
+    const len = Math.max(c.length, m.length);
+
+    for (let i = 0; i < len; i++) {
+      const cv = c[i] ?? 0;
+      const mv = m[i] ?? 0;
+      if (cv < mv) return true;
+      if (cv > mv) return false;
+    }
+    return false;
+  }
+
+  async showForceUpdateModal(storeUrl: string) {
+    const modal = await this.modalController.create({
+      component: ForceUpdateComponent,
+      componentProps: { storeUrl },
+      backdropDismiss: false,
+      cssClass: 'force-update-modal',
+    });
+
+    await modal.present();
   }
   
   initializeApp() {

@@ -9,7 +9,7 @@
     <!-- POINTS SUMMARY -->
     <section class="rewards-section">
       <app-points
-        [points]="user.points"
+        [points]="walletPoints"
         [isExclusiveMember]="user.premium"
         aria-label="Your reward points and membership status"
       ></app-points>
@@ -24,7 +24,7 @@
     <!-- AIQ TIERS -->
     <section class="rewards-section">
       <app-aiq-tiers
-        [userPoints]="user.points"
+        [userPoints]="walletPoints"
         [userDob]="user.dob"
         [discounts]="discounts"
         aria-label="Available loyalty reward tiers"

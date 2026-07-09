@@ -345,6 +345,50 @@ export class SettingsService {
     }
   }
 
+  // Live AIQ wallet for the logged-in user — real-time points balance and
+  // only the rewards currently redeemable right now (same source of truth
+  // the backend uses to actually redeem at checkout).
+  async getWalletRewards(): Promise<{ rewards: any[]; points: number }> {
+    const sessionData = localStorage.getItem('sessionData');
+    const token = sessionData ? JSON.parse(sessionData).token : null;
+
+    if (!token) {
+      return { rewards: [], points: 0 };
+    }
+
+    const options = {
+      url: `${environment.apiUrl}/alpine/wallet`,
+      method: 'GET',
+      headers: { 'x-auth-api-key': environment.db_api_key, 'Authorization': token },
+    };
+
+    try {
+      const response = await CapacitorHttp.request(options);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching wallet rewards:', error);
+      return { rewards: [], points: 0 };
+    }
+  }
+
+  // Minimum-required-version config for the force-update check. Returns
+  // null on any failure so app init never gets blocked by this call itself.
+  async getVersionConfig(): Promise<{ minVersion: string; iosStoreUrl: string; androidStoreUrl: string } | null> {
+    const options = {
+      url: `${environment.apiUrl}/app/version-check`,
+      method: 'GET',
+      headers: { 'x-auth-api-key': environment.db_api_key },
+    };
+
+    try {
+      const response = await CapacitorHttp.request(options);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching version config:', error);
+      return null;
+    }
+  }
+
 
   //2FA for Aeropay - Twilio
   async sendVerify(phoneNumber: string): Promise<any[]> {

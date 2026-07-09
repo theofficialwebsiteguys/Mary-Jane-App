@@ -16,6 +16,9 @@ export class RewardsPage implements OnInit {
 
   isLoggedIn: boolean = false;
   discounts: Discount[] = [];
+  // Real-time AIQ points balance, used instead of the (possibly stale)
+  // cached user.points to decide which discounts are actually unlocked.
+  walletPoints = 0;
   showAdvanced = false;
   constructor(private authService: AuthService,   private alertController: AlertController, private settingsService: SettingsService) {}
 
@@ -24,7 +27,19 @@ export class RewardsPage implements OnInit {
       this.isLoggedIn = status;
       this.authService.getUserInfo().subscribe(async (userInfo: any) => {
         this.user = userInfo;
-        this.discounts = await this.settingsService.getDiscounts();
+        this.walletPoints = userInfo?.points ?? 0;
+
+        const [discounts, wallet] = await Promise.all([
+          this.settingsService.getDiscounts(),
+          this.settingsService.getWalletRewards(),
+        ]);
+
+        this.discounts = discounts;
+        // Fall back to the cached value only if the live wallet fetch failed
+        // outright (getWalletRewards() itself never throws).
+        if (wallet?.points !== undefined) {
+          this.walletPoints = wallet.points;
+        }
       });
     });
   }
